@@ -725,7 +725,7 @@ const DEMOS={
       ['.a2','transform',[[4.7,T(0,0)],[5.1,T(0,-36)]]]
     ]},
   /* ----- Jelly Smash core loop: slide a cube, the group of 4 flies into its cannon, the cannon shoots the wall ----- */
-  lockedBlock:{D:5.4, /* Locked Block: slide a red cube next to the chained red jelly; the group matches, the chain breaks and the group flies to the red cannon */
+  lockedBlock:{D:5.4, /* Lock Cube: slide a red cube next to the chained red jelly; the group matches, the chain breaks and the group flies to the red cannon */
     svg:()=>{
       const bx=i=>36+32*i,by=j=>66+32*j;
       let wall='';[1,1,1,1,2,2,2].forEach((c,i)=>{wall+=jcube(16+24*i,4,20,c);});
@@ -1011,8 +1011,8 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Locked Block','Khối bị khóa')};
-  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Locked Block','Khối bị khóa')};
+  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Lock Cube','Khối khóa')};
+  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Lock Cube','Khối khóa')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
   const noBo=none('No boosters yet. To be added later.','Chưa có booster. Sẽ bổ sung sau.');
@@ -1261,19 +1261,18 @@ function view(l){
       t(`A cube with a colored outer layer wrapped around a smaller jelly of another color.`,`Một khối có lớp vỏ màu bọc quanh một khối thạch nhỏ hơn, khác màu.`),
       t(`The outer layer counts as its own color for matching. The jelly inside cannot be used yet.`,`Khi ghép, lớp vỏ tính theo màu của nó. Thạch bên trong chưa dùng được.`),
       t(`The player matches the outer layer: make a group of the layer color, the same way as normal cubes.`,`Người chơi gỡ lớp vỏ bằng cách ghép: tạo nhóm cùng màu lớp vỏ, giống khối thường.`),
-      t(`A layered cube can be moved like a normal cube.`,`Khối có lớp vỏ di chuyển được như khối thường.`)+' '+inf,
-      t(`Layers and normal cubes of the same color can match together.`,`Lớp vỏ và khối thường cùng màu ghép chung được với nhau.`)+' '+inf,
-      t(`Once matched, the layers become ammo for the cannon of their color, like normal cubes.`,`Khi đã ghép, các lớp vỏ thành đạn cho pháo cùng màu, giống khối thường.`)+' '+inf,
-      t(`The jelly inside stays in its cell as a normal cube of its own color, ready to use.`,`Thạch bên trong ở lại ô, thành khối thường mang màu của nó, dùng được ngay.`)+' '+inf,
-      t(`One layer per cube in the tutorial. More layers: TBD.`,`Trong tutorial mỗi khối có 1 lớp. Nhiều lớp hơn: TBD.`),
+      t(`A layered cube can be moved like a normal cube.`,`Khối có lớp vỏ di chuyển được như khối thường.`),
+      t(`Layers and normal cubes of the same color can match together.`,`Lớp vỏ và khối thường cùng màu ghép chung được với nhau.`),
+      t(`Once matched, the layers become ammo for the cannon of their color, like normal cubes.`,`Khi đã ghép, các lớp vỏ thành đạn cho pháo cùng màu, giống khối thường.`),
+      t(`The jelly inside stays in its cell as a normal cube of its own color, ready to use.`,`Thạch bên trong ở lại ô, thành khối thường mang màu của nó, dùng được ngay.`),
+      t(`One layer per cube only.`,`Mỗi khối chỉ có 1 lớp.`),
       `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`Jelly Layer has no countdown. Whether it needs extra stuck handling: TBD.`,`Lớp thạch không có đếm ngược. Có cần xử lý kẹt riêng hay không: TBD.`)}`
     ]),unlock(17),demo('jellyLayer'))+
     ent(N.el2,ul([
       t(`A jelly cube held by a chain, shown with a padlock on it.`,`Một khối thạch bị xích giữ, có ổ khóa trên mặt.`),
-      t(`The chained jelly cannot be moved.`,`Khối bị xích không kéo đi được.`)+' '+inf,
-      t(`It still counts as its color for matching: the player slides cubes of the same color next to it to build a group.`,`Khi ghép, nó vẫn tính theo màu của nó: người chơi trượt các khối cùng màu tới cạnh để tạo nhóm.`)+' '+inf,
-      t(`Matching a group that includes the chained jelly breaks the chain.`,`Ghép một nhóm có chứa khối bị xích sẽ phá xích.`),
-      t(`Once the chain breaks, the jelly clears with its group and becomes ammo like a normal cube.`,`Khi xích vỡ, khối được xóa cùng nhóm và thành đạn như khối thường.`)+' '+inf,
+      t(`The chained jelly cannot be moved.`,`Khối bị xích không kéo đi được.`),
+      t(`It still counts as its color for matching: the player slides cubes of the same color next to it to build a group.`,`Khi ghép, nó vẫn tính theo màu của nó: người chơi trượt các khối cùng màu tới cạnh để tạo nhóm.`),
+      t(`Once the cube is part of a matched group, the chain breaks and the cube clears with its group, becoming ammo like a normal cube.`,`Khi khối nằm trong một nhóm được ghép, xích vỡ và khối được xóa cùng nhóm, thành đạn như khối thường.`),
       `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`A chained jelly cannot move, so a level can get stuck if not enough cubes of its color can reach it. Stuck handling: TBD.`,`Khối bị xích không di chuyển được, nên màn có thể bị kẹt nếu không đủ khối cùng màu tới được cạnh nó. Cách xử lý kẹt: TBD.`)}`
     ]),unlock(24),demo('lockedBlock'));
 
@@ -1376,11 +1375,11 @@ function view(l){
   B['element-object-concept']=
     ent(N.el1,params([
       [look,t('A thick, glossy rim in the layer color around a small inner jelly of another color.','Viền thạch dày, bóng, mang màu lớp vỏ, bọc quanh một khối thạch nhỏ khác màu.')],
-      [an,t('Match: the layer pulses and flies to its cannon like a cube. The inner jelly grows to full size with a small bounce.','Khi ghép: lớp vỏ phồng lên rồi bay vào pháo như một khối. Thạch bên trong lớn lên đủ cỡ, nảy nhẹ.')+' '+inf]
+      [an,t('Match: the layer pulses and flies to its cannon like a cube. The inner jelly grows to full size with a small bounce.','Khi ghép: lớp vỏ phồng lên rồi bay vào pháo như một khối. Thạch bên trong lớn lên đủ cỡ, nảy nhẹ.')]
     ]))+
     ent(N.el2,params([
       [look,t('A normal jelly cube, slightly darkened, with a grey padlock on its face.','Khối thạch thường, hơi tối màu, có ổ khóa xám trên mặt.')],
-      [an,t('Chain breaks: the padlock swells and pops with a small puff, then the cube clears with its group.','Khi phá xích: ổ khóa phồng lên rồi vỡ kèm làn khói nhỏ, sau đó khối được xóa cùng nhóm.')+' '+inf]
+      [an,t('Chain breaks: the padlock swells and pops with a small puff, then the cube clears with its group.','Khi phá xích: ổ khóa phồng lên rồi vỡ kèm làn khói nhỏ, sau đó khối được xóa cùng nhóm.')]
     ]));
 
   B['booster-object-concept']=noBo;
@@ -1404,7 +1403,7 @@ function view(l){
     ['Cannon Shot','core',t('A cannon fires','Pháo bắn'),0],
     ['Wall Cube Pop','core',t('A wall cube is destroyed','Một khối trên tường bị phá'),1],
     ['Jelly Layer','el',t('A layer clears and frees the jelly inside','Lớp vỏ được gỡ và thả thạch bên trong'),0],
-    ['Locked Block','el',t('The chain breaks','Xích bị phá'),0]
+    ['Lock Cube','el',t('The chain breaks','Xích bị phá'),0]
   ];
   B['sfx--haptics']=table(t('SFX and haptics','Âm thanh và rung'),
     [t('Name','Tên'),t('Category','Nhóm'),t('Plays when','Phát khi'),t('Haptic','Rung')],
@@ -1591,6 +1590,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Element rules confirmed','Chốt luật yếu tố đặc biệt'),ul([
+        t(`Jelly Layer and Lock Cube rules confirmed, "to verify" tags removed. Jelly Layer: one layer per cube only.`,`Đã chốt luật Lớp thạch và Khối khóa, bỏ nhãn "cần kiểm chứng". Lớp thạch: mỗi khối chỉ có 1 lớp.`),
+        t(`Locked Block renamed to Lock Cube.`,`Đổi tên Locked Block thành Lock Cube.`)
+      ]))+
       ent(t('Locked Block','Khối bị khóa'),ul([
         t(`Added the second element, Locked Block (unlocks at level 24), from the in-game tutorial screenshot: rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo.`,`Thêm yếu tố đặc biệt thứ 2, Khối bị khóa (mở ở màn 24), theo ảnh tutorial trong game: luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động.`)
       ]))+
