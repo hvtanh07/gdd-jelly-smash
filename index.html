@@ -725,6 +725,30 @@ const DEMOS={
       ['.a2','transform',[[4.7,T(0,0)],[5.1,T(0,-36)]]]
     ]},
   /* ----- Jelly Smash core loop: slide a cube, the group of 4 flies into its cannon, the cannon shoots the wall ----- */
+  lockedCannon:{D:5.2, /* Locked Cannon: each cleared group counts the lock down; ammo goes in but the cannon only fires once unlocked */
+    svg:()=>{
+      const bx=i=>36+32*i,by=j=>96+32*j;
+      let wall='';[1,1,1,2,2,2,2].forEach((c,i)=>{wall+=`<g class="w${i}">${jcube(16+24*i,4,20,c)}</g>`;});
+      let cells='';for(let j=0;j<3;j++)for(let i=0;i<4;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="30" height="30" rx="8"/>`;
+      const lock=`<g class="lk"><rect class="veil" x="110.8" y="40" width="38.4" height="41" rx="7"/>${padlock(130,62)}</g>`;
+      const badge=`<g class="pin lb"><circle cx="152" cy="42" r="9.5"/>${['2','1','0'].map((v,i)=>`<text class="v${i}" x="152" y="42" dy=".35em"${i?' style="opacity:0"':''}>${v}</text>`).join('')}</g>`;
+      const drops=[0,1].map(k=>`<circle class="f2 dp${k}" cx="130" cy="40" r="4" style="opacity:0"/>`).join('');
+      return wall+cannon(70,40,1,['0','10'],'rc',1.2)+cannon(130,40,2,['0','10','9','8'],'bc',1.2)+lock+badge+cells+
+        jcube(bx(3),by(0),30,4)+jcube(bx(0),by(1),30,4)+jcube(bx(0),by(2),30,4)+
+        [0,1,2].map(i=>`<g class="r${i}">${jcube(bx(i),by(0),30,1)}</g>`).join('')+[1,2,3].map((i,k)=>`<g class="b${k}">${jcube(bx(i),by(2),30,2)}</g>`).join('')+drops;},
+    tracks:()=>{
+      const tr=[];
+      [51,83,115].forEach((x,k)=>{const s=.7+k*.08;tr.push([`.r${k}`,'transform',[[.3,'scale(1)'],[.45,'scale(1.08)'],[.6,'scale(1)'],[s,T(0,0)],[s+.4,T(70-x,-45,.3)]]],[`.r${k}`,'opacity',[[0,1],[s+.35,1],[s+.4,0]]]);});
+      [83,115,147].forEach((x,k)=>{const s=2.0+k*.08;tr.push([`.b${k}`,'transform',[[1.6,'scale(1)'],[1.75,'scale(1.08)'],[1.9,'scale(1)'],[s,T(0,0)],[s+.4,T(130-x,-109,.3)]]],[`.b${k}`,'opacity',[[0,1],[s+.35,1],[s+.4,0]]]);});
+      tr.push(['.rc .v0','opacity',[[0,1],[1.2,1],[1.24,0]]],['.rc .v1','opacity',[[0,0],[1.2,0],[1.24,1]]],
+        ['.lb .v0','opacity',[[0,1],[1.25,1],[1.29,0]]],['.lb .v1','opacity',[[0,0],[1.25,0],[1.29,1],[2.5,1],[2.54,0]]],['.lb .v2','opacity',[[0,0],[2.5,0],[2.54,1]]],
+        ['.lb','transform',[[1.25,'scale(1)'],[1.35,'scale(1.3)'],[1.5,'scale(1)'],[2.5,'scale(1)'],[2.6,'scale(1.3)'],[2.75,'scale(0)']]],
+        ['.bc .v0','opacity',[[0,1],[2.5,1],[2.54,0]]],['.bc .v1','opacity',[[0,0],[2.5,0],[2.54,1],[3.1,1],[3.14,0]]],['.bc .v2','opacity',[[0,0],[3.1,0],[3.14,1],[3.5,1],[3.54,0]]],['.bc .v3','opacity',[[0,0],[3.5,0],[3.54,1]]],
+        ['.lk','transform',[[2.75,'scale(1)'],[2.9,'scale(1.15)'],[3.05,'scale(0)']]],['.lk','opacity',[[0,1],[2.95,1],[3.05,0]]]);
+      [[98,14],[122,14]].forEach(([x,y],k)=>{const s=3.1+k*.4,e=s+.3;
+        tr.push([`.dp${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[e,1],[e+.03,0]]],[`.dp${k}`,'transform',[[s,T(0,0)],[e,T(x-130,y-40)]]],
+          [`.w${3+k}`,'transform',[[e,'scale(1)'],[e+.1,'scale(1.25)'],[e+.28,'scale(0)']]],[`.w${3+k}`,'opacity',[[0,1],[e+.2,1],[e+.28,0]]]);});
+      return tr;}},
   hiddenCube:{D:5.0, /* Hidden Cube: clear a group next to the hidden cube, it flips and shows its real color */
     svg:()=>{
       const bx=i=>36+32*i,by=j=>66+32*j;
@@ -1048,8 +1072,8 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Lock Cube','Khối khóa'),el3:nm('Stacked Cube','Khối chồng'),el4:nm('Hidden Cube','Khối ẩn')};
-  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Lock Cube','Khối khóa'),el3:t('Stacked Cube','Khối chồng'),el4:t('Hidden Cube','Khối ẩn')};
+  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Lock Cube','Khối khóa'),el3:nm('Stacked Cube','Khối chồng'),el4:nm('Hidden Cube','Khối ẩn'),el5:nm('Locked Cannon','Pháo bị khóa')};
+  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Lock Cube','Khối khóa'),el3:t('Stacked Cube','Khối chồng'),el4:t('Hidden Cube','Khối ẩn'),el5:t('Locked Cannon','Pháo bị khóa')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
   const noBo=none('No boosters yet. To be added later.','Chưa có booster. Sẽ bổ sung sau.');
@@ -1065,6 +1089,7 @@ function view(l){
     pop:t('A drop hits a wall cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối trên tường. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
     praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
+    lockedCannon:t('The blue cannon is locked (2 groups to go). A red group counts it down to 1. A blue group loads 10 ammo and counts it to 0: the lock breaks and the cannon starts firing.','Pháo xanh đang bị khóa (còn 2 nhóm). Một nhóm đỏ đếm xuống 1. Một nhóm xanh nạp 10 đạn và đếm về 0: khóa vỡ và pháo bắt đầu bắn.'),
     hiddenCube:t('A red line of 3 clears right next to the hidden cube. The hidden cube flips and shows its real color: blue.','Một hàng 3 khối đỏ được xóa ngay cạnh khối ẩn. Khối ẩn lật lại và hiện màu thật: xanh dương.'),
     stacked:t('A stack of 3 blue cubes on the wall. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên tường. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
     lockedBlock:t('A red cube slides next to the chained red jelly. The group of 4 matches, the chain breaks and the group flies into the red cannon.','Một khối đỏ trượt tới cạnh khối đỏ bị xích. Nhóm 4 khối được ghép, xích vỡ và cả nhóm bay vào pháo đỏ.'),
@@ -1330,7 +1355,16 @@ function view(l){
       t(`While hidden, it has no color, so it cannot be part of a match.`,`Khi còn ẩn, khối không có màu nên không ghép được.`)+' '+inf,
       t(`Can a hidden cube be moved? TBD. Unlock level: TBD.`,`Khối ẩn có kéo đi được không: TBD. Màn mở khóa: TBD.`),
       `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`If no group can be cleared next to a hidden cube, it can never be revealed. Stuck handling: TBD.`,`Nếu không thể xóa nhóm nào cạnh khối ẩn thì khối đó không bao giờ lộ màu. Cách xử lý kẹt: TBD.`)}`
-    ]),unlock('TBD'),demo('hiddenCube'));
+    ]),unlock('TBD'),demo('hiddenCube'))+
+    ent(N.el5,ul([
+      t(`A cannon that starts locked. It shows a padlock and a countdown: the number of groups the player still has to make to unlock it.`,`Một khẩu pháo bị khóa từ đầu màn. Pháo có ổ khóa và bộ đếm ngược: số nhóm người chơi còn phải tạo để mở khóa.`),
+      t(`Each group the player clears counts the lock down by 1.`,`Mỗi nhóm người chơi xóa được làm bộ đếm giảm 1.`),
+      t(`A group of any color counts, not only the cannon's color.`,`Nhóm màu nào cũng được tính, không chỉ màu của pháo.`)+' '+inf,
+      t(`While locked, the cannon still takes ammo from matched cubes of its color, but it does not fire.`,`Khi còn khóa, pháo vẫn nhận đạn từ các khối cùng màu được ghép, nhưng không bắn.`),
+      t(`When the countdown reaches 0, the lock breaks and the cannon fires all the ammo it has stored, like a normal cannon.`,`Khi bộ đếm về 0, khóa vỡ và pháo bắn hết số đạn đã tích, như pháo thường.`),
+      t(`Groups needed per cannon (x): set per level, TBD. Unlock level: TBD.`,`Số nhóm cần cho mỗi pháo (x): đặt theo từng màn, TBD. Màn mở khóa: TBD.`),
+      `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`If no more groups can be made while a cannon is still locked, its stored ammo can never be fired. Stuck handling: TBD.`,`Nếu không thể tạo thêm nhóm trong khi pháo vẫn còn khóa, số đạn đã tích sẽ không bao giờ được bắn. Cách xử lý kẹt: TBD.`)}`
+    ]),unlock('TBD'),demo('lockedCannon'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). Jelly Smash has none yet. */
   B['booster-mechanics']=noBo;
@@ -1382,7 +1416,8 @@ function view(l){
       [N.el1,popup('Match the outer layer<br>to use the jelly inside.','Ghép lớp vỏ ngoài<br>để dùng thạch bên trong.'),lvl(17)],
       [N.el2,popup('Match the chained jellies<br>to break them free.','Ghép các khối bị xích<br>để giải phóng chúng.'),lvl(24)],
       [N.el3,popup('Stacked cubes take<br>more shots!','Khối chồng cần<br>nhiều phát bắn hơn!'),lvl('TBD')],
-      [N.el4,popup('Clear cubes next to it<br>to reveal its color!','Xóa khối bên cạnh<br>để lộ màu thật!'),lvl('TBD')]
+      [N.el4,popup('Clear cubes next to it<br>to reveal its color!','Xóa khối bên cạnh<br>để lộ màu thật!'),lvl('TBD')],
+      [N.el5,popup('Make groups to unlock<br>the cannon!','Tạo nhóm để mở khóa<br>pháo!'),lvl('TBD')],
     ]);
 
   /* PER GAME: one row per booster. Jelly Smash has none yet. */
@@ -1394,7 +1429,8 @@ function view(l){
     [17,P.el1,'elem','elements-mechanics'],
     [24,P.el2,'elem','elements-mechanics'],
     ['TBD',P.el3,'elem','elements-mechanics'],
-    ['TBD',P.el4,'elem','elements-mechanics']
+    ['TBD',P.el4,'elem','elements-mechanics'],
+    ['TBD',P.el5,'elem','elements-mechanics']
   ];
   B['ftue--tutorial:after']=`<div class="glance">
     <h4>${t('Unlock order at a glance','Thứ tự mở khóa theo màn')}</h4>
@@ -1448,6 +1484,10 @@ function view(l){
     ent(N.el4,params([
       [look,t('A grey jelly cube with a white “?” on its face.','Khối thạch màu xám có dấu “?” trắng trên mặt.')],
       [an,t('Reveal: the cube flips around and comes back in its real color with a small bounce.','Lộ màu: khối lật một vòng rồi hiện lại với màu thật, nảy nhẹ.')]
+    ]))+
+    ent(N.el5,params([
+      [look,t('A normal cannon under a dark veil, with a padlock on it and a number badge with the groups left.','Pháo thường phủ lớp tối, có ổ khóa và huy hiệu số ghi số nhóm còn lại.')],
+      [an,t('Count down: the badge bounces and the number drops by 1. Unlock: the badge and padlock pop, the veil fades and the cannon starts firing.','Đếm ngược: huy hiệu nảy và con số giảm 1. Mở khóa: huy hiệu và ổ khóa vỡ, lớp tối mờ đi và pháo bắt đầu bắn.')]
     ]));
 
   B['booster-object-concept']=noBo;
@@ -1472,6 +1512,7 @@ function view(l){
     ['Wall Cube Pop','core',t('A wall cube is destroyed','Một khối trên tường bị phá'),1],
     ['Jelly Layer','el',t('A layer clears and frees the jelly inside','Lớp vỏ được gỡ và thả thạch bên trong'),0],
     ['Lock Cube','el',t('The chain breaks','Xích bị phá'),0],
+    ['Locked Cannon Unlock','el',t('A locked cannon counts down or unlocks','Pháo bị khóa đếm ngược hoặc mở khóa'),1],
     ['Hidden Cube Reveal','el',t('A hidden cube shows its real color','Khối ẩn hiện màu thật'),0],
     ['Stacked Cube Hit','el',t('A shot pops the front cube of a stack','Một phát bắn phá khối trước của chồng'),0]
   ];
@@ -1660,6 +1701,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Locked Cannon','Pháo bị khóa'),ul([
+        t(`Added the fifth element, Locked Cannon: it takes ammo but only fires after the player makes x groups. Rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo. Whether any color counts, x per level and unlock level: TBD.`,`Thêm yếu tố đặc biệt thứ 5, Pháo bị khóa: vẫn nhận đạn nhưng chỉ bắn sau khi người chơi tạo đủ x nhóm. Luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động. Nhóm màu nào cũng tính hay không, x mỗi màn và màn mở khóa: TBD.`)
+      ]))+
       ent(t('Hidden Cube','Khối ẩn'),ul([
         t(`Added the fourth element, Hidden Cube: clear a group next to it to reveal its real color. Rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo. Moving while hidden and unlock level: TBD.`,`Thêm yếu tố đặc biệt thứ 4, Khối ẩn: xóa một nhóm cạnh nó để lộ màu thật. Luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động. Có kéo được khi còn ẩn không và màn mở khóa: TBD.`)
       ]))+
