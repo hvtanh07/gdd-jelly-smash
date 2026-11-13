@@ -1353,18 +1353,17 @@ function view(l){
       t(`A board cube whose real color is hidden. It shows as a grey cube with a “?”.`,`Một khối trên bàn bị giấu màu thật. Khối hiện màu xám kèm dấu “?”.`),
       t(`To reveal it, the player clears a group in which at least one cube is next to the hidden cube (up, down, left or right).`,`Để lộ màu, người chơi phải xóa một nhóm có ít nhất 1 khối nằm kề khối ẩn (trên, dưới, trái hoặc phải).`),
       t(`Once revealed, it becomes a normal cube of its real color and stays in its cell.`,`Khi đã lộ màu, khối thành khối thường mang màu thật và ở lại ô.`),
-      t(`While hidden, it has no color, so it cannot be part of a match.`,`Khi còn ẩn, khối không có màu nên không ghép được.`)+' '+inf,
-      t(`Can a hidden cube be moved? TBD. Unlock level: TBD.`,`Khối ẩn có kéo đi được không: TBD. Màn mở khóa: TBD.`),
-      `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`If no group can be cleared next to a hidden cube, it can never be revealed. Stuck handling: TBD.`,`Nếu không thể xóa nhóm nào cạnh khối ẩn thì khối đó không bao giờ lộ màu. Cách xử lý kẹt: TBD.`)}`
+      t(`While hidden, it has no color, so it cannot be part of a match.`,`Khi còn ẩn, khối không có màu nên không ghép được.`),
+      t(`A hidden cube can be moved freely, like a normal cube. So the player can always form a group next to it, and no stuck handling is needed. Unlock level: TBD.`,`Khối ẩn kéo đi tự do như khối thường. Vì vậy người chơi luôn tạo được nhóm cạnh nó, không cần xử lý kẹt. Màn mở khóa: TBD.`)
     ]),unlock('TBD'),demo('hiddenCube'))+
     ent(N.el5,ul([
       t(`A cannon that starts locked. It shows a padlock and a countdown: the number of groups the player still has to make to unlock it.`,`Một khẩu pháo bị khóa từ đầu màn. Pháo có ổ khóa và bộ đếm ngược: số nhóm người chơi còn phải tạo để mở khóa.`),
       t(`Each group the player clears counts the lock down by 1.`,`Mỗi nhóm người chơi xóa được làm bộ đếm giảm 1.`),
-      t(`A group of any color counts, not only the cannon's color.`,`Nhóm màu nào cũng được tính, không chỉ màu của pháo.`)+' '+inf,
+      t(`A group of any color counts, not only the cannon's color.`,`Nhóm màu nào cũng được tính, không chỉ màu của pháo.`),
       t(`While locked, the cannon still takes ammo from matched cubes of its color, but it does not fire.`,`Khi còn khóa, pháo vẫn nhận đạn từ các khối cùng màu được ghép, nhưng không bắn.`),
       t(`When the countdown reaches 0, the lock breaks and the cannon fires all the ammo it has stored, like a normal cannon.`,`Khi bộ đếm về 0, khóa vỡ và pháo bắn hết số đạn đã tích, như pháo thường.`),
-      t(`Groups needed per cannon (x): set per level, TBD. Unlock level: TBD.`,`Số nhóm cần cho mỗi pháo (x): đặt theo từng màn, TBD. Màn mở khóa: TBD.`),
-      `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`If no more groups can be made while a cannon is still locked, its stored ammo can never be fired. Stuck handling: TBD.`,`Nếu không thể tạo thêm nhóm trong khi pháo vẫn còn khóa, số đạn đã tích sẽ không bao giờ được bắn. Cách xử lý kẹt: TBD.`)}`
+      t(`Groups needed per cannon (x) is set in each level's config. Unlock level: TBD.`,`Số nhóm cần cho mỗi pháo (x) được đặt trong config của từng màn. Màn mở khóa: TBD.`),
+      t(`Levels always have enough cubes to make the groups needed, so no stuck handling is needed.`,`Màn chơi luôn có đủ khối để tạo đủ số nhóm cần, nên không cần xử lý kẹt.`)
     ]),unlock('TBD'),demo('lockedCannon'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). Jelly Smash has none yet. */
@@ -1759,6 +1758,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Element rules confirmed (2)','Chốt luật yếu tố đặc biệt (2)'),ul([
+        t(`Hidden Cube: cannot match while hidden; moves freely, so the fail-safe is removed.`,`Khối ẩn: không ghép được khi còn ẩn; kéo đi tự do nên bỏ phần chống kẹt.`),
+        t(`Locked Cannon: a group of any color counts; x is set per level in the level config; fail-safe removed, levels always have enough cubes.`,`Pháo bị khóa: nhóm màu nào cũng tính; x đặt theo config từng màn; bỏ phần chống kẹt, màn luôn đủ khối.`)
+      ]))+
       ent(t('Collection Event','Sự kiện thu thập'),ul([
         t(`Added the Collection Event (7.3): collect one jelly color per event, streak multiplier up to ×5, 5 milestones with gifts. Benchmark: Royal Match.`,`Thêm Sự kiện thu thập (mục 7.3): mỗi sự kiện thu một màu thạch, hệ số streak tối đa ×5, 5 mốc quà. Tham khảo: Royal Match.`),
         t(`Added its values to remote config (5).`,`Thêm các thông số vào cấu hình từ xa (mục 5).`)
