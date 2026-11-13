@@ -1059,7 +1059,7 @@ function view(l){
       [t('Stars','Sao'),t(`3 stars on every win. No star criteria seen.`,`Thắng luôn được 3 sao. Chưa thấy tiêu chí tính sao.`)]
     ]))+
     ent(t('Open questions','Câu hỏi còn mở'),ul([
-      t(`Exact minimum match size, and how group size maps to the praise tiers.`,`Số khối tối thiểu để ghép, và cỡ nhóm ứng với từng mức khen ra sao.`),
+      t(`How group size maps to the praise tiers.`,`Cỡ nhóm ứng với từng mức khen ra sao.`),
       t(`Does a cube slide until it is blocked, or move to any reachable empty cell?`,`Khối trượt tới khi bị chặn, hay đi tới bất kỳ ô trống nào tới được?`),
       t(`Is there a fail state (stuck board, not enough ammo), and what UI shows it?`,`Có trạng thái thua không (bàn bị kẹt, thiếu đạn), và giao diện báo thế nào?`),
       t(`Are the board cubes of each color tuned to match the wall cubes of that color?`,`Số khối mỗi màu trên bàn có được chỉnh khớp với số khối màu đó trên tường không?`),
@@ -1081,18 +1081,19 @@ function view(l){
     ]))+
     ent(nm('Matching','Ghép nhóm'),ul([
       t(`A match is an orthogonally connected group of one color. Lines and bent shapes (T, L) both count.`,`Một nhóm ghép là các khối cùng màu nối nhau theo hàng ngang hoặc dọc. Cả đường thẳng lẫn hình gấp (T, L) đều tính.`),
-      t(`Minimum group size: 4. Groups of 3 never cleared in the recording.`,`Cỡ nhóm tối thiểu: 4. Trong video, nhóm 3 khối chưa bao giờ biến mất.`)+' '+inf,
+      t(`Minimum group size: 3 if the 3 cubes are in a straight line (row or column), otherwise 4. A bent group of 3 (L shape) does not match.`,`Cỡ nhóm tối thiểu: 3 nếu 3 khối thẳng hàng (cùng hàng ngang hoặc cột dọc), còn lại là 4. Nhóm 3 khối gấp khúc (hình chữ L) không được tính.`),
       t(`The match resolves at once on the move that completes it.`,`Nhóm được xử lý ngay ở move hoàn thành nó.`)
     ]))+
     ent(t('Ammo by group size','Số đạn theo cỡ nhóm'),
       table(t('Ammo by group size','Số đạn theo cỡ nhóm'),[t('Popup','Popup'),t('Group size','Cỡ nhóm'),t('Ammo','Đạn')],[
+        [dash,t('3, straight line only','3, chỉ khi thẳng hàng'),'+10'],
         [dash,'4','+10'],
         [popup('Great','Tốt'),'5','+15'],
         [popup('Amazing','Tuyệt vời'),'6','+20'],
         [popup('Extreme','Cực đỉnh'),'8','+30']
       ],'compact')+
-      `<p>${t(`Ammo values are seen in the recording. The size mapping is inferred and fits <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches.`,
-              `Số đạn lấy từ video. Cỡ nhóm là suy luận, khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn.`)} ${inf}</p>`)+
+      `<p>${t(`A straight line of 3 gives +10, the same as a group of 4. From 4 cubes, ammo values are seen in the recording; the size mapping is inferred and fits <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches.`,
+              `Hàng thẳng 3 khối được +10, bằng nhóm 4. Từ 4 khối trở lên, số đạn lấy từ video; cỡ nhóm là suy luận, khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn.`)} ${inf}</p>`)+
     ent(nm('Cannons','Pháo'),ul([
       t(`One cannon per wall color, in a row between the wall and the board. Each shows its ammo count.`,`Mỗi màu trên tường có 1 khẩu pháo, xếp thành hàng giữa tường và bàn chơi. Mỗi pháo hiện số đạn.`),
       t(`Cannon count: 1 in level 1, 2 in levels 2–5, 3 from level 6.`,`Số pháo: 1 ở màn 1, 2 ở màn 2–5, 3 từ màn 6.`),
@@ -1555,6 +1556,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Match of 3','Ghép 3 khối'),ul([
+        t(`A straight line of 3 same-color cubes now matches and gives +10 ammo (1.2). A bent group of 3 still does not match.`,`Hàng thẳng 3 khối cùng màu giờ được ghép và cho +10 đạn (mục 1.2). Nhóm 3 khối gấp khúc vẫn không được ghép.`)
+      ]))+
       ent(t('Jelly Layer','Lớp thạch'),ul([
         t(`Added the first element, Jelly Layer (unlocks at level 17), from the in-game tutorial screenshot: rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo.`,`Thêm yếu tố đặc biệt đầu tiên, Lớp thạch (mở ở màn 17), theo ảnh tutorial trong game: luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động.`)
       ]))+
@@ -1578,7 +1582,7 @@ function view(l){
     ['A',t('HUD','HUD'),t('Settings on the left, level badge in the middle, Restart on the right.','Cài đặt bên trái, số màn ở giữa, Chơi lại bên phải.')],
     ['B',t('Target wall','Bức tường mục tiêu'),t('Colored cubes hanging from the top of the arena. Clear them all to win.','Các khối màu treo từ trên khung đấu. Phá hết là thắng.')],
     ['C',t('Cannons','Pháo'),t('One per wall color, with its ammo count. Fires on its own at cubes of its color.','Mỗi màu một khẩu, kèm số đạn. Tự bắn vào khối cùng màu.')],
-    ['D',t('Board cubes','Khối trên bàn'),t('Slide them to build same-color groups of 4 or more.','Trượt để tạo nhóm cùng màu từ 4 khối trở lên.')],
+    ['D',t('Board cubes','Khối trên bàn'),t('Slide them to build same-color groups: a straight line of 3, or 4 cubes or more.','Trượt để tạo nhóm cùng màu: hàng thẳng 3 khối, hoặc từ 4 khối trở lên.')],
     ['E',t('Empty cells','Ô trống'),t('Cubes can only move into these.','Khối chỉ đi vào được các ô này.')]
   ];
   const hero=`<div class="hero" id="top" data-sec="top" data-spy="top">
