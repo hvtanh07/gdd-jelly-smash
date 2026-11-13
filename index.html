@@ -519,7 +519,8 @@ const SECTIONS=[
     {id:'remove-ads',n:'6.4',en:'Remove Ads',vi:'Gỡ quảng cáo'}]},
   {id:'live-ops',n:'7',c:6,en:'Live ops',vi:'Tính năng Live Ops',subs:[
     {id:'popup-list',n:'7.1',en:'Popup list',vi:'Danh sách popup'},
-    {id:'popup-priority',n:'7.2',en:'Popup priority',vi:'Thứ tự ưu tiên popup'}]},
+    {id:'popup-priority',n:'7.2',en:'Popup priority',vi:'Thứ tự ưu tiên popup'},
+    {id:'collection-event',n:'7.3',en:'Collection Event',vi:'Sự kiện thu thập'}]},
   {id:'change-note',n:'8',c:7,en:'Change note',vi:'Ghi chú thay đổi'}
 ];
 const SEC={};
@@ -1564,6 +1565,13 @@ function view(l){
     rc(t('Unlock popups — offer unlock level','Popup mở khóa — màn mở ưu đãi'),[
       ['starter_pack_unlock_level',t('Starter Pack (IAP) — level from which the offer popup can show','Gói Khởi đầu (IAP) — màn bắt đầu có thể hiện popup ưu đãi'),'12',t('level','màn')],
       ['remove_ads_unlock_level',t('Remove Ads (IAP) — level from which the offer popup can show','Gỡ quảng cáo (IAP) — màn bắt đầu có thể hiện popup ưu đãi'),'15',t('level','màn')]
+    ])+
+    rc(t('Collection Event','Sự kiện thu thập'),[
+      ['collection_event_unlock_level',t('Level from which the event can start','Màn bắt đầu có sự kiện'),'20',t('level','màn')],
+      ['collection_event_duration_hours',t('Length of one event','Thời gian một sự kiện'),'72',t('h','giờ')],
+      ['collection_event_colors',t('Target color order, one per event','Thứ tự màu mục tiêu, mỗi sự kiện một màu'),'red, blue, purple, yellow',t('list','danh sách')],
+      ['collection_event_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
+      ['collection_event_milestones',t('Total jelly for each milestone','Tổng thạch cho từng mốc'),'50, 150, 300, 500, 800',t('jelly','thạch')]
     ]);
 
   /* ===== 6. IAP & offers ===== */
@@ -1693,14 +1701,68 @@ function view(l){
 
   /* ===== 7. Live ops ===== */
   /* FIXED: keep the logic. Only change the numbers if the new game differs. */
-  B['live-ops']=`<p class="sec-intro">${t(`The rules for every offer popup (7.1, 7.2). Jelly Smash has no Limited Time Reward, Skip Level or Retry with Booster.`,
-    `Quy tắc cho mọi popup ưu đãi (7.1, 7.2). Jelly Smash không có Quà giới hạn thời gian, Bỏ qua màn hay Chơi lại kèm công cụ.`)}</p>`;
+  B['live-ops']=`<p class="sec-intro">${t(`The rules for every offer popup (7.1, 7.2) and the Collection Event (7.3). Jelly Smash has no Limited Time Reward, Skip Level or Retry with Booster.`,
+    `Quy tắc cho mọi popup ưu đãi (7.1, 7.2) và Sự kiện thu thập (7.3). Jelly Smash không có Quà giới hạn thời gian, Bỏ qua màn hay Chơi lại kèm công cụ.`)}</p>`;
+  const CE=nm('Collection Event','Sự kiện thu thập');
+  B['collection-event']=
+    sys(CE,
+      lead(t(`A timed event. Each event asks the player to collect one jelly color: red, blue, purple or yellow. Win levels to fill the progress bar. Each milestone gives a gift. Win in a row to multiply what you collect, up to ×5. Benchmark: Royal Match collection events.`,
+        `Sự kiện có thời hạn. Mỗi sự kiện yêu cầu thu thập một màu thạch: đỏ, xanh, tím hoặc vàng. Thắng màn để làm đầy thanh tiến độ. Mỗi mốc cho một phần quà. Thắng liên tiếp để nhân số thu được, tối đa ×5. Tham khảo: sự kiện thu thập của Royal Match.`))+
+      tiles([[t('Level 20','Màn 20'),t('Unlocks','Mở khóa')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('×5','×5'),t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['5',t('Milestones','Số mốc quà')]])+
+      panel(t('Mission: collect jelly','Nhiệm vụ: thu thập thạch'),ul([
+        t(`Each event has 1 target color. The color rotates between events: red → blue → purple → yellow.`,`Mỗi sự kiện có 1 màu mục tiêu. Màu đổi theo từng sự kiện: đỏ → xanh → tím → vàng.`),
+        t(`Every cube of the target color the player matches on the board counts as 1 jelly.`,`Mỗi khối màu mục tiêu người chơi ghép trên bàn tính là 1 thạch.`),
+        t(`Jelly from a Jelly Layer counts too: the outer layer and the cube under it are 2 jelly.`,`Thạch từ Lớp thạch cũng được tính: lớp ngoài và khối bên dưới là 2 thạch.`)+' '+inf,
+        t(`In the level, each matched target cube flies a small jelly icon to a counter under the HUD.`,`Trong màn, mỗi khối mục tiêu được ghép bay một biểu tượng thạch nhỏ tới bộ đếm dưới HUD.`),
+        t(`Jelly is only added to the event when the level is won. Lose or quit: the jelly from that attempt is lost.`,`Thạch chỉ được cộng vào sự kiện khi thắng màn. Thua hoặc thoát: mất số thạch của lượt đó.`)
+      ]))+
+      panel(t('Streak multiplier','Hệ số streak'),
+        table(t('Streak multiplier','Hệ số streak'),[t('Wins in a row','Số màn thắng liên tiếp'),t('Multiplier','Hệ số')],[
+          ['1','×1'],['2','×2'],['3','×3'],['4','×4'],[t('5 or more','Từ 5 trở lên'),'×5 (max)']
+        ],'compact')+
+        ul([
+          t(`Jelly added on a win = jelly collected in the level × the multiplier.`,`Thạch cộng khi thắng = số thạch thu trong màn × hệ số.`),
+          t(`A loss or quitting the level resets the streak to ×1. A revive does not break it.`,`Thua hoặc thoát màn đưa streak về ×1. Hồi sinh không làm mất streak.`),
+          t(`The current multiplier shows on the event icon and on the level start popup.`,`Hệ số hiện tại hiện trên biểu tượng sự kiện và trên popup bắt đầu màn.`),
+          t(`The streak resets when a new event starts.`,`Streak tính lại khi bắt đầu sự kiện mới.`)
+        ]))+
+      panel(t('Progress & rewards','Tiến độ & phần thưởng'),
+        table(t('Collection Event milestones','Các mốc của Sự kiện thu thập'),[t('Milestone','Mốc'),t('Total jelly','Tổng thạch'),t('Reward','Phần thưởng')],[
+          ['1','50',t('100 coins','100 xu')],
+          ['2','150',t('1 Weak booster','1 booster yếu')],
+          ['3','300',t('200 coins + 1 Medium booster','200 xu + 1 booster vừa')],
+          ['4','500',t('30 min unlimited lives + 1 Strong booster','30 phút tim vô hạn + 1 booster mạnh')],
+          ['5',t('800 (final)','800 (cuối)'),t('Big chest: 500 coins + 1 of each booster','Rương lớn: 500 xu + mỗi loại booster 1 cái')]
+        ],'compact')+
+        ul([
+          t(`Reaching a milestone gives its gift right away, with a reward popup on the win screen. No extra tap or ad needed.`,`Đạt mốc là nhận quà ngay, kèm popup phần thưởng ở màn hình thắng. Không cần chạm thêm hay xem quảng cáo.`),
+          t(`One win can pass more than one milestone. Each gift shows one after another.`,`Một lần thắng có thể vượt nhiều mốc. Từng phần quà hiện lần lượt.`),
+          t(`After the final milestone the event is done. The icon shows a check until the event ends.`,`Sau mốc cuối, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi sự kiện kết thúc.`),
+          t(`The event ends when the 72 h timer runs out. Progress resets for the next event.`,`Sự kiện kết thúc khi hết 72 giờ. Tiến độ tính lại cho sự kiện sau.`)
+        ]))+
+      panel(t('Event flow','Luồng sự kiện'),
+        table(t('Collection Event cycle','Chu kỳ Sự kiện thu thập'),[t('State','Trạng thái'),t('Player sees','Người chơi thấy'),t('Next','Tiếp theo')],[
+          [t('Locked','Chưa mở'),t('Nothing','Không có gì'),t('Level Complete of level 20 → Start','Level Complete màn 20 → Bắt đầu')],
+          [t('Start','Bắt đầu'),t('Event popup with the target color, the 72 h timer and the rewards. 1st time: a short how-to.','Popup sự kiện với màu mục tiêu, timer 72 giờ và phần thưởng. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
+          [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win → add jelly · Final milestone → Done · Timer over → End','Thắng → cộng thạch · Mốc cuối → Hoàn thành · Hết giờ → Kết thúc')],
+          [t('Done','Hoàn thành'),t('Icon with a check','Biểu tượng có dấu tích'),t('Timer over → End','Hết giờ → Kết thúc')],
+          [t('End','Kết thúc'),t('Event end popup with the result','Popup kết thúc kèm kết quả'),t('Next event starts at the next session → Start','Sự kiện mới bắt đầu ở phiên chơi tiếp theo → Bắt đầu')]
+        ],'compact'))+
+      kv([
+        [t('Popup priority','Ưu tiên popup'),t(`Event popups show after the offer popups (7.2). If an offer popup shows, the event popup waits for the next screen.`,`Popup sự kiện hiện sau popup ưu đãi (mục 7.2). Nếu có popup ưu đãi, popup sự kiện chờ sang màn hình tiếp theo.`)+' '+inf],
+        [t('Offline','Offline'),t(`The 72 h timer runs on server time, also offline.`,`Timer 72 giờ chạy theo giờ server, kể cả khi offline.`)],
+        [t('Numbers','Con số'),t(`Unlock level, length, max multiplier, milestones and rewards are remote config (5).`,`Màn mở khóa, thời gian, hệ số tối đa, các mốc và phần thưởng nằm trong cấu hình từ xa (mục 5).`)]
+      ]));
 
   /* ===== 8. Change note ===== */
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Collection Event','Sự kiện thu thập'),ul([
+        t(`Added the Collection Event (7.3): collect one jelly color per event, streak multiplier up to ×5, 5 milestones with gifts. Benchmark: Royal Match.`,`Thêm Sự kiện thu thập (mục 7.3): mỗi sự kiện thu một màu thạch, hệ số streak tối đa ×5, 5 mốc quà. Tham khảo: Royal Match.`),
+        t(`Added its values to remote config (5).`,`Thêm các thông số vào cấu hình từ xa (mục 5).`)
+      ]))+
       ent(t('Locked Cannon','Pháo bị khóa'),ul([
         t(`Added the fifth element, Locked Cannon: it takes ammo but only fires after the player makes x groups. Rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo. Whether any color counts, x per level and unlock level: TBD.`,`Thêm yếu tố đặc biệt thứ 5, Pháo bị khóa: vẫn nhận đạn nhưng chỉ bắn sau khi người chơi tạo đủ x nhóm. Luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động. Nhóm màu nào cũng tính hay không, x mỗi màn và màn mở khóa: TBD.`)
       ]))+
