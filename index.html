@@ -725,6 +725,25 @@ const DEMOS={
       ['.a2','transform',[[4.7,T(0,0)],[5.1,T(0,-36)]]]
     ]},
   /* ----- Jelly Smash core loop: slide a cube, the group of 4 flies into its cannon, the cannon shoots the wall ----- */
+  stacked:{D:4.6, /* Stacked Cube: a stack of 3 on the wall takes 3 shots; each shot pops the front cube and the rest drop into place */
+    svg:()=>{
+      let wall='';[4,2,0,4,2].forEach((c,i)=>{if(c)wall+=jcube(18+34*i,50,28,c);});
+      const st=[0,1,2].map(k=>`<g class="sk${k}">${jcube(86,30+10*k,28,2)}</g>`).join('');
+      const badge=`<g class="pin sb"><circle cx="116" cy="32" r="9.5"/>${['3','2','1'].map((v,i)=>`<text class="v${i}" x="116" y="32" dy=".35em"${i?' style="opacity:0"':''}>${v}</text>`).join('')}</g>`;
+      const drops=[0,1,2].map(k=>`<circle class="f2 dp${k}" cx="100" cy="128" r="5" style="opacity:0"/>`).join('');
+      return wall+st+badge+cannon(100,128,2,['3','2','1','0'],'cn',1.4)+drops;},
+    tracks:()=>{
+      const hit=[1.0,2.0,3.0],tr=[];
+      hit.forEach((h,k)=>{const s=h-.35;
+        tr.push([`.dp${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[h,1],[h+.03,0]]],[`.dp${k}`,'transform',[[s,T(0,0)],[h,T(0,-64)]]],
+                ...(k===0?[[`.sk2`,'transform',[[h,'scale(1)'],[h+.1,'scale(1.25)'],[h+.28,'scale(0)']]]]:[]),[`.sk${2-k}`,'opacity',[[0,1],[h+.2,1],[h+.28,0]]],
+                [`.cn .v${k}`,'opacity',k===0?[[0,1],[s,1],[s+.04,0]]:[[0,0],[hit[k-1]-.35,0],[hit[k-1]-.31,1],[s,1],[s+.04,0]]]);});
+      tr.push([`.cn .v3`,'opacity',[[0,0],[hit[2]-.35,0],[hit[2]-.31,1]]]);
+      tr.push(['.sk1','transform',[[1.25,T(0,0)],[1.45,T(0,10)],[2.0,T(0,10)],[2.1,'translate(0px,10px) scale(1.25)'],[2.28,'translate(0px,10px) scale(0)']]]);
+      tr.push(['.sk0','transform',[[1.25,T(0,0)],[1.45,T(0,10)],[2.25,T(0,10)],[2.45,T(0,20)],[3.0,T(0,20)],[3.1,'translate(0px,20px) scale(1.25)'],[3.28,'translate(0px,20px) scale(0)']]]);
+      tr.push(['.sb .v0','opacity',[[0,1],[1.0,1],[1.04,0]]],['.sb .v1','opacity',[[0,0],[1.0,0],[1.04,1],[2.0,1],[2.04,0]]],['.sb .v2','opacity',[[0,0],[2.0,0],[2.04,1]]],
+              ['.sb','opacity',[[0,1],[3.0,1],[3.1,0]]]);
+      return tr;}},
   lockedBlock:{D:5.4, /* Lock Cube: slide a red cube next to the chained red jelly; the group matches, the chain breaks and the group flies to the red cannon */
     svg:()=>{
       const bx=i=>36+32*i,by=j=>66+32*j;
@@ -1011,8 +1030,8 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Lock Cube','Khối khóa')};
-  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Lock Cube','Khối khóa')};
+  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Lock Cube','Khối khóa'),el3:nm('Stacked Cube','Khối chồng')};
+  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Lock Cube','Khối khóa'),el3:t('Stacked Cube','Khối chồng')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
   const noBo=none('No boosters yet. To be added later.','Chưa có booster. Sẽ bổ sung sau.');
@@ -1028,6 +1047,7 @@ function view(l){
     pop:t('A drop hits a wall cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối trên tường. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
     praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
+    stacked:t('A stack of 3 blue cubes on the wall. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên tường. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
     lockedBlock:t('A red cube slides next to the chained red jelly. The group of 4 matches, the chain breaks and the group flies into the red cannon.','Một khối đỏ trượt tới cạnh khối đỏ bị xích. Nhóm 4 khối được ghép, xích vỡ và cả nhóm bay vào pháo đỏ.'),
     jellyLayer:t('Four red layers line up and match. The layers fly into the red cannon, and the jellies inside become normal cubes.','4 lớp đỏ xếp thành hàng và được ghép. Các lớp bay vào pháo đỏ, thạch bên trong thành khối thường.'),
     smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the wall.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên tường.'),
@@ -1274,7 +1294,16 @@ function view(l){
       t(`It still counts as its color for matching: the player slides cubes of the same color next to it to build a group.`,`Khi ghép, nó vẫn tính theo màu của nó: người chơi trượt các khối cùng màu tới cạnh để tạo nhóm.`),
       t(`Once the cube is part of a matched group, the chain breaks and the cube clears with its group, becoming ammo like a normal cube.`,`Khi khối nằm trong một nhóm được ghép, xích vỡ và khối được xóa cùng nhóm, thành đạn như khối thường.`),
       `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`A chained jelly cannot move, so a level can get stuck if not enough cubes of its color can reach it. Stuck handling: TBD.`,`Khối bị xích không di chuyển được, nên màn có thể bị kẹt nếu không đủ khối cùng màu tới được cạnh nó. Cách xử lý kẹt: TBD.`)}`
-    ]),unlock(24),demo('lockedBlock'));
+    ]),unlock(24),demo('lockedBlock'))+
+    ent(N.el3,ul([
+      t(`A spot on the target wall where several cubes are stacked on top of each other. A number on the stack shows how many cubes are left.`,`Một vị trí trên bức tường mục tiêu có nhiều khối chồng lên nhau. Con số trên chồng cho biết còn bao nhiêu khối.`),
+      t(`Each shot removes only the front cube of the stack. The cubes behind drop into its place.`,`Mỗi phát bắn chỉ phá khối trước cùng của chồng. Các khối phía sau tụt xuống thế chỗ.`),
+      t(`1 ammo = 1 cube still holds, so a stack of N cubes takes N ammo to clear. This makes the stack cost more ammo than a single cube.`,`Vẫn giữ 1 đạn = 1 khối, nên chồng N khối cần N đạn mới phá hết. Vì vậy chồng tốn nhiều đạn hơn một khối đơn.`),
+      t(`The spot is cleared only when the last cube of the stack is destroyed.`,`Vị trí chỉ trống khi khối cuối cùng của chồng bị phá.`),
+      t(`Level design: the board must hold enough cubes of each color to cover every cube in every stack.`,`Thiết kế màn: bàn chơi phải đủ khối mỗi màu để phá hết mọi khối trong mọi chồng.`),
+      t(`Can one stack mix colors? TBD. Maximum stack height: TBD. Unlock level: TBD.`,`Một chồng có được trộn nhiều màu không: TBD. Chiều cao tối đa của chồng: TBD. Màn mở khóa: TBD.`),
+      `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`No countdown. Stacks only change how much ammo a level needs, which level design covers.`,`Không có đếm ngược. Chồng khối chỉ làm tăng lượng đạn cần cho màn, phần này do thiết kế màn đảm bảo.`)}`
+    ]),unlock('TBD'),demo('stacked'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). Jelly Smash has none yet. */
   B['booster-mechanics']=noBo;
@@ -1324,7 +1353,8 @@ function view(l){
     [t('Element','Yếu tố'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn')],
     [
       [N.el1,popup('Match the outer layer<br>to use the jelly inside.','Ghép lớp vỏ ngoài<br>để dùng thạch bên trong.'),lvl(17)],
-      [N.el2,popup('Match the chained jellies<br>to break them free.','Ghép các khối bị xích<br>để giải phóng chúng.'),lvl(24)]
+      [N.el2,popup('Match the chained jellies<br>to break them free.','Ghép các khối bị xích<br>để giải phóng chúng.'),lvl(24)],
+      [N.el3,popup('Stacked cubes take<br>more shots!','Khối chồng cần<br>nhiều phát bắn hơn!'),lvl('TBD')]
     ]);
 
   /* PER GAME: one row per booster. Jelly Smash has none yet. */
@@ -1334,7 +1364,8 @@ function view(l){
   const stops=[
     [1,t('First tutorial','Hướng dẫn đầu tiên'),'ftue','ftue-steps','FTUE'],
     [17,P.el1,'elem','elements-mechanics'],
-    [24,P.el2,'elem','elements-mechanics']
+    [24,P.el2,'elem','elements-mechanics'],
+    ['TBD',P.el3,'elem','elements-mechanics']
   ];
   B['ftue--tutorial:after']=`<div class="glance">
     <h4>${t('Unlock order at a glance','Thứ tự mở khóa theo màn')}</h4>
@@ -1380,6 +1411,10 @@ function view(l){
     ent(N.el2,params([
       [look,t('A normal jelly cube, slightly darkened, with a grey padlock on its face.','Khối thạch thường, hơi tối màu, có ổ khóa xám trên mặt.')],
       [an,t('Chain breaks: the padlock swells and pops with a small puff, then the cube clears with its group.','Khi phá xích: ổ khóa phồng lên rồi vỡ kèm làn khói nhỏ, sau đó khối được xóa cùng nhóm.')]
+    ]))+
+    ent(N.el3,params([
+      [look,t('A wall cube with one or more cubes peeking out behind it, and a small number badge with the cubes left.','Một khối trên tường, phía sau lộ ra một hoặc nhiều khối, kèm huy hiệu nhỏ ghi số khối còn lại.')],
+      [an,t('Hit: the front cube pops with a paint splash, the cubes behind drop into place and the number goes down by 1.','Trúng đạn: khối trước vỡ kèm sơn bắn tung, các khối sau tụt xuống thế chỗ và con số giảm 1.')]
     ]));
 
   B['booster-object-concept']=noBo;
@@ -1403,7 +1438,8 @@ function view(l){
     ['Cannon Shot','core',t('A cannon fires','Pháo bắn'),0],
     ['Wall Cube Pop','core',t('A wall cube is destroyed','Một khối trên tường bị phá'),1],
     ['Jelly Layer','el',t('A layer clears and frees the jelly inside','Lớp vỏ được gỡ và thả thạch bên trong'),0],
-    ['Lock Cube','el',t('The chain breaks','Xích bị phá'),0]
+    ['Lock Cube','el',t('The chain breaks','Xích bị phá'),0],
+    ['Stacked Cube Hit','el',t('A shot pops the front cube of a stack','Một phát bắn phá khối trước của chồng'),0]
   ];
   B['sfx--haptics']=table(t('SFX and haptics','Âm thanh và rung'),
     [t('Name','Tên'),t('Category','Nhóm'),t('Plays when','Phát khi'),t('Haptic','Rung')],
@@ -1590,6 +1626,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Stacked Cube','Khối chồng'),ul([
+        t(`Added the third element, Stacked Cube: cubes stacked on the target wall, so each stack costs more ammo. Rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo. Unlock level, stack height and mixed colors: TBD.`,`Thêm yếu tố đặc biệt thứ 3, Khối chồng: các khối chồng lên nhau trên tường mục tiêu, nên mỗi chồng tốn nhiều đạn hơn. Luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động. Màn mở khóa, chiều cao chồng và việc trộn màu: TBD.`)
+      ]))+
       ent(t('Element rules confirmed','Chốt luật yếu tố đặc biệt'),ul([
         t(`Jelly Layer and Lock Cube rules confirmed, "to verify" tags removed. Jelly Layer: one layer per cube only.`,`Đã chốt luật Lớp thạch và Khối khóa, bỏ nhãn "cần kiểm chứng". Lớp thạch: mỗi khối chỉ có 1 lớp.`),
         t(`Locked Block renamed to Lock Cube.`,`Đổi tên Locked Block thành Lock Cube.`)
