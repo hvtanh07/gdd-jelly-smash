@@ -1147,7 +1147,8 @@ function view(l){
       t(`The player drags a cube from its cell to the target cell. While dragging, arrows on the grid show the path the cube will take.`,`Người chơi kéo khối từ vị trí ban đầu tới ô đích. Khi kéo, mũi tên trên lưới hiện đường khối sẽ đi.`),
       t(`A cube moves only into empty cells. Cubes never swap.`,`Khối chỉ đi vào ô trống. Các khối không đổi chỗ cho nhau.`),
       t(`A cube can travel more than one cell along a free path, including a bent (L-shaped) path.`,`Khối có thể đi qua nhiều ô theo đường trống, kể cả đường gấp khúc (hình chữ L).`),
-      t(`If the cube cannot move, or cannot reach that cell, it stays where it is.`,`Nếu khối không thể di chuyển hoặc không tới được ô đó, khối đứng yên.`),
+      t(`If the player drags outside the area the cube can reach, the arrow points to the last valid cell. On release, the cube moves to that cell.`,`Nếu người chơi kéo ra khỏi vùng khối đi được, mũi tên chỉ tới ô hợp lệ cuối cùng. Khi thả tay, khối di chuyển tới ô đó.`),
+      t(`If the cube cannot move at all (no free cell next to it), it stays where it is.`,`Nếu khối hoàn toàn không thể di chuyển (không có ô trống bên cạnh), khối đứng yên.`),
       t(`No move limit.`,`Không giới hạn số move.`)
     ]))+
     ent(nm('Matching','Ghép nhóm'),ul([
@@ -1750,7 +1751,7 @@ function view(l){
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
       ent(t('Moving cubes','Di chuyển khối'),ul([
-        t(`Drag from the cube to the target cell; arrows on the grid show the path. Cannot reach: the cube stays. Open questions list removed, all answered.`,`Kéo từ khối tới ô đích; mũi tên trên lưới hiện đường đi. Không tới được: khối đứng yên. Bỏ danh sách Câu hỏi còn mở vì đã trả lời hết.`)
+        t(`Drag from the cube to the target cell; arrows on the grid show the path. Dragged outside the reachable area: the arrow points to the last valid cell and the cube moves there on release. Cannot move at all: the cube stays. Open questions list removed, all answered.`,`Kéo từ khối tới ô đích; mũi tên trên lưới hiện đường đi. Không tới được: khối đứng yên. Bỏ danh sách Câu hỏi còn mở vì đã trả lời hết.`)
       ]))+
       ent(t('Open questions answered','Trả lời câu hỏi còn mở'),ul([
         t(`Praise tiers: each group's cube count maps to the Ammo by group size table (1.2).`,`Mức khen: số khối của mỗi nhóm map vào bảng Số đạn theo cỡ nhóm (mục 1.2).`),
