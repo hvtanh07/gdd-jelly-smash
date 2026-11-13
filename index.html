@@ -725,6 +725,24 @@ const DEMOS={
       ['.a2','transform',[[4.7,T(0,0)],[5.1,T(0,-36)]]]
     ]},
   /* ----- Jelly Smash core loop: slide a cube, the group of 4 flies into its cannon, the cannon shoots the wall ----- */
+  lockedBlock:{D:5.4, /* Locked Block: slide a red cube next to the chained red jelly; the group matches, the chain breaks and the group flies to the red cannon */
+    svg:()=>{
+      const bx=i=>36+32*i,by=j=>66+32*j;
+      let wall='';[1,1,1,1,2,2,2].forEach((c,i)=>{wall+=jcube(16+24*i,4,20,c);});
+      let cells='';for(let j=0;j<4;j++)for(let i=0;i<4;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="30" height="30" rx="8"/>`;
+      const chain=`<g class="ch"><rect class="veil" x="${bx(1)}" y="${by(1)}" width="30" height="30" rx="8"/>${padlock(bx(1)+15,by(1)+13)}</g>`;
+      return wall+cannon(80,28,1,['0','10'],'rc')+cannon(120,28,2,['0'],'')+cells+
+        `<g class="g0">${jcube(bx(1),by(1),30,1)}${chain}</g><g class="g1"><g class="mv">${jcube(bx(3),by(1),30,1)}</g></g>`+
+        `<g class="g2">${jcube(bx(1),by(2),30,1)}</g><g class="g3">${jcube(bx(2),by(2),30,1)}</g>`+puff(83,113)+tap(147,113);},
+    tracks:()=>{
+      const cs=[[83,113],[115,113],[83,145],[115,145]],tr=[...tapTracks(.4),['.mv','transform',[[.65,T(0,0)],[1.05,T(-32,0)]]],
+        ['.ch','transform',[[1.25,'scale(1)'],[1.4,'scale(1.25)'],[1.6,'scale(0)']]],['.ch','opacity',[[0,1],[1.5,1],[1.6,0]]],...puffTracks(1.4)];
+      cs.forEach(([x,y],k)=>{const s=2.0+k*.1;
+        tr.push([`.g${k}`,'transform',[[1.7,'scale(1)'],[1.82,'scale(1.08)'],[1.94,'scale(1)'],[s,T(0,0)],[s+.45,T(80-x,50-y,.3)]]],
+                [`.g${k}`,'opacity',[[0,1],[s+.4,1],[s+.45,0]]]);});
+      tr.push(['.rc .v0','opacity',[[0,1],[2.7,1],[2.75,0]]],['.rc .v1','opacity',[[0,0],[2.7,0],[2.75,1]]],
+              ['.rc','transform',[[2.7,'scale(1)'],[2.8,'scale(1.15)'],[3.0,'scale(1)']]]);
+      return tr;}},
   jellyLayer:{D:5.4, /* Jelly Layer: line up 4 red outer layers; the layers fly to the red cannon and the inner jellies grow into normal cubes */
     svg:()=>{
       const bx=i=>36+32*i,by=j=>66+32*j;
@@ -993,8 +1011,8 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Jelly Layer','Lớp thạch')};
-  const P={el1:t('Jelly Layer','Lớp thạch')};
+  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Locked Block','Khối bị khóa')};
+  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Locked Block','Khối bị khóa')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
   const noBo=none('No boosters yet. To be added later.','Chưa có booster. Sẽ bổ sung sau.');
@@ -1010,6 +1028,7 @@ function view(l){
     pop:t('A drop hits a wall cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối trên tường. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
     praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
+    lockedBlock:t('A red cube slides next to the chained red jelly. The group of 4 matches, the chain breaks and the group flies into the red cannon.','Một khối đỏ trượt tới cạnh khối đỏ bị xích. Nhóm 4 khối được ghép, xích vỡ và cả nhóm bay vào pháo đỏ.'),
     jellyLayer:t('Four red layers line up and match. The layers fly into the red cannon, and the jellies inside become normal cubes.','4 lớp đỏ xếp thành hàng và được ghép. Các lớp bay vào pháo đỏ, thạch bên trong thành khối thường.'),
     smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the wall.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên tường.'),
     hidden:t('The box reaches the top of its queue and reveals its color.','Hộp lên tới đầu hàng chờ và hiện màu.'),
@@ -1248,7 +1267,15 @@ function view(l){
       t(`The jelly inside stays in its cell as a normal cube of its own color, ready to use.`,`Thạch bên trong ở lại ô, thành khối thường mang màu của nó, dùng được ngay.`)+' '+inf,
       t(`One layer per cube in the tutorial. More layers: TBD.`,`Trong tutorial mỗi khối có 1 lớp. Nhiều lớp hơn: TBD.`),
       `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`Jelly Layer has no countdown. Whether it needs extra stuck handling: TBD.`,`Lớp thạch không có đếm ngược. Có cần xử lý kẹt riêng hay không: TBD.`)}`
-    ]),unlock(17),demo('jellyLayer'));
+    ]),unlock(17),demo('jellyLayer'))+
+    ent(N.el2,ul([
+      t(`A jelly cube held by a chain, shown with a padlock on it.`,`Một khối thạch bị xích giữ, có ổ khóa trên mặt.`),
+      t(`The chained jelly cannot be moved.`,`Khối bị xích không kéo đi được.`)+' '+inf,
+      t(`It still counts as its color for matching: the player slides cubes of the same color next to it to build a group.`,`Khi ghép, nó vẫn tính theo màu của nó: người chơi trượt các khối cùng màu tới cạnh để tạo nhóm.`)+' '+inf,
+      t(`Matching a group that includes the chained jelly breaks the chain.`,`Ghép một nhóm có chứa khối bị xích sẽ phá xích.`),
+      t(`Once the chain breaks, the jelly clears with its group and becomes ammo like a normal cube.`,`Khi xích vỡ, khối được xóa cùng nhóm và thành đạn như khối thường.`)+' '+inf,
+      `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`A chained jelly cannot move, so a level can get stuck if not enough cubes of its color can reach it. Stuck handling: TBD.`,`Khối bị xích không di chuyển được, nên màn có thể bị kẹt nếu không đủ khối cùng màu tới được cạnh nó. Cách xử lý kẹt: TBD.`)}`
+    ]),unlock(24),demo('lockedBlock'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). Jelly Smash has none yet. */
   B['booster-mechanics']=noBo;
@@ -1297,7 +1324,8 @@ function view(l){
   B['element-tutorial']=table(t('Element tutorial','Hướng dẫn yếu tố đặc biệt'),
     [t('Element','Yếu tố'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn')],
     [
-      [N.el1,popup('Match the outer layer<br>to use the jelly inside.','Ghép lớp vỏ ngoài<br>để dùng thạch bên trong.'),lvl(17)]
+      [N.el1,popup('Match the outer layer<br>to use the jelly inside.','Ghép lớp vỏ ngoài<br>để dùng thạch bên trong.'),lvl(17)],
+      [N.el2,popup('Match the chained jellies<br>to break them free.','Ghép các khối bị xích<br>để giải phóng chúng.'),lvl(24)]
     ]);
 
   /* PER GAME: one row per booster. Jelly Smash has none yet. */
@@ -1306,7 +1334,8 @@ function view(l){
   /* PER GAME: every element and booster with its unlock level, sorted by level. Add rows when elements and boosters exist. */
   const stops=[
     [1,t('First tutorial','Hướng dẫn đầu tiên'),'ftue','ftue-steps','FTUE'],
-    [17,P.el1,'elem','elements-mechanics']
+    [17,P.el1,'elem','elements-mechanics'],
+    [24,P.el2,'elem','elements-mechanics']
   ];
   B['ftue--tutorial:after']=`<div class="glance">
     <h4>${t('Unlock order at a glance','Thứ tự mở khóa theo màn')}</h4>
@@ -1348,6 +1377,10 @@ function view(l){
     ent(N.el1,params([
       [look,t('A thick, glossy rim in the layer color around a small inner jelly of another color.','Viền thạch dày, bóng, mang màu lớp vỏ, bọc quanh một khối thạch nhỏ khác màu.')],
       [an,t('Match: the layer pulses and flies to its cannon like a cube. The inner jelly grows to full size with a small bounce.','Khi ghép: lớp vỏ phồng lên rồi bay vào pháo như một khối. Thạch bên trong lớn lên đủ cỡ, nảy nhẹ.')+' '+inf]
+    ]))+
+    ent(N.el2,params([
+      [look,t('A normal jelly cube, slightly darkened, with a grey padlock on its face.','Khối thạch thường, hơi tối màu, có ổ khóa xám trên mặt.')],
+      [an,t('Chain breaks: the padlock swells and pops with a small puff, then the cube clears with its group.','Khi phá xích: ổ khóa phồng lên rồi vỡ kèm làn khói nhỏ, sau đó khối được xóa cùng nhóm.')+' '+inf]
     ]));
 
   B['booster-object-concept']=noBo;
@@ -1370,7 +1403,8 @@ function view(l){
     ['Ammo Load','core',t('Cubes reach the cannon and its counter goes up','Khối bay tới pháo và số đạn tăng'),0],
     ['Cannon Shot','core',t('A cannon fires','Pháo bắn'),0],
     ['Wall Cube Pop','core',t('A wall cube is destroyed','Một khối trên tường bị phá'),1],
-    ['Jelly Layer','el',t('A layer clears and frees the jelly inside','Lớp vỏ được gỡ và thả thạch bên trong'),0]
+    ['Jelly Layer','el',t('A layer clears and frees the jelly inside','Lớp vỏ được gỡ và thả thạch bên trong'),0],
+    ['Locked Block','el',t('The chain breaks','Xích bị phá'),0]
   ];
   B['sfx--haptics']=table(t('SFX and haptics','Âm thanh và rung'),
     [t('Name','Tên'),t('Category','Nhóm'),t('Plays when','Phát khi'),t('Haptic','Rung')],
@@ -1557,6 +1591,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Locked Block','Khối bị khóa'),ul([
+        t(`Added the second element, Locked Block (unlocks at level 24), from the in-game tutorial screenshot: rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo.`,`Thêm yếu tố đặc biệt thứ 2, Khối bị khóa (mở ở màn 24), theo ảnh tutorial trong game: luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động.`)
+      ]))+
       ent(t('Epic popup','Popup Epic'),ul([
         t(`Added the Epic praise tier for groups of 10 or more cubes (1.2). Ammo for Epic: TBD. The praise demo, 3.2 and SFX now list Epic too.`,`Thêm mức khen Epic cho nhóm từ 10 khối trở lên (mục 1.2). Số đạn của Epic: TBD. Minh họa popup khen, mục 3.2 và SFX đã có thêm Epic.`)
       ]))+
