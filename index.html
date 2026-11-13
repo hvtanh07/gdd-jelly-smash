@@ -1136,18 +1136,15 @@ function view(l){
       [t('Stars','Sao'),t(`3 stars on every win. No star criteria seen.`,`Thắng luôn được 3 sao. Chưa thấy tiêu chí tính sao.`)]
     ]))+
     ent(t('Open questions','Câu hỏi còn mở'),ul([
-      t(`How group size maps to the praise tiers.`,`Cỡ nhóm ứng với từng mức khen ra sao.`),
-      t(`Does a cube slide until it is blocked, or move to any reachable empty cell?`,`Khối trượt tới khi bị chặn, hay đi tới bất kỳ ô trống nào tới được?`),
-      t(`Are the board cubes of each color tuned to match the target cubes of that color?`,`Số khối mỗi màu trên bàn có được chỉnh khớp với số khối màu đó trên lưới mục tiêu không?`),
-      t(`What do the target-ring markers seen on the board in levels 7 and 10 mean?`,`Các vòng tròn đánh dấu thấy trên bàn ở màn 7 và 10 nghĩa là gì?`),
-      t(`What sets the star rating, other than completing the level?`,`Ngoài việc qua màn, sao được tính theo gì?`)
+      t(`Does a cube slide until it is blocked, or move to any reachable empty cell?`,`Khối trượt tới khi bị chặn, hay đi tới bất kỳ ô trống nào tới được?`)
     ]));
 
   B['main-game-mechanics']=
     ent(nm('Puzzle board','Bàn chơi'),ul([
       t(`A grid of colored jelly cubes and empty cells at the bottom of the screen.`,`Lưới gồm các khối thạch màu và ô trống, nằm ở phần dưới màn hình.`),
       t(`6×6 in early levels, about 7×7 to 8×8 later. Some boards have shaped holes (for example a hollow center in level 10).`,`6×6 ở các màn đầu, khoảng 7×7 tới 8×8 về sau. Một số bàn có lỗ theo hình (ví dụ khoảng trống ở giữa trong màn 10).`),
-      t(`No gravity and no refill: cubes only move when the player moves them.`,`Không có trọng lực, không bổ sung khối: khối chỉ di chuyển khi người chơi kéo.`)
+      t(`No gravity: cubes only move when the player moves them.`,`Không có trọng lực: khối chỉ di chuyển khi người chơi kéo.`),
+      t(`New cubes spawn on the board after each group the player makes. Where they spawn and which colors: TBD.`,`Khối mới được spawn thêm trên bàn sau mỗi nhóm người chơi tạo được. Vị trí spawn và màu: TBD.`)
     ]),'',demo('smash'))+
     ent(nm('Moving cubes (shift)','Di chuyển khối (shift)'),ul([
       t(`Drag or swipe a cube toward an empty cell. Tutorial hand and arrow hints show the path.`,`Kéo hoặc vuốt một khối về phía ô trống. Bàn tay hướng dẫn và mũi tên gợi ý chỉ đường đi.`),
@@ -1169,8 +1166,8 @@ function view(l){
         [popup('Extreme','Cực đỉnh'),'8','+30'],
         [popup('Epic','Siêu đỉnh'),t('10 or more','Từ 10 trở lên'),'TBD']
       ],'compact')+
-      `<p>${t(`A straight line of 3 gives +10, the same as a group of 4. From 4 cubes, ammo values are seen in the recording; the size mapping is inferred and fits <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches. Epic (10+ cubes): ammo TBD. Groups of 7 and 9 have no tier yet: TBD.`,
-              `Hàng thẳng 3 khối được +10, bằng nhóm 4. Từ 4 khối trở lên, số đạn lấy từ video; cỡ nhóm là suy luận, khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn. Epic (từ 10 khối): số đạn TBD. Nhóm 7 và 9 khối chưa có mức khen: TBD.`)} ${inf}</p>`)+
+      `<p>${t(`Each time a group forms, the game maps its cube count to this table to show the praise popup and give the ammo. A straight line of 3 gives +10, the same as a group of 4. Values fit <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches. Epic (10+ cubes): ammo TBD. Groups of 7 and 9 have no tier yet: TBD.`,
+              `Mỗi khi một nhóm được tạo, game map số khối trong nhóm vào bảng này để hiện popup khen và cộng đạn. Hàng thẳng 3 khối được +10, bằng nhóm 4. Số đạn khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn. Epic (từ 10 khối): số đạn TBD. Nhóm 7 và 9 khối chưa có mức khen: TBD.`)}</p>`)+
     ent(nm('Cannons','Pháo'),ul([
       t(`One cannon per target color, in a row between the target grid and the board. Each shows its ammo count.`,`Mỗi màu mục tiêu có 1 khẩu pháo, xếp thành hàng giữa lưới mục tiêu và bàn chơi. Mỗi pháo hiện số đạn.`),
       t(`Cannon count: 1 in level 1, 2 in levels 2–5, 3 from level 6.`,`Số pháo: 1 ở màn 1, 2 ở màn 2–5, 3 từ màn 6.`),
@@ -1186,7 +1183,7 @@ function view(l){
       t(`The whole grid moves down together, toward the bottom of the target area. Speed: TBD.`,`Cả lưới di chuyển đồng thời từ trên xuống, về phía đáy khu vực mục tiêu. Tốc độ: TBD.`),
       t(`The grid does not move when the level starts. It starts moving the first time the player touches a board cube (moving cubes).`,`Lưới đứng yên khi bắt đầu màn. Lưới chỉ bắt đầu di chuyển khi người chơi chạm vào khối trên bàn lần đầu tiên (moving cubes).`),
       t(`If any target cube touches the bottom, the level is lost (see Win and lose in 1.1).`,`Nếu có khối mục tiêu chạm đáy thì thua màn (xem Thắng và thua ở mục 1.1).`),
-      t(`The board never refills, so a level is a closed puzzle: the board cubes of each color should roughly cover the target cubes of that color.`,`Bàn không bổ sung khối, nên mỗi màn là một câu đố đóng: số khối mỗi màu trên bàn phải gần đủ cho số khối mục tiêu màu đó.`)+' '+inf
+      t(`The board cubes of each color do not have to match the target cubes of that color: new board cubes spawn after each group.`,`Số khối mỗi màu trên bàn không cần khớp với số khối mục tiêu màu đó: khối mới được spawn thêm trên bàn sau mỗi nhóm.`)
     ]))+
     ent(t('Level progression (as recorded)','Tiến trình màn chơi (theo video)'),
       table(t('Level progression','Tiến trình màn chơi'),[t('Level','Màn'),t('Colors','Màu'),t('What is new','Điểm mới')],[
@@ -1754,6 +1751,11 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Open questions answered','Trả lời câu hỏi còn mở'),ul([
+        t(`Praise tiers: each group's cube count maps to the Ammo by group size table (1.2).`,`Mức khen: số khối của mỗi nhóm map vào bảng Số đạn theo cỡ nhóm (mục 1.2).`),
+        t(`Board cubes do not have to match target cubes: new cubes spawn on the board after each group (1.2).`,`Khối trên bàn không cần khớp khối mục tiêu: khối mới được spawn trên bàn sau mỗi nhóm (mục 1.2).`),
+        t(`Removed the questions on target-ring markers and star rating.`,`Bỏ câu hỏi về vòng tròn đánh dấu và cách tính sao.`)
+      ]))+
       ent(t('Target grid and lose','Lưới mục tiêu và điều kiện thua'),ul([
         t(`Target wall renamed to target grid. The whole grid slides down together; each target cube needs 1 ammo of its color.`,`Đổi tên Bức tường mục tiêu thành Lưới cube mục tiêu. Cả lưới trượt xuống đồng thời; mỗi khối mục tiêu cần 1 viên đạn cùng màu.`),
         t(`The grid stays still until the player first touches a board cube.`,`Lưới đứng yên tới khi người chơi chạm khối trên bàn lần đầu.`),
