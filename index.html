@@ -753,6 +753,81 @@ const DEMOS={
           [`.t${k}`,'transform',[[e,'scale(1)'],[e+.1,'scale(1.25)'],[e+.3,'scale(0)']]],
           [`.t${k}`,'opacity',[[0,1],[e+.2,1],[e+.3,0]]]];})
       ];}},
+  /* ----- Jelly Smash reference animations for section 3.2 (one per core object) ----- */
+  jelly:{D:4.6, /* slide, squash on landing, then the group pulses and flies into the cannon */
+    svg:()=>{
+      const bx=i=>40+40*i,by=j=>60+40*j;let cells='';
+      for(let j=0;j<3;j++)for(let i=0;i<3;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="36" height="36" rx="9"/>`;
+      return cannon(100,4,2,['0','10'],'gc')+cells+jcube(bx(2),by(0),36,4)+jcube(bx(0),by(2),36,4)+jcube(bx(2),by(2),36,4)+
+        `<g class="grp"><g class="c0">${jcube(bx(0),by(0),36,2)}</g><g class="c1">${jcube(bx(1),by(0),36,2)}</g><g class="c2">${jcube(bx(0),by(1),36,2)}</g>`+
+        `<g class="c3"><g class="mv"><g class="mvs">${jcube(bx(2),by(1),36,2)}</g></g></g></g>`+tap(138,118);},
+    tracks:()=>{
+      const from=[[58,78],[98,78],[58,118],[98,118]];
+      return [
+        ...tapTracks(.3),
+        ['.mv','transform',[[.55,T(0,0)],[.95,T(-40,0)]]],
+        ['.mvs','transform',[[.95,'scale(1)'],[1.05,'scale(1.2,.8)'],[1.18,'scale(.9,1.1)'],[1.3,'scale(1.05,.95)'],[1.42,'scale(1)']]],
+        ['.grp','transform',[[1.7,'scale(1)'],[1.85,'scale(1.08)'],[2.0,'scale(1)']]],
+        ...from.flatMap(([x,y],k)=>{const s=2.15+k*.12;return [
+          [`.c${k}`,'transform',[[s,T(0,0)],[s+.45,T(100-x,26-y,.3)]]],
+          [`.c${k}`,'opacity',[[0,1],[s+.4,1],[s+.45,0]]]];}),
+        ['.gc .v0','opacity',[[0,1],[2.95,1],[3.0,0]]],['.gc .v1','opacity',[[0,0],[2.95,0],[3.0,1]]],
+        ['.gc','transform',[[2.95,'scale(1)'],[3.05,'scale(1.15)'],[3.25,'scale(1)']]]
+      ];}},
+  cannonIn:{D:4.6, /* ammo flies in and the counter ticks up, then one shot with recoil */
+    svg:()=>{
+      let wall='';[0,1,2,3,4].forEach(i=>{wall+=`<g class="${i===2?'wt':''}">${jcube(26+30*i,8,26,i===2?2:[4,2,0,2,4][i]||4)}</g>`;});
+      let ammo='';[0,1,2,3].forEach(k=>{ammo+=`<g class="am${k}">${jcube(66+18*k,176,16,2)}</g>`;});
+      return wall+`<g class="rc">${cannon(100,104,2,['6','7','8','9','10','9'],'cn',1.4)}</g>`+ammo+`<circle class="f2 dp" cx="100" cy="104" r="5" style="opacity:0"/>`;},
+    tracks:()=>{
+      const tr=[];
+      [0,1,2,3].forEach(k=>{const s=.4+k*.3,e=s+.35,x=74+18*k;
+        tr.push([`.am${k}`,'transform',[[s,T(0,0)],[e,T(100-x,140-184,.5)]]],[`.am${k}`,'opacity',[[0,1],[e-.03,1],[e,0]]]);});
+      const at=[0,.75,1.05,1.35,1.65,2.45];
+      at.forEach((a,i)=>{const n=at[i+1];tr.push([`.cn .v${i}`,'opacity',i===0?[[0,1],[n,1],[n+.04,0]]:[[0,0],[a,0],[a+.04,1]].concat(n?[[n,1],[n+.04,0]]:[[4.6,1]])]);});
+      tr.push(['.cn','transform',[[.75,'scale(1)'],[.85,'scale(1.08)'],[1.05,'scale(1)'],[1.15,'scale(1.08)'],[1.35,'scale(1)'],[1.45,'scale(1.08)'],[1.65,'scale(1)'],[1.75,'scale(1.08)'],[1.95,'scale(1)']]]);
+      tr.push(['.rc','transform',[[2.4,T(0,0)],[2.48,T(0,6)],[2.75,T(0,0)]]]);
+      tr.push(['.dp','opacity',[[0,0],[2.42,0],[2.45,1],[2.8,1],[2.83,0]]],['.dp','transform',[[2.45,T(0,0)],[2.8,T(0,-74)]]]);
+      tr.push(['.wt','transform',[[2.8,'scale(1)'],[2.9,'scale(1.25)'],[3.1,'scale(0)']]],['.wt','opacity',[[0,1],[3.0,1],[3.1,0]]]);
+      return tr;}},
+  pop:{D:3.6, /* a drop hits a wall cube: it swells, pops and splashes paint in its color */
+    svg:()=>{
+      let wall='';
+      for(let j=0;j<3;j++)for(let i=0;i<4;i++){const c=[[2,4,2,4],[4,2,2,4],[2,4,4,2]][j][i],x=36+33*i,y=30+33*j;wall+=(i===1&&j===2)?'':jcube(x,y,30,c);}
+      const tgt=`<g class="tg">${jcube(69,96,30,2)}</g>`;
+      const sp=[0,1,2,3,4,5,6,7].map(k=>`<circle class="f2 sp${k}" cx="84" cy="111" r="${k%2?3.5:5}" style="opacity:0"/>`).join('');
+      return wall+tgt+sp+`<circle class="f2 dp" cx="84" cy="190" r="5" style="opacity:0"/>`;},
+    tracks:()=>{
+      const tr=[['.dp','opacity',[[0,0],[.4,0],[.45,1],[.85,1],[.88,0]]],['.dp','transform',[[.45,T(0,0)],[.85,T(0,-64)]]],
+        ['.tg','transform',[[.85,'scale(1)'],[.97,'scale(1.3)'],[1.12,'scale(0)'],[2.6,'scale(0)'],[2.9,'scale(1)']]],
+        ['.tg','opacity',[[0,1],[1.05,1],[1.12,0],[2.6,0],[2.75,1]]]];
+      [0,1,2,3,4,5,6,7].forEach(k=>{const a=k*Math.PI/4,r=k%2?30:40;
+        tr.push([`.sp${k}`,'transform',[[1.0,T(0,0,.4)],[1.55,T(Math.cos(a)*r,Math.sin(a)*r,1)]]],[`.sp${k}`,'opacity',[[0,0],[1.0,0],[1.04,1],[1.4,1],[1.7,0]]]);});
+      return tr;}},
+  praise:{D:6.6, /* Great, Amazing and Extreme pop over the board with the ammo gained */
+    svg:()=>{
+      let bd='';for(let j=0;j<4;j++)for(let i=0;i<4;i++){bd+=`<g opacity=".35">${jcube(32+35*i,30+35*j,31,[[2,4,2,2],[4,4,2,4],[2,2,4,2],[4,2,2,4]][j][i])}</g>`;}
+      const tier=(k,w,word,ammo)=>`<g class="pw${k}" style="opacity:0"><rect class="f7" x="${100-w/2}" y="64" width="${w}" height="36" rx="18"/><text class="bn" x="100" y="82" dy=".35em">${word}</text></g>`+
+        `<g class="pa${k}" style="opacity:0"><rect class="f4" x="72" y="108" width="56" height="26" rx="13"/><text class="bn sm l" x="100" y="121" dy=".35em">${ammo}</text></g>`;
+      return bd+tier(0,104,'Great!','+15')+tier(1,128,'Amazing!','+20')+tier(2,124,'Extreme!','+30');},
+    tracks:()=>[0,1,2].flatMap(k=>{const s=.3+k*2.1;return [
+      [`.pw${k}`,'opacity',[[0,0],[s,0],[s+.08,1],[s+1.5,1],[s+1.75,0]]],
+      [`.pw${k}`,'transform',[[s,'scale(.3)'],[s+.2,'scale(1.15)'],[s+.35,'scale(1)']]],
+      [`.pa${k}`,'opacity',[[0,0],[s+.35,0],[s+.45,1],[s+1.5,1],[s+1.75,0]]],
+      [`.pa${k}`,'transform',[[s+.35,T(0,12)],[s+.6,T(0,0)]]]];})},
+  result:{D:5.2, /* the 3 stars fill in one by one, confetti falls, Level Completed shows */
+    svg:()=>{
+      const star=(cx,cy,r)=>{let d='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;d+=(i?'L':'M')+f1(cx+rr*Math.cos(a))+' '+f1(cy+rr*Math.sin(a));}return d+'Z';};
+      const S=[[52,70,22],[100,58,30],[148,70,22]];
+      const conf=[...Array(14)].map((_,k)=>`<rect class="f${[1,2,3,4,5,6][k%6]} cf${k}" x="${10+k*13}" y="-12" width="7" height="11" rx="2" style="opacity:0"/>`).join('');
+      return S.map(([x,y,r])=>`<path class="trackfill" d="${star(x,y,r)}"/>`).join('')+S.map(([x,y,r],k)=>`<path class="f4 st${k}" d="${star(x,y,r)}" style="opacity:0"/>`).join('')+
+        `<g class="lc" style="opacity:0"><rect class="f7" x="22" y="116" width="156" height="36" rx="18"/><text class="bn sm" x="100" y="134" dy=".35em">Level Completed!</text></g>`+conf;},
+    tracks:()=>{
+      const tr=[];
+      [0,1,2].forEach(k=>{const s=.5+k*.35;tr.push([`.st${k}`,'opacity',[[0,0],[s,0],[s+.05,1]]],[`.st${k}`,'transform',[[s,'scale(0)'],[s+.2,'scale(1.3)'],[s+.35,'scale(1)']]]);});
+      tr.push(['.lc','opacity',[[0,0],[1.7,0],[1.9,1]]],['.lc','transform',[[1.7,T(0,10)],[1.95,T(0,0)]]]);
+      [...Array(14)].forEach((_,k)=>{const s=1.3+(k*.37)%1.2;tr.push([`.cf${k}`,'opacity',[[0,0],[s,0],[s+.05,1],[s+1.6,1],[s+1.8,0]]],[`.cf${k}`,'transform',[[s,T(0,0)+' rotate(0deg)','linear'],[s+1.8,T((k%3-1)*14,215)+` rotate(${k%2?300:-300}deg)`]]]);});
+      return tr;}},
   /* ----- booster demos ----- */
   hand:{D:5.6, /* tap any box in the queues: it jumps to a slot and clears at once */
     svg:()=>dslots(12)+mbox(20,14,5,3)+
@@ -913,6 +988,11 @@ function view(l){
 
   /* PER GAME: one caption per entry in DEMOS, same keys. These are the Caps Sorting captions for the example demos. */
   const DCAP={
+    jelly:t('A cube slides in, squashes as it lands, then the group pulses and flies into the cannon.','Khối trượt vào, bẹp lại khi dừng, rồi cả nhóm phồng lên và bay vào pháo.'),
+    cannonIn:t('Ammo flies in and the counter ticks up with a bounce. Then a shot: recoil, and a drop flies to the wall.','Đạn bay vào, số đạn tăng kèm cú nảy. Sau đó pháo bắn: giật nhẹ, giọt màu bay lên tường.'),
+    pop:t('A drop hits a wall cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối trên tường. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
+    praise:t('Great, Amazing and Extreme pop over the board, with the ammo gained under each.','Great, Amazing và Extreme bật lên trên bàn, bên dưới là số đạn nhận được.'),
+    result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
     smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the wall.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên tường.'),
     hidden:t('The box reaches the top of its queue and reveals its color.','Hộp lên tới đầu hàng chờ và hiện màu.'),
     locked:t('Two boxes are sent, the number hits 0 and the item can be picked.','Đưa 2 hộp lên, con số về 0 và vật phẩm được nhặt.'),
@@ -1213,20 +1293,20 @@ function view(l){
     ent(nm('Jelly cube','Khối thạch'),params([
       [anim(1),t('Slide and land: the cube squashes and wobbles when it stops in a cell.','Trượt và dừng: khối bẹp lại rồi rung nhẹ khi dừng vào ô.')],
       [anim(2),t('Match: the group pulses, then each cube flies up into the cannon of its color.','Ghép nhóm: nhóm phồng lên, rồi từng khối bay vào pháo cùng màu.')]
-    ]))+
+    ]),'',demo('jelly'))+
     ent(nm('Cannon','Pháo'),params([
       [anim(1),t('Ammo in: the counter ticks up and the cannon bounces.','Nạp đạn: số đạn tăng và pháo nảy nhẹ.')],
       [anim(2),t('Shot: small recoil, a colored drop flies to the target cube.','Bắn: giật nhẹ, một giọt màu bay tới khối mục tiêu.')]
-    ]))+
+    ]),'',demo('cannonIn'))+
     ent(nm('Wall cube','Khối trên tường'),params([
       [anim(1),t('Hit: the cube pops with a paint-splash particle in its color.','Trúng đạn: khối vỡ kèm hạt sơn bắn tung cùng màu.')]
-    ]))+
+    ]),'',demo('pop'))+
     ent(nm('Praise popup','Popup khen'),params([
       [anim(1),t('Great, Amazing or Extreme pops up over the board, with the ammo gained under it.','Great, Amazing hoặc Extreme bật lên trên bàn, bên dưới là số đạn nhận được.')]
-    ]))+
+    ]),'',demo('praise'))+
     ent(nm('Result screen','Màn hình kết quả'),params([
       [anim(1),t('Confetti, 3 stars fill in, “Well Done! Level Completed!”, then Tap To Continue.','Pháo giấy, 3 sao lần lượt sáng, “Well Done! Level Completed!”, rồi Tap To Continue.')]
-    ]));
+    ]),'',demo('result'));
 
   B['element-object-concept']=noEl;
 
@@ -1436,6 +1516,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Reference animations','Anim tham khảo'),ul([
+        t(`Added a looping reference animation to each core object in 3.2: jelly cube, cannon, wall cube, praise popup and result screen.`,`Thêm anim tham khảo chạy lặp cho từng đối tượng ở mục 3.2: khối thạch, pháo, khối trên tường, popup khen và màn hình kết quả.`)
+      ]))+
       ent(t('New document','Tài liệu mới'),ul([
         t(`Created this GDD from the template.`,`Tạo tài liệu này từ template.`),
         t(`Rules from “Shifting Match – Gameplay Breakdown GDD” (Nov 12, 2026). Inferred rules are tagged “to verify”.`,`Luật chơi lấy từ “Shifting Match – Gameplay Breakdown GDD” (12/11/2026). Luật suy luận được gắn nhãn “cần kiểm chứng”.`),
