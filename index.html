@@ -1147,7 +1147,7 @@ function view(l){
       params([
         [t('When','Khi nào'),t(`Right after a group clears, while the cleared cubes fly into the cannon.`,`Ngay khi một nhóm bị xóa, trong lúc các khối vừa xóa bay vào pháo.`)],
         [t('Which colors','Màu nào'),t(`Only colors the target grid still needs. Need of a color = target cubes of that color left − ammo of that color (in cannons and in flight). A color with need ≤ 0 does not spawn. The spawn color does not have to be the color just cleared.`,`Chỉ những màu lưới mục tiêu còn cần. Nhu cầu của một màu = số khối mục tiêu màu đó còn lại − số đạn màu đó (trong pháo và đang bay). Màu có nhu cầu ≤ 0 thì không spawn. Màu spawn không nhất thiết là màu vừa xóa.`)],
-        [t('How many','Bao nhiêu'),t(`Cubes cleared − 1 (5 cleared → 4 new, 4 cleared → 3 new), split between the needed colors.`,`Số khối vừa xóa − 1 (xóa 5 → 4 khối mới, xóa 4 → 3 khối mới), chia cho các màu còn cần.`)+' '+inf],
+        [t('How many','Bao nhiêu'),t(`The same number as the cubes just turned into ammo (5 cleared → 5 new), split between the needed colors. The board keeps the same cube count.`,`Bằng số khối vừa biến thành đạn (xóa 5 → 5 khối mới), chia cho các màu còn cần. Số khối trên bàn giữ nguyên.`)],
         [t('Where','Ở đâu'),t(`Empty cells spread over the board, often corners and edges. A new cube never lands where it makes a group by itself: the player still has to move cubes.`,`Các ô trống rải khắp bàn, thường ở góc và mép. Khối mới không bao giờ đáp vào chỗ tự tạo thành nhóm: người chơi vẫn phải kéo khối.`)],
         [t('Always a group','Luôn tạo được nhóm'),t(`After a spawn, every needed color that is still short must have at least 4 cubes on the board (or 3 that can line up), so the player can always make a new group. Cubes move freely, so enough cubes of one color means a group is possible.`,`Sau mỗi lần spawn, mỗi màu còn cần phải có ít nhất 4 khối trên bàn (hoặc 3 khối xếp thẳng hàng được), để người chơi luôn tạo được nhóm mới. Khối kéo đi tự do, nên đủ khối cùng màu là ghép được.`)],
         [t('Look','Hình ảnh'),t(`The landing cell first shows rings in the new cube's color. Then the cube flies in from the left or right edge of the screen, large, shrinks and lands.`,`Ô sắp nhận khối hiện vòng tròn đồng tâm cùng màu khối mới. Sau đó khối bay vào từ mép trái hoặc phải màn hình, to rồi thu nhỏ và đáp xuống ô.`)],
@@ -1750,7 +1750,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
-        ent(t('Spawning new cubes','Spawn khối mới'),ul([
+        ent(t('Spawn count','Số khối spawn'),ul([
+        t(`New cubes spawned = cubes just turned into ammo (was cleared − 1).`,`Số khối spawn mới = số khối vừa biến thành đạn (trước là số khối xóa − 1).`)
+      ]))+
+      ent(t('Spawning new cubes','Spawn khối mới'),ul([
         t(`Added the spawn rules for new board cubes (1.2), from the reference video: needed colors only, cleared − 1 cubes, spread-out cells, ring telegraph.`,`Thêm luật spawn khối mới trên bàn (mục 1.2), rút từ video tham khảo: chỉ màu còn cần, số khối = số vừa xóa − 1, ô rải rác, vòng tròn báo trước.`)
       ]))+
       ent(t('Ammo and praise tiers','Số đạn và mức khen'),ul([
