@@ -725,6 +725,24 @@ const DEMOS={
       ['.a2','transform',[[4.7,T(0,0)],[5.1,T(0,-36)]]]
     ]},
   /* ----- Jelly Smash core loop: slide a cube, the group of 4 flies into its cannon, the cannon shoots the wall ----- */
+  hiddenCube:{D:5.0, /* Hidden Cube: clear a group next to the hidden cube, it flips and shows its real color */
+    svg:()=>{
+      const bx=i=>36+32*i,by=j=>66+32*j;
+      let wall='';[1,1,1,2,2,2,2].forEach((c,i)=>{wall+=jcube(16+24*i,4,20,c);});
+      let cells='';for(let j=0;j<4;j++)for(let i=0;i<4;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="30" height="30" rx="8"/>`;
+      const hid=`<g class="hd"><rect class="hidbox" x="${bx(2)}" y="${by(1)}" width="30" height="30" rx="8"/><rect class="lip" x="${bx(2)}" y="${by(1)}" width="30" height="30" rx="8"/><rect class="hidbox" x="${bx(2)}" y="${by(1)}" width="30" height="27" rx="8"/><text class="qmark" x="${bx(2)+15}" y="${by(1)+13}" dy=".35em">?</text></g>`;
+      return wall+cannon(80,28,1,['0','10'],'rc')+cannon(120,28,2,['0'],'')+cells+
+        jcube(bx(3),by(1),30,2)+jcube(bx(2),by(2),30,4)+jcube(bx(0),by(2),30,4)+jcube(bx(1),by(3),30,2)+
+        hid+`<g class="rv" style="opacity:0">${jcube(bx(2),by(1),30,2)}</g>`+
+        `<g class="g0">${jcube(bx(0),by(0),30,1)}</g><g class="g1">${jcube(bx(1),by(0),30,1)}</g><g class="g2"><g class="mv">${jcube(bx(3),by(0),30,1)}</g></g>`+tap(147,81);},
+    tracks:()=>{
+      const tr=[...tapTracks(.4),['.mv','transform',[[.65,T(0,0)],[1.05,T(-32,0)]]]];
+      [51,83,115].forEach((x,k)=>{const s=1.5+k*.1;
+        tr.push([`.g${k}`,'transform',[[1.2,'scale(1)'],[1.32,'scale(1.08)'],[1.44,'scale(1)'],[s,T(0,0)],[s+.45,T(80-x,-31,.3)]]],[`.g${k}`,'opacity',[[0,1],[s+.4,1],[s+.45,0]]]);});
+      tr.push(['.rc .v0','opacity',[[0,1],[2.1,1],[2.15,0]]],['.rc .v1','opacity',[[0,0],[2.1,0],[2.15,1]]],['.rc','transform',[[2.1,'scale(1)'],[2.2,'scale(1.15)'],[2.4,'scale(1)']]],
+        ['.hd','transform',[[2.3,'scale(1,1)'],[2.5,'scale(0,1)']]],['.hd','opacity',[[0,1],[2.48,1],[2.5,0]]],
+        ['.rv','opacity',[[0,0],[2.5,0],[2.52,1]]],['.rv','transform',[[2.5,'scale(0,1)'],[2.7,'scale(1.1,1)'],[2.85,'scale(1)']]]);
+      return tr;}},
   stacked:{D:4.6, /* Stacked Cube: a stack of 3 on the wall takes 3 shots; each shot pops the front cube and the rest drop into place */
     svg:()=>{
       let wall='';[4,2,0,4,2].forEach((c,i)=>{if(c)wall+=jcube(18+34*i,50,28,c);});
@@ -1030,8 +1048,8 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Lock Cube','Khối khóa'),el3:nm('Stacked Cube','Khối chồng')};
-  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Lock Cube','Khối khóa'),el3:t('Stacked Cube','Khối chồng')};
+  const N={el1:nm('Jelly Layer','Lớp thạch'),el2:nm('Lock Cube','Khối khóa'),el3:nm('Stacked Cube','Khối chồng'),el4:nm('Hidden Cube','Khối ẩn')};
+  const P={el1:t('Jelly Layer','Lớp thạch'),el2:t('Lock Cube','Khối khóa'),el3:t('Stacked Cube','Khối chồng'),el4:t('Hidden Cube','Khối ẩn')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
   const noBo=none('No boosters yet. To be added later.','Chưa có booster. Sẽ bổ sung sau.');
@@ -1047,6 +1065,7 @@ function view(l){
     pop:t('A drop hits a wall cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối trên tường. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
     praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
+    hiddenCube:t('A red line of 3 clears right next to the hidden cube. The hidden cube flips and shows its real color: blue.','Một hàng 3 khối đỏ được xóa ngay cạnh khối ẩn. Khối ẩn lật lại và hiện màu thật: xanh dương.'),
     stacked:t('A stack of 3 blue cubes on the wall. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên tường. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
     lockedBlock:t('A red cube slides next to the chained red jelly. The group of 4 matches, the chain breaks and the group flies into the red cannon.','Một khối đỏ trượt tới cạnh khối đỏ bị xích. Nhóm 4 khối được ghép, xích vỡ và cả nhóm bay vào pháo đỏ.'),
     jellyLayer:t('Four red layers line up and match. The layers fly into the red cannon, and the jellies inside become normal cubes.','4 lớp đỏ xếp thành hàng và được ghép. Các lớp bay vào pháo đỏ, thạch bên trong thành khối thường.'),
@@ -1303,7 +1322,15 @@ function view(l){
       t(`Level design: the board must hold enough cubes of each color to cover every cube in every stack.`,`Thiết kế màn: bàn chơi phải đủ khối mỗi màu để phá hết mọi khối trong mọi chồng.`),
       t(`Can one stack mix colors? TBD. Maximum stack height: TBD. Unlock level: TBD.`,`Một chồng có được trộn nhiều màu không: TBD. Chiều cao tối đa của chồng: TBD. Màn mở khóa: TBD.`),
       `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`No countdown. Stacks only change how much ammo a level needs, which level design covers.`,`Không có đếm ngược. Chồng khối chỉ làm tăng lượng đạn cần cho màn, phần này do thiết kế màn đảm bảo.`)}`
-    ]),unlock('TBD'),demo('stacked'));
+    ]),unlock('TBD'),demo('stacked'))+
+    ent(N.el4,ul([
+      t(`A board cube whose real color is hidden. It shows as a grey cube with a “?”.`,`Một khối trên bàn bị giấu màu thật. Khối hiện màu xám kèm dấu “?”.`),
+      t(`To reveal it, the player clears a group in which at least one cube is next to the hidden cube (up, down, left or right).`,`Để lộ màu, người chơi phải xóa một nhóm có ít nhất 1 khối nằm kề khối ẩn (trên, dưới, trái hoặc phải).`),
+      t(`Once revealed, it becomes a normal cube of its real color and stays in its cell.`,`Khi đã lộ màu, khối thành khối thường mang màu thật và ở lại ô.`),
+      t(`While hidden, it has no color, so it cannot be part of a match.`,`Khi còn ẩn, khối không có màu nên không ghép được.`)+' '+inf,
+      t(`Can a hidden cube be moved? TBD. Unlock level: TBD.`,`Khối ẩn có kéo đi được không: TBD. Màn mở khóa: TBD.`),
+      `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`If no group can be cleared next to a hidden cube, it can never be revealed. Stuck handling: TBD.`,`Nếu không thể xóa nhóm nào cạnh khối ẩn thì khối đó không bao giờ lộ màu. Cách xử lý kẹt: TBD.`)}`
+    ]),unlock('TBD'),demo('hiddenCube'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). Jelly Smash has none yet. */
   B['booster-mechanics']=noBo;
@@ -1354,7 +1381,8 @@ function view(l){
     [
       [N.el1,popup('Match the outer layer<br>to use the jelly inside.','Ghép lớp vỏ ngoài<br>để dùng thạch bên trong.'),lvl(17)],
       [N.el2,popup('Match the chained jellies<br>to break them free.','Ghép các khối bị xích<br>để giải phóng chúng.'),lvl(24)],
-      [N.el3,popup('Stacked cubes take<br>more shots!','Khối chồng cần<br>nhiều phát bắn hơn!'),lvl('TBD')]
+      [N.el3,popup('Stacked cubes take<br>more shots!','Khối chồng cần<br>nhiều phát bắn hơn!'),lvl('TBD')],
+      [N.el4,popup('Clear cubes next to it<br>to reveal its color!','Xóa khối bên cạnh<br>để lộ màu thật!'),lvl('TBD')]
     ]);
 
   /* PER GAME: one row per booster. Jelly Smash has none yet. */
@@ -1365,7 +1393,8 @@ function view(l){
     [1,t('First tutorial','Hướng dẫn đầu tiên'),'ftue','ftue-steps','FTUE'],
     [17,P.el1,'elem','elements-mechanics'],
     [24,P.el2,'elem','elements-mechanics'],
-    ['TBD',P.el3,'elem','elements-mechanics']
+    ['TBD',P.el3,'elem','elements-mechanics'],
+    ['TBD',P.el4,'elem','elements-mechanics']
   ];
   B['ftue--tutorial:after']=`<div class="glance">
     <h4>${t('Unlock order at a glance','Thứ tự mở khóa theo màn')}</h4>
@@ -1415,6 +1444,10 @@ function view(l){
     ent(N.el3,params([
       [look,t('A wall cube with one or more cubes peeking out behind it, and a small number badge with the cubes left.','Một khối trên tường, phía sau lộ ra một hoặc nhiều khối, kèm huy hiệu nhỏ ghi số khối còn lại.')],
       [an,t('Hit: the front cube pops with a paint splash, the cubes behind drop into place and the number goes down by 1.','Trúng đạn: khối trước vỡ kèm sơn bắn tung, các khối sau tụt xuống thế chỗ và con số giảm 1.')]
+    ]))+
+    ent(N.el4,params([
+      [look,t('A grey jelly cube with a white “?” on its face.','Khối thạch màu xám có dấu “?” trắng trên mặt.')],
+      [an,t('Reveal: the cube flips around and comes back in its real color with a small bounce.','Lộ màu: khối lật một vòng rồi hiện lại với màu thật, nảy nhẹ.')]
     ]));
 
   B['booster-object-concept']=noBo;
@@ -1439,6 +1472,7 @@ function view(l){
     ['Wall Cube Pop','core',t('A wall cube is destroyed','Một khối trên tường bị phá'),1],
     ['Jelly Layer','el',t('A layer clears and frees the jelly inside','Lớp vỏ được gỡ và thả thạch bên trong'),0],
     ['Lock Cube','el',t('The chain breaks','Xích bị phá'),0],
+    ['Hidden Cube Reveal','el',t('A hidden cube shows its real color','Khối ẩn hiện màu thật'),0],
     ['Stacked Cube Hit','el',t('A shot pops the front cube of a stack','Một phát bắn phá khối trước của chồng'),0]
   ];
   B['sfx--haptics']=table(t('SFX and haptics','Âm thanh và rung'),
@@ -1626,6 +1660,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Hidden Cube','Khối ẩn'),ul([
+        t(`Added the fourth element, Hidden Cube: clear a group next to it to reveal its real color. Rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo. Moving while hidden and unlock level: TBD.`,`Thêm yếu tố đặc biệt thứ 4, Khối ẩn: xóa một nhóm cạnh nó để lộ màu thật. Luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động. Có kéo được khi còn ẩn không và màn mở khóa: TBD.`)
+      ]))+
       ent(t('Stacked Cube','Khối chồng'),ul([
         t(`Added the third element, Stacked Cube: cubes stacked on the target wall, so each stack costs more ammo. Rules in 1.4, tutorial in 2.3, look and animation in 3.3, SFX row in 4, and a reference demo. Unlock level, stack height and mixed colors: TBD.`,`Thêm yếu tố đặc biệt thứ 3, Khối chồng: các khối chồng lên nhau trên tường mục tiêu, nên mỗi chồng tốn nhiều đạn hơn. Luật ở 1.4, hướng dẫn ở 2.3, hình ảnh và chuyển động ở 3.3, dòng SFX ở mục 4, kèm minh họa động. Màn mở khóa, chiều cao chồng và việc trộn màu: TBD.`)
       ]))+
