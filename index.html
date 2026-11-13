@@ -1134,9 +1134,6 @@ function view(l){
       [t('Win','Thắng'),t(`Every target cube is destroyed.`,`Mọi khối mục tiêu đều bị phá.`)],
       [t('Lose','Thua'),t(`A target cube slides down and touches the bottom of the target area: the player did not make groups fast enough to load the cannons. Shown before the revive offer.`,`Một khối mục tiêu trượt xuống chạm đáy khu vực mục tiêu: người chơi không tạo nhóm kịp để nạp đạn cho pháo. Hiện trước lựa chọn hồi sinh.`)],
       [t('Stars','Sao'),t(`3 stars on every win. No star criteria seen.`,`Thắng luôn được 3 sao. Chưa thấy tiêu chí tính sao.`)]
-    ]))+
-    ent(t('Open questions','Câu hỏi còn mở'),ul([
-      t(`Does a cube slide until it is blocked, or move to any reachable empty cell?`,`Khối trượt tới khi bị chặn, hay đi tới bất kỳ ô trống nào tới được?`)
     ]));
 
   B['main-game-mechanics']=
@@ -1147,9 +1144,10 @@ function view(l){
       t(`New cubes spawn on the board after each group the player makes. Where they spawn and which colors: TBD.`,`Khối mới được spawn thêm trên bàn sau mỗi nhóm người chơi tạo được. Vị trí spawn và màu: TBD.`)
     ]),'',demo('smash'))+
     ent(nm('Moving cubes (shift)','Di chuyển khối (shift)'),ul([
-      t(`Drag or swipe a cube toward an empty cell. Tutorial hand and arrow hints show the path.`,`Kéo hoặc vuốt một khối về phía ô trống. Bàn tay hướng dẫn và mũi tên gợi ý chỉ đường đi.`),
+      t(`The player drags a cube from its cell to the target cell. While dragging, arrows on the grid show the path the cube will take.`,`Người chơi kéo khối từ vị trí ban đầu tới ô đích. Khi kéo, mũi tên trên lưới hiện đường khối sẽ đi.`),
       t(`A cube moves only into empty cells. Cubes never swap.`,`Khối chỉ đi vào ô trống. Các khối không đổi chỗ cho nhau.`),
-      t(`A cube can travel more than one cell along a free path, including a bent (L-shaped) path.`,`Khối có thể đi qua nhiều ô theo đường trống, kể cả đường gấp khúc (hình chữ L).`)+' '+inf,
+      t(`A cube can travel more than one cell along a free path, including a bent (L-shaped) path.`,`Khối có thể đi qua nhiều ô theo đường trống, kể cả đường gấp khúc (hình chữ L).`),
+      t(`If the cube cannot move, or cannot reach that cell, it stays where it is.`,`Nếu khối không thể di chuyển hoặc không tới được ô đó, khối đứng yên.`),
       t(`No move limit.`,`Không giới hạn số move.`)
     ]))+
     ent(nm('Matching','Ghép nhóm'),ul([
@@ -1751,6 +1749,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Moving cubes','Di chuyển khối'),ul([
+        t(`Drag from the cube to the target cell; arrows on the grid show the path. Cannot reach: the cube stays. Open questions list removed, all answered.`,`Kéo từ khối tới ô đích; mũi tên trên lưới hiện đường đi. Không tới được: khối đứng yên. Bỏ danh sách Câu hỏi còn mở vì đã trả lời hết.`)
+      ]))+
       ent(t('Open questions answered','Trả lời câu hỏi còn mở'),ul([
         t(`Praise tiers: each group's cube count maps to the Ammo by group size table (1.2).`,`Mức khen: số khối của mỗi nhóm map vào bảng Số đạn theo cỡ nhóm (mục 1.2).`),
         t(`Board cubes do not have to match target cubes: new cubes spawn on the board after each group (1.2).`,`Khối trên bàn không cần khớp khối mục tiêu: khối mới được spawn trên bàn sau mỗi nhóm (mục 1.2).`),
