@@ -520,7 +520,8 @@ const SECTIONS=[
   {id:'live-ops',n:'7',c:6,en:'Live ops',vi:'Tính năng Live Ops',subs:[
     {id:'popup-list',n:'7.1',en:'Popup list',vi:'Danh sách popup'},
     {id:'popup-priority',n:'7.2',en:'Popup priority',vi:'Thứ tự ưu tiên popup'},
-    {id:'collection-event',n:'7.3',en:'Collection Event',vi:'Sự kiện thu thập'}]},
+    {id:'collection-event',n:'7.3',en:'Collection Event',vi:'Sự kiện thu thập'},
+    {id:'leaderboard',n:'7.4',en:'Leaderboard',vi:'Bảng xếp hạng'}]},
   {id:'change-note',n:'8',c:7,en:'Change note',vi:'Ghi chú thay đổi'}
 ];
 const SEC={};
@@ -1599,6 +1600,11 @@ function view(l){
       ['collection_event_colors',t('Target color order, one per event','Thứ tự màu mục tiêu, mỗi sự kiện một màu'),'red, blue, purple, yellow',t('list','danh sách')],
       ['collection_event_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['collection_event_milestones',t('Total jelly for each milestone','Tổng thạch cho từng mốc'),'50, 150, 300, 500, 800',t('jelly','thạch')]
+    ])+
+    rc(t('Leaderboard','Bảng xếp hạng'),[
+      ['leaderboard_round_hours',t('Length of one round','Độ dài một vòng'),'24',t('h','giờ')],
+      ['leaderboard_rank_stars',t('Stars for rank 1, 2, 3, 4–10, 11+','Sao cho hạng 1, 2, 3, 4–10, 11+'),'20, 15, 10, 5, 3','★'],
+      ['leaderboard_league_stars',t('Stars needed for each league','Số sao cần cho từng giải'),'0, 10, 50, 150, 300, 1200, 1700, 2500','★']
     ]);
 
   /* ===== 6. IAP & offers ===== */
@@ -1728,9 +1734,51 @@ function view(l){
 
   /* ===== 7. Live ops ===== */
   /* FIXED: keep the logic. Only change the numbers if the new game differs. */
-  B['live-ops']=`<p class="sec-intro">${t(`The rules for every offer popup (7.1, 7.2) and the Collection Event (7.3). Jelly Smash has no Limited Time Reward, Skip Level or Retry with Booster.`,
-    `Quy tắc cho mọi popup ưu đãi (7.1, 7.2) và Sự kiện thu thập (7.3). Jelly Smash không có Quà giới hạn thời gian, Bỏ qua màn hay Chơi lại kèm công cụ.`)}</p>`;
+  B['live-ops']=`<p class="sec-intro">${t(`The rules for every offer popup (7.1, 7.2) the Collection Event (7.3) and the Leaderboard (7.4). Jelly Smash has no Limited Time Reward, Skip Level or Retry with Booster.`,
+    `Quy tắc cho mọi popup ưu đãi (7.1, 7.2) Sự kiện thu thập (7.3) và Bảng xếp hạng (7.4). Jelly Smash không có Quà giới hạn thời gian, Bỏ qua màn hay Chơi lại kèm công cụ.`)}</p>`;
   const CE=nm('Collection Event','Sự kiện thu thập');
+  B['leaderboard']=
+    sys(nm('Leaderboard','Bảng xếp hạng'),
+      lead(t(`A daily ranking against a small group of players. Win main levels to score points and climb the board. When the round ends, each rank gives stars, and stars move the player up through the leagues. Benchmark: Meowdoku.`,
+        `Bảng xếp hạng theo ngày, đấu với một nhóm nhỏ người chơi. Thắng màn chính để ghi điểm và leo hạng. Hết vòng, mỗi hạng nhận sao, và sao giúp người chơi lên các giải đấu cao hơn. Tham khảo: Meowdoku.`))+
+      tiles([[t('24 h','24 giờ'),t('One round','Một vòng')],['+20 ★',t('Rank 1 reward','Thưởng hạng 1'),'hot'],['8',t('Leagues seen','Số giải đấu thấy được')],[t('TBD','TBD'),t('Unlocks','Mở khóa')]])+
+      panel(t('Scoring and the board','Tính điểm và bảng'),ul([
+        t(`Each main level the player wins adds points to their score this round. Points per level: TBD (1 per win seen).`,`Mỗi màn chính người chơi thắng được cộng điểm cho vòng này. Điểm mỗi màn: TBD (thấy 1 điểm mỗi màn thắng).`)+' '+inf,
+        t(`The board lists the group by score, highest first. Group size: TBD (at least 12 seen).`,`Bảng xếp người trong nhóm theo điểm, cao nhất ở trên. Số người mỗi nhóm: TBD (thấy ít nhất 12).`),
+        t(`Each row: rank, avatar, name, status (Online, Playing, or “x min ago”), score, and the stars that rank gives.`,`Mỗi dòng: hạng, avatar, tên, trạng thái (Đang online, Đang chơi, hoặc “x phút trước”), điểm, và số sao của hạng đó.`),
+        t(`Ranks 1–3 also show a gift box: red, blue and green. Box contents: TBD.`,`Hạng 1–3 có thêm hộp quà: đỏ, xanh dương và xanh lá. Nội dung hộp: TBD.`),
+        t(`The player's own row is highlighted and stays in view.`,`Dòng của người chơi được làm nổi bật và luôn hiện trên màn hình.`)+' '+inf
+      ]))+
+      panel(t('Stars by rank at round end','Sao theo hạng khi hết vòng'),
+        table(t('Stars by rank','Sao theo hạng'),[t('Rank','Hạng'),t('Stars','Sao'),t('Extra','Thêm')],[
+          ['1','+20 ★',t('Red gift box','Hộp quà đỏ')],
+          ['2','+15 ★',t('Blue gift box','Hộp quà xanh dương')],
+          ['3','+10 ★',t('Green gift box','Hộp quà xanh lá')],
+          ['4–10','+5 ★',dash],
+          [t('11 and below','Từ 11 trở xuống'),'+3 ★',dash]
+        ],'compact'))+
+      panel(t('Leagues','Giải đấu'),
+        table(t('Leagues','Các giải đấu'),[t('League','Giải đấu'),t('Stars needed','Số sao cần')],[
+          [t('Iron (start)','Sắt (khởi đầu)'),'0'],[t('League 2','Giải 2'),'10'],[t('League 3','Giải 3'),'50'],[t('Gold','Vàng'),'150'],
+          [t('League 5','Giải 5'),'300'],[t('League 6','Giải 6'),'1,200'],[t('League 7','Giải 7'),'1,700'],[t('Legend','Huyền thoại'),'2,500']
+        ],'compact')+
+        ul([
+          t(`Total stars decide the league. Reaching a league's star count unlocks it. Locked leagues show a padlock and their star count.`,`Tổng số sao quyết định giải đấu. Đạt số sao của một giải là mở khóa giải đó. Giải chưa mở hiện ổ khóa và số sao cần.`),
+          t(`The top of the screen is a carousel of league statues (one character per league). Swipe left or right to see them. “Current: x ★” shows the player's stars.`,`Phía trên màn hình là băng chuyền tượng các giải đấu (mỗi giải một nhân vật). Vuốt trái hoặc phải để xem. “Hiện tại: x ★” là số sao của người chơi.`),
+          t(`Names of leagues 2, 3, 5, 6 and 7: TBD. More leagues may sit between 300 and 1,200 stars: the video swipes past them.`,`Tên giải 2, 3, 5, 6 và 7: TBD. Có thể còn giải giữa mốc 300 và 1.200 sao: video vuốt qua quá nhanh.`),
+          t(`Not playing for a long time can drop the player to a lower league. How long and how far: TBD.`,`Không chơi trong thời gian dài có thể bị hạ xuống giải thấp hơn. Bao lâu và hạ mấy bậc: TBD.`)
+        ]))+
+      panel(t('Screens','Màn hình'),ul([
+        t(`<b>Home icon:</b> a podium with the round countdown (for example 23:57:09) and a red badge. Tap to open the board.`,`<b>Biểu tượng ở màn hình chính:</b> bục xếp hạng kèm đồng hồ đếm ngược của vòng (ví dụ 23:57:09) và chấm đỏ. Chạm để mở bảng.`),
+        t(`<b>Board:</b> title, round countdown, league carousel, ranking list, and a “Go Get Rewards” button that starts the next level.`,`<b>Bảng:</b> tiêu đề, đồng hồ đếm ngược, băng chuyền giải đấu, danh sách xếp hạng, và nút “Đi Nhận Thưởng” để vào màn tiếp theo.`),
+        t(`<b>Info (i):</b> how it works in 4 pictures: win main levels → top the board → get an exclusive frame and gift → earn ★ to move up a league. Note: “Not playing for a long time can drop you a league.” Tap to continue.`,`<b>Thông tin (i):</b> cách chơi bằng 4 hình: hoàn thành các màn chính → dẫn đầu bảng xếp hạng → nhận khung và quà độc quyền → nhận ★ để thăng giải đấu cao hơn. Ghi chú: “Không chơi trong thời gian dài có thể khiến bạn bị hạ bậc.” Chạm để tiếp tục.`),
+        t(`Rank 1 gets an exclusive avatar frame. Details: TBD.`,`Hạng 1 nhận khung avatar độc quyền. Chi tiết: TBD.`)
+      ]))+
+      kv([
+        [t('Round reset','Bắt đầu vòng mới'),t(`Every 24 h. Stars are given when the round ends, then scores reset and a new group is formed. Reset time and group matching: TBD.`,`Mỗi 24 giờ. Sao được trao khi hết vòng, sau đó điểm về 0 và ghép nhóm mới. Giờ reset và cách ghép nhóm: TBD.`)+' '+inf],
+        [t('Numbers','Con số'),t(`Round length, stars per rank and league thresholds are remote config (5).`,`Độ dài vòng, sao mỗi hạng và mốc giải đấu nằm trong cấu hình từ xa (mục 5).`)]
+      ]));
+
   B['collection-event']=
     sys(CE,
       lead(t(`A timed event. Each event asks the player to collect one jelly color: red, blue, purple or yellow. Win levels to fill the progress bar. Each milestone gives a gift. Win in a row to multiply what you collect, up to ×5. Benchmark: Royal Match collection events.`,
@@ -1786,7 +1834,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
-        ent(t('Spawn demo','Minh họa spawn'),ul([
+        ent(t('Leaderboard','Bảng xếp hạng'),ul([
+        t(`Added the Leaderboard (7.4) from the Meowdoku screen recording: daily round, stars by rank, 8 leagues by stars, inactivity demotion. Values added to remote config (5).`,`Thêm Bảng xếp hạng (mục 7.4) từ video quay màn hình Meowdoku: vòng theo ngày, sao theo hạng, 8 giải đấu theo sao, hạ bậc khi không chơi. Thêm thông số vào cấu hình từ xa (mục 5).`)
+      ]))+
+      ent(t('Spawn demo','Minh họa spawn'),ul([
         t(`Added a reference animation to Spawning new cubes (1.2): bottom-row scan, % per color, and new cubes flying in.`,`Thêm anim tham khảo cho mục Spawn khối mới (1.2): scan hàng dưới cùng, % mỗi màu và khối mới bay vào.`)
       ]))+
       ent(t('Spawn colors','Màu spawn'),ul([
