@@ -1086,16 +1086,16 @@ function view(l){
   /* PER GAME: one caption per entry in DEMOS, same keys. These are the Caps Sorting captions for the example demos. */
   const DCAP={
     jelly:t('A cube slides in, squashes as it lands, then the group pulses and flies into the cannon.','Khối trượt vào, bẹp lại khi dừng, rồi cả nhóm phồng lên và bay vào pháo.'),
-    cannonIn:t('Ammo flies in and the counter ticks up with a bounce. Then a shot: recoil, and a drop flies to the wall.','Đạn bay vào, số đạn tăng kèm cú nảy. Sau đó pháo bắn: giật nhẹ, giọt màu bay lên tường.'),
-    pop:t('A drop hits a wall cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối trên tường. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
+    cannonIn:t('Ammo flies in and the counter ticks up with a bounce. Then a shot: recoil, and a drop flies to the target grid.','Đạn bay vào, số đạn tăng kèm cú nảy. Sau đó pháo bắn: giật nhẹ, giọt màu bay lên lưới mục tiêu.'),
+    pop:t('A drop hits a target cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối mục tiêu. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
     praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
     lockedCannon:t('The blue cannon is locked (2 groups to go). A red group counts it down to 1. A blue group loads 10 ammo and counts it to 0: the lock breaks and the cannon starts firing.','Pháo xanh đang bị khóa (còn 2 nhóm). Một nhóm đỏ đếm xuống 1. Một nhóm xanh nạp 10 đạn và đếm về 0: khóa vỡ và pháo bắt đầu bắn.'),
     hiddenCube:t('A red line of 3 clears right next to the hidden cube. The hidden cube flips and shows its real color: blue.','Một hàng 3 khối đỏ được xóa ngay cạnh khối ẩn. Khối ẩn lật lại và hiện màu thật: xanh dương.'),
-    stacked:t('A stack of 3 blue cubes on the wall. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên tường. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
+    stacked:t('A stack of 3 blue cubes on the target grid. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên lưới mục tiêu. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
     lockedBlock:t('A red cube slides next to the chained red jelly. The group of 4 matches, the chain breaks and the group flies into the red cannon.','Một khối đỏ trượt tới cạnh khối đỏ bị xích. Nhóm 4 khối được ghép, xích vỡ và cả nhóm bay vào pháo đỏ.'),
     jellyLayer:t('Four red layers line up and match. The layers fly into the red cannon, and the jellies inside become normal cubes.','4 lớp đỏ xếp thành hàng và được ghép. Các lớp bay vào pháo đỏ, thạch bên trong thành khối thường.'),
-    smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the wall.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên tường.'),
+    smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the target grid.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên lưới mục tiêu.'),
     hidden:t('The box reaches the top of its queue and reveals its color.','Hộp lên tới đầu hàng chờ và hiện màu.'),
     locked:t('Two boxes are sent, the number hits 0 and the item can be picked.','Đưa 2 hộp lên, con số về 0 và vật phẩm được nhặt.'),
     linked:t('Both boxes reach the top, the link breaks and they can be sent.','Hai hộp cùng lên đầu hàng chờ, liên kết được gỡ và cả hai được đưa lên.'),
@@ -1122,31 +1122,23 @@ function view(l){
         `Người chơi trượt các khối thạch trên bàn vào ô trống để tạo nhóm cùng màu.`),
       t(`A group that is big enough clears and becomes ammo for the cannon of that color.`,
         `Nhóm đủ lớn sẽ biến mất và thành đạn cho khẩu pháo cùng màu.`),
-      t(`Cannons fire on their own and smash cubes of their color on the wall above. Clear the wall to win.`,
-        `Pháo tự bắn và phá các khối cùng màu trên bức tường phía trên. Phá hết tường là thắng.`)
+      t(`Cannons fire on their own at the nearest target cube of their color. The target grid above slides down. Clear it before it reaches the bottom.`,
+        `Pháo tự bắn vào khối mục tiêu cùng màu gần nhất. Lưới mục tiêu phía trên trượt dần xuống. Phá hết lưới trước khi nó chạm đáy.`)
     ]))+
     ent(t('At a glance','Tóm tắt'),params([
       [t('Genre','Thể loại'),t('Hyper/hybrid-casual puzzle: sliding-block match that feeds an auto-shooter','Puzzle hyper/hybrid-casual: trượt khối ghép màu, nạp đạn cho pháo tự bắn')],
       [t('Platform','Nền tảng'),t('Mobile, portrait','Mobile, màn hình dọc')],
       [t('Session','Thời lượng'),t('About 15–40 s for early levels, 1.5 min or more by level 10','Khoảng 15–40 giây ở các màn đầu, từ 1,5 phút trở lên ở màn 10')]
     ]))+
-    ent(t('Core loop','Vòng chơi chính'),ol([
-      t(`Slide a cube into an empty cell.`,`Trượt một khối vào ô trống.`),
-      t(`If it completes a big enough same-color group, the group clears with a praise popup.`,`Nếu tạo được nhóm cùng màu đủ lớn, nhóm biến mất kèm popup khen.`),
-      t(`The cleared cubes fly into the cannon of that color. Its ammo counter goes up.`,`Các khối vừa xóa bay vào pháo cùng màu. Số đạn của pháo tăng lên.`),
-      t(`Cannons with ammo fire on their own, one shot per ammo. Each hit pops one wall cube of that color.`,`Pháo có đạn tự bắn, mỗi viên đạn một phát. Mỗi phát trúng phá 1 khối cùng màu trên tường.`),
-      t(`Repeat until the wall is empty: “Well Done! Level Completed!” with 3 stars, then Tap To Continue.`,`Lặp lại tới khi tường trống: hiện “Well Done! Level Completed!” kèm 3 sao, rồi Tap To Continue.`)
-    ]))+
     ent(t('Win and lose','Thắng và thua'),params([
-      [t('Win','Thắng'),t(`Every cube on the wall is destroyed.`,`Mọi khối trên tường đều bị phá.`)],
-      [t('Lose','Thua'),t(`No match is possible on the board while wall cubes remain (stuck). Shown before the revive offer.`,`Trên bàn không còn cách ghép nào trong khi tường vẫn còn khối (bị kẹt). Hiện trước lựa chọn hồi sinh.`)+' '+inf],
+      [t('Win','Thắng'),t(`Every target cube is destroyed.`,`Mọi khối mục tiêu đều bị phá.`)],
+      [t('Lose','Thua'),t(`A target cube slides down and touches the bottom of the target area: the player did not make groups fast enough to load the cannons. Shown before the revive offer.`,`Một khối mục tiêu trượt xuống chạm đáy khu vực mục tiêu: người chơi không tạo nhóm kịp để nạp đạn cho pháo. Hiện trước lựa chọn hồi sinh.`)],
       [t('Stars','Sao'),t(`3 stars on every win. No star criteria seen.`,`Thắng luôn được 3 sao. Chưa thấy tiêu chí tính sao.`)]
     ]))+
     ent(t('Open questions','Câu hỏi còn mở'),ul([
       t(`How group size maps to the praise tiers.`,`Cỡ nhóm ứng với từng mức khen ra sao.`),
       t(`Does a cube slide until it is blocked, or move to any reachable empty cell?`,`Khối trượt tới khi bị chặn, hay đi tới bất kỳ ô trống nào tới được?`),
-      t(`Is there a fail state (stuck board, not enough ammo), and what UI shows it?`,`Có trạng thái thua không (bàn bị kẹt, thiếu đạn), và giao diện báo thế nào?`),
-      t(`Are the board cubes of each color tuned to match the wall cubes of that color?`,`Số khối mỗi màu trên bàn có được chỉnh khớp với số khối màu đó trên tường không?`),
+      t(`Are the board cubes of each color tuned to match the target cubes of that color?`,`Số khối mỗi màu trên bàn có được chỉnh khớp với số khối màu đó trên lưới mục tiêu không?`),
       t(`What do the target-ring markers seen on the board in levels 7 and 10 mean?`,`Các vòng tròn đánh dấu thấy trên bàn ở màn 7 và 10 nghĩa là gì?`),
       t(`What sets the star rating, other than completing the level?`,`Ngoài việc qua màn, sao được tính theo gì?`)
     ]));
@@ -1180,17 +1172,21 @@ function view(l){
       `<p>${t(`A straight line of 3 gives +10, the same as a group of 4. From 4 cubes, ammo values are seen in the recording; the size mapping is inferred and fits <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches. Epic (10+ cubes): ammo TBD. Groups of 7 and 9 have no tier yet: TBD.`,
               `Hàng thẳng 3 khối được +10, bằng nhóm 4. Từ 4 khối trở lên, số đạn lấy từ video; cỡ nhóm là suy luận, khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn. Epic (từ 10 khối): số đạn TBD. Nhóm 7 và 9 khối chưa có mức khen: TBD.`)} ${inf}</p>`)+
     ent(nm('Cannons','Pháo'),ul([
-      t(`One cannon per wall color, in a row between the wall and the board. Each shows its ammo count.`,`Mỗi màu trên tường có 1 khẩu pháo, xếp thành hàng giữa tường và bàn chơi. Mỗi pháo hiện số đạn.`),
+      t(`One cannon per target color, in a row between the target grid and the board. Each shows its ammo count.`,`Mỗi màu mục tiêu có 1 khẩu pháo, xếp thành hàng giữa lưới mục tiêu và bàn chơi. Mỗi pháo hiện số đạn.`),
       t(`Cannon count: 1 in level 1, 2 in levels 2–5, 3 from level 6.`,`Số pháo: 1 ở màn 1, 2 ở màn 2–5, 3 từ màn 6.`),
       t(`A cannon only damages cubes of its own color.`,`Pháo chỉ phá khối cùng màu với nó.`),
       t(`Fires on its own while ammo is above 0, several shots per second. Fire rate: TBD.`,`Tự bắn khi còn đạn, vài phát mỗi giây. Tốc độ bắn: TBD.`),
-      t(`Aims at the nearest or lowest reachable cube of its color.`,`Nhắm vào khối cùng màu gần nhất hoặc thấp nhất mà nó bắn tới được.`)+' '+inf,
-      t(`1 ammo = 1 shot = 1 wall cube.`,`1 đạn = 1 phát = 1 khối trên tường.`)+' '+inf,
+      t(`Targets the nearest target cube of its color and fires at it while it has ammo. No ammo: it waits.`,`Nhắm vào khối mục tiêu cùng màu gần nhất và bắn khi còn đạn. Hết đạn: pháo chờ.`),
+      t(`1 ammo = 1 shot = 1 target cube.`,`1 đạn = 1 phát = 1 khối mục tiêu.`),
       t(`Cannons fire in parallel, so the player keeps matching while shots land.`,`Các pháo bắn cùng lúc, nên người chơi vẫn ghép tiếp trong khi đạn bay.`)
     ]))+
-    ent(nm('Target wall','Bức tường mục tiêu'),ul([
-      t(`A mosaic of colored cubes hanging from the top of a framed arena.`,`Một mảng khối nhiều màu treo từ phía trên của khung đấu.`),
-      t(`The board never refills, so a level is a closed puzzle: the board cubes of each color should roughly cover the wall cubes of that color.`,`Bàn không bổ sung khối, nên mỗi màn là một câu đố đóng: số khối mỗi màu trên bàn phải gần đủ cho số khối màu đó trên tường.`)+' '+inf
+    ent(nm('Target grid','Lưới cube mục tiêu'),ul([
+      t(`A grid of colored target cubes at the top of the arena.`,`Một lưới gồm các khối mục tiêu nhiều màu ở phía trên khung đấu.`),
+      t(`Each target cube needs 1 ammo of its color to be destroyed.`,`Mỗi khối mục tiêu cần 1 viên đạn cùng màu để phá.`),
+      t(`The whole grid moves down together, toward the bottom of the target area. Speed: TBD.`,`Cả lưới di chuyển đồng thời từ trên xuống, về phía đáy khu vực mục tiêu. Tốc độ: TBD.`),
+      t(`The grid does not move when the level starts. It starts moving the first time the player touches a board cube (moving cubes).`,`Lưới đứng yên khi bắt đầu màn. Lưới chỉ bắt đầu di chuyển khi người chơi chạm vào khối trên bàn lần đầu tiên (moving cubes).`),
+      t(`If any target cube touches the bottom, the level is lost (see Win and lose in 1.1).`,`Nếu có khối mục tiêu chạm đáy thì thua màn (xem Thắng và thua ở mục 1.1).`),
+      t(`The board never refills, so a level is a closed puzzle: the board cubes of each color should roughly cover the target cubes of that color.`,`Bàn không bổ sung khối, nên mỗi màn là một câu đố đóng: số khối mỗi màu trên bàn phải gần đủ cho số khối mục tiêu màu đó.`)+' '+inf
     ]))+
     ent(t('Level progression (as recorded)','Tiến trình màn chơi (theo video)'),
       table(t('Level progression','Tiến trình màn chơi'),[t('Level','Màn'),t('Colors','Màu'),t('What is new','Điểm mới')],[
@@ -1205,8 +1201,8 @@ function view(l){
         ['9',t('Blue, Yellow','Xanh dương, Vàng'),t('Full 7×7 checker-like scatter, many small groups.','Bàn 7×7 kín, rải kiểu bàn cờ, nhiều nhóm nhỏ.')],
         ['10',t('Red, Blue, Green','Đỏ, Xanh dương, Xanh lá'),t('8×8 board with a hollow center. Longest level so far.','Bàn 8×8 trống ở giữa. Màn dài nhất tới giờ.')]
       ],'wide')+
-      `<p>${t(`Difficulty levers: number of colors, board shape and free-cell count, how scattered each color starts, and wall size.`,
-              `Các đòn bẩy độ khó: số màu, hình bàn và số ô trống, độ phân tán ban đầu của từng màu, và kích thước tường.`)}</p>`);
+      `<p>${t(`Difficulty levers: number of colors, board shape and free-cell count, how scattered each color starts, and target grid size.`,
+              `Các đòn bẩy độ khó: số màu, hình bàn và số ô trống, độ phân tán ban đầu của từng màu, và kích thước lưới mục tiêu.`)}</p>`);
 
   /* FIXED: 1.3 is shared logic across projects. Keep it as it is and only change the numbers. */
 
@@ -1341,7 +1337,7 @@ function view(l){
       `<b>${t('Fail-safe','Chống kẹt')}:</b> ${t(`A chained jelly cannot move, so a level can get stuck if not enough cubes of its color can reach it. Stuck handling: TBD.`,`Khối bị xích không di chuyển được, nên màn có thể bị kẹt nếu không đủ khối cùng màu tới được cạnh nó. Cách xử lý kẹt: TBD.`)}`
     ]),unlock(24),demo('lockedBlock'))+
     ent(N.el3,ul([
-      t(`A spot on the target wall where several cubes are stacked on top of each other. A number on the stack shows how many cubes are left.`,`Một vị trí trên bức tường mục tiêu có nhiều khối chồng lên nhau. Con số trên chồng cho biết còn bao nhiêu khối.`),
+      t(`A spot on the target grid where several cubes are stacked on top of each other. A number on the stack shows how many cubes are left.`,`Một vị trí trên lưới mục tiêu có nhiều khối chồng lên nhau. Con số trên chồng cho biết còn bao nhiêu khối.`),
       t(`Each shot removes only the front cube of the stack. The cubes behind drop into its place.`,`Mỗi phát bắn chỉ phá khối trước cùng của chồng. Các khối phía sau tụt xuống thế chỗ.`),
       t(`1 ammo = 1 cube still holds, so a stack of N cubes takes N ammo to clear. This makes the stack cost more ammo than a single cube.`,`Vẫn giữ 1 đạn = 1 khối, nên chồng N khối cần N đạn mới phá hết. Vì vậy chồng tốn nhiều đạn hơn một khối đơn.`),
       t(`The spot is cleared only when the last cube of the stack is destroyed.`,`Vị trí chỉ trống khi khối cuối cùng của chồng bị phá.`),
@@ -1402,11 +1398,11 @@ function view(l){
        t('The player taps to agree to the Terms &amp; Conditions / Privacy Policy.','Người chơi chạm đồng ý với Điều khoản / Chính sách quyền riêng tư.'),dash,dash,dash],
       [t('First shift','Shift đầu tiên'),t('The player drags the shown cube along the arrow into the empty cell and makes a line of 4 blue cubes.','Người chơi kéo khối được chỉ theo mũi tên vào ô trống, tạo hàng 4 khối xanh.'),
        t('The cube, the arrow path and the target cell. The tutorial hand plays the drag.','Khối cần kéo, đường mũi tên và ô đích. Bàn tay hướng dẫn diễn cách kéo.'),popup('Slide to match 4!','Trượt để ghép 4 khối!'),dash],
-      [t('Ammo and shooting','Nạp đạn và bắn'),t('The group flies into the blue cannon and it fires at the wall. No input needed.','Nhóm bay vào pháo xanh và pháo bắn lên tường. Không cần thao tác.'),
+      [t('Ammo and shooting','Nạp đạn và bắn'),t('The group flies into the blue cannon and it fires at the target grid. No input needed.','Nhóm bay vào pháo xanh và pháo bắn lên lưới mục tiêu. Không cần thao tác.'),
        t('The cannon and its ammo counter','Pháo và số đạn'),popup('Matches load your cannon!','Ghép khối để nạp đạn cho pháo!'),dash],
       [t('Bigger group','Nhóm lớn hơn'),t('The player makes a group of 5 or 6 (Great or Amazing).','Người chơi ghép nhóm 5 hoặc 6 khối (Great hoặc Amazing).'),
        t('The cubes of the group to finish','Các khối của nhóm cần hoàn thành'),popup('Bigger groups, more ammo!','Nhóm càng lớn, đạn càng nhiều!'),dash],
-      [t('Level complete','Hoàn thành màn'),t('Every wall cube is destroyed.','Mọi khối trên tường đều bị phá.'),dash,dash,t('Yes','Có')]
+      [t('Level complete','Hoàn thành màn'),t('Every target cube is destroyed.','Mọi khối mục tiêu đều bị phá.'),dash,dash,t('Yes','Có')]
     ],'wide steps-tbl');
 
   /* PER GAME: one row per element, in unlock order. Jelly Smash has none yet. */
@@ -1440,14 +1436,14 @@ function view(l){
 
   /* ===== 3. Object set & animation ===== */
   /* PER GAME */
-  B['game-concept']=`<p>${t(`Glossy jelly cubes in bright colors on a deep purple arena. The player lines them up to load chunky cannons, which blast a hanging wall of jelly cubes with paint-drop shots. Reference: the level 2 screenshot (sketch at the top of this page).`,
-    `Các khối thạch bóng, màu tươi, trên nền khung đấu tím đậm. Người chơi xếp khối để nạp đạn cho những khẩu pháo to tròn, pháo bắn đạn giọt sơn vào bức tường khối thạch treo phía trên. Tham khảo: ảnh chụp màn 2 (hình minh họa ở đầu trang).`)}</p>`;
+  B['game-concept']=`<p>${t(`Glossy jelly cubes in bright colors on a deep purple arena. The player lines them up to load chunky cannons, which blast a grid of target jelly cubes with paint-drop shots. Reference: the level 2 screenshot (sketch at the top of this page).`,
+    `Các khối thạch bóng, màu tươi, trên nền khung đấu tím đậm. Người chơi xếp khối để nạp đạn cho những khẩu pháo to tròn, pháo bắn đạn giọt sơn vào lưới khối thạch mục tiêu phía trên. Tham khảo: ảnh chụp màn 2 (hình minh họa ở đầu trang).`)}</p>`;
 
   const colors=[t('Red','Đỏ'),t('Blue','Xanh dương'),t('Green','Xanh lá'),t('Yellow','Vàng'),t('Pink','Hồng'),t('Orange','Cam'),t('Purple','Tím'),t('Cyan','Xanh ngọc')];
   const anim=n=>t('Animation '+n,'Chuyển động '+n);
   B['core-game-object-concept']=
     ent(t('Color list','Bảng màu'),
-      `<p>${t('Board cubes, wall cubes, cannons and shots share this color list.','Khối trên bàn, khối trên tường, pháo và đạn dùng chung bảng màu này.')}</p>
+      `<p>${t('Board cubes, target cubes, cannons and shots share this color list.','Khối trên bàn, khối mục tiêu, pháo và đạn dùng chung bảng màu này.')}</p>
        <ol class="colors">${colors.map((c,i)=>`<li>${cap(i+1,i+1)}<span><span class="sr">${i+1}: </span>${c}</span></li>`).join('')}</ol>`)+
     ent(nm('Jelly cube','Khối thạch'),params([
       [anim(1),t('Slide and land: the cube squashes and wobbles when it stops in a cell.','Trượt và dừng: khối bẹp lại rồi rung nhẹ khi dừng vào ô.')],
@@ -1457,7 +1453,7 @@ function view(l){
       [anim(1),t('Ammo in: the counter ticks up and the cannon bounces.','Nạp đạn: số đạn tăng và pháo nảy nhẹ.')],
       [anim(2),t('Shot: small recoil, a colored drop flies to the target cube.','Bắn: giật nhẹ, một giọt màu bay tới khối mục tiêu.')]
     ]),'',demo('cannonIn'))+
-    ent(nm('Wall cube','Khối trên tường'),params([
+    ent(nm('Target cube','Khối mục tiêu'),params([
       [anim(1),t('Hit: the cube pops with a paint-splash particle in its color.','Trúng đạn: khối vỡ kèm hạt sơn bắn tung cùng màu.')]
     ]),'',demo('pop'))+
     ent(nm('Praise popup','Popup khen'),params([
@@ -1478,7 +1474,7 @@ function view(l){
       [an,t('Chain breaks: the padlock swells and pops with a small puff, then the cube clears with its group.','Khi phá xích: ổ khóa phồng lên rồi vỡ kèm làn khói nhỏ, sau đó khối được xóa cùng nhóm.')]
     ]))+
     ent(N.el3,params([
-      [look,t('A wall cube with one or more cubes peeking out behind it, and a small number badge with the cubes left.','Một khối trên tường, phía sau lộ ra một hoặc nhiều khối, kèm huy hiệu nhỏ ghi số khối còn lại.')],
+      [look,t('A target cube with one or more cubes peeking out behind it, and a small number badge with the cubes left.','Một khối mục tiêu, phía sau lộ ra một hoặc nhiều khối, kèm huy hiệu nhỏ ghi số khối còn lại.')],
       [an,t('Hit: the front cube pops with a paint splash, the cubes behind drop into place and the number goes down by 1.','Trúng đạn: khối trước vỡ kèm sơn bắn tung, các khối sau tụt xuống thế chỗ và con số giảm 1.')]
     ]))+
     ent(N.el4,params([
@@ -1500,7 +1496,7 @@ function view(l){
     ['BGM In Game','ui',t('Gameplay starts','Bắt đầu vào chơi'),0],
     ['BGM Home','ui',t('The home scene is open','Đang ở màn hình chính'),0],
     ['Win Level','ui',t('The player wins the level','Người chơi thắng màn'),3],
-    ['Lose Level','ui',t('The player is temporarily stuck','Người chơi tạm thời bị kẹt'),3],
+    ['Lose Level','ui',t('A target cube reaches the bottom','Một khối mục tiêu chạm đáy'),3],
     ['Tap','ui',t('The player taps the screen','Người chơi chạm vào màn hình'),1],
     ['Coin Reward','ui',t('The player earns coins','Người chơi nhận xu'),0],
     ['Booster Reward','ui',t('The player earns a booster','Người chơi nhận công cụ hỗ trợ'),0],
@@ -1509,7 +1505,7 @@ function view(l){
     ['Praise','core',t('Great, Amazing, Extreme or Epic shows','Hiện Great, Amazing, Extreme hoặc Epic'),2],
     ['Ammo Load','core',t('Cubes reach the cannon and its counter goes up','Khối bay tới pháo và số đạn tăng'),0],
     ['Cannon Shot','core',t('A cannon fires','Pháo bắn'),0],
-    ['Wall Cube Pop','core',t('A wall cube is destroyed','Một khối trên tường bị phá'),1],
+    ['Target Cube Pop','core',t('A target cube is destroyed','Một khối mục tiêu bị phá'),1],
     ['Jelly Layer','el',t('A layer clears and frees the jelly inside','Lớp vỏ được gỡ và thả thạch bên trong'),0],
     ['Lock Cube','el',t('The chain breaks','Xích bị phá'),0],
     ['Locked Cannon Unlock','el',t('A locked cannon counts down or unlocks','Pháo bị khóa đếm ngược hoặc mở khóa'),1],
@@ -1758,6 +1754,12 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Target grid and lose','Lưới mục tiêu và điều kiện thua'),ul([
+        t(`Target wall renamed to target grid. The whole grid slides down together; each target cube needs 1 ammo of its color.`,`Đổi tên Bức tường mục tiêu thành Lưới cube mục tiêu. Cả lưới trượt xuống đồng thời; mỗi khối mục tiêu cần 1 viên đạn cùng màu.`),
+        t(`The grid stays still until the player first touches a board cube.`,`Lưới đứng yên tới khi người chơi chạm khối trên bàn lần đầu.`),
+        t(`Lose: a target cube touches the bottom of the target area before the player loads enough ammo.`,`Thua: một khối mục tiêu chạm đáy khu vực mục tiêu trước khi người chơi nạp đủ đạn.`),
+        t(`Cannons target the nearest target cube of their color. Core loop list removed from 1.1.`,`Pháo nhắm khối mục tiêu cùng màu gần nhất. Bỏ phần Vòng chơi chính ở mục 1.1.`)
+      ]))+
       ent(t('Element rules confirmed (2)','Chốt luật yếu tố đặc biệt (2)'),ul([
         t(`Hidden Cube: cannot match while hidden; moves freely, so the fail-safe is removed.`,`Khối ẩn: không ghép được khi còn ẩn; kéo đi tự do nên bỏ phần chống kẹt.`),
         t(`Locked Cannon: a group of any color counts; x is set per level in the level config; fail-safe removed, levels always have enough cubes.`,`Pháo bị khóa: nhóm màu nào cũng tính; x đặt theo config từng màn; bỏ phần chống kẹt, màn luôn đủ khối.`)
@@ -1809,8 +1811,8 @@ function view(l){
   /* PER GAME: one legend row per part of the play-screen sketch (A to E), matching the part-A … part-E groups in fieldSVG */
   const legend=[
     ['A',t('HUD','HUD'),t('Settings on the left, level badge in the middle, Restart on the right.','Cài đặt bên trái, số màn ở giữa, Chơi lại bên phải.')],
-    ['B',t('Target wall','Bức tường mục tiêu'),t('Colored cubes hanging from the top of the arena. Clear them all to win.','Các khối màu treo từ trên khung đấu. Phá hết là thắng.')],
-    ['C',t('Cannons','Pháo'),t('One per wall color, with its ammo count. Fires on its own at cubes of its color.','Mỗi màu một khẩu, kèm số đạn. Tự bắn vào khối cùng màu.')],
+    ['B',t('Target grid','Lưới cube mục tiêu'),t('Target cubes at the top. They slide down together once the player first moves a cube. Clear them all before they reach the bottom.','Các khối mục tiêu ở phía trên. Cả lưới trượt xuống từ lần đầu người chơi kéo khối. Phá hết trước khi chạm đáy.')],
+    ['C',t('Cannons','Pháo'),t('One per target color, with its ammo count. Fires on its own at cubes of its color.','Mỗi màu một khẩu, kèm số đạn. Tự bắn vào khối cùng màu.')],
     ['D',t('Board cubes','Khối trên bàn'),t('Slide them to build same-color groups: a straight line of 3, or 4 cubes or more.','Trượt để tạo nhóm cùng màu: hàng thẳng 3 khối, hoặc từ 4 khối trở lên.')],
     ['E',t('Empty cells','Ô trống'),t('Cubes can only move into these.','Khối chỉ đi vào được các ô này.')]
   ];
@@ -1818,12 +1820,12 @@ function view(l){
     <div>
       <h1>${GAME}</h1>
       <p class="kind">${ui.sub}</p>
-      <p class="pitch">${t(`Slide jelly cubes into same-color groups to load the cannons, and let them smash the cube wall above.`,
-                           `Trượt khối thạch thành nhóm cùng màu để nạp đạn cho pháo, rồi để pháo phá tan bức tường khối phía trên.`)}</p>
+      <p class="pitch">${t(`Slide jelly cubes into same-color groups to load the cannons, and let them smash the target grid before it reaches the bottom.`,
+                           `Trượt khối thạch thành nhóm cùng màu để nạp đạn cho pháo, rồi để pháo phá lưới mục tiêu trước khi nó chạm đáy.`)}</p>
       <ul class="legend">${legend.map(g=>`<li><button type="button" data-part="${g[0]}" aria-pressed="false"><span class="pinl" data-nosearch>${g[0]}</span><span><b>${g[1]}</b><span class="d">${g[2]}</span></span></button></li>`).join('')}</ul>
     </div>
     <figure class="field${paused?' paused':''}" id="field">
-      <div class="field-box">${fieldSVG(t('Sketch of level 2: a wall of blue and yellow cubes on top, a blue cannon with 0 ammo and a yellow cannon with 16 firing at the wall, and a 4 by 4 board of cubes and empty cells below.','Hình minh họa màn 2: bức tường khối xanh và vàng ở trên, pháo xanh 0 đạn và pháo vàng 16 đạn đang bắn lên tường, bên dưới là bàn 4×4 gồm khối và ô trống.'))}</div>
+      <div class="field-box">${fieldSVG(t('Sketch of level 2: a target grid of blue and yellow cubes on top, a blue cannon with 0 ammo and a yellow cannon with 16 firing at the target grid, and a 4 by 4 board of cubes and empty cells below.','Hình minh họa màn 2: lưới mục tiêu xanh và vàng ở trên, pháo xanh 0 đạn và pháo vàng 16 đạn đang bắn lên lưới mục tiêu, bên dưới là bàn 4×4 gồm khối và ô trống.'))}</div>
       <div class="field-foot"><button type="button" class="pause" id="pauseBtn">${paused?ui.play:ui.pause}</button></div>
       <figcaption>${t(`Sketch of level 2, from the reference screenshot. The yellow cannon fires while the player sets up the next blue match.`,
                        `Minh họa màn 2, theo ảnh chụp tham khảo. Pháo vàng đang bắn trong khi người chơi dựng nhóm xanh tiếp theo.`)}</figcaption>
