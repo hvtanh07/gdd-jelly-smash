@@ -1146,14 +1146,26 @@ function view(l){
     ent(t('Spawning new cubes','Spawn khối mới'),
       params([
         [t('When','Khi nào'),t(`Right after a group clears, while the cleared cubes fly into the cannon.`,`Ngay khi một nhóm bị xóa, trong lúc các khối vừa xóa bay vào pháo.`)],
-        [t('Which colors','Màu nào'),t(`Only colors the target grid still needs. Need of a color = target cubes of that color left − ammo of that color (in cannons and in flight). A color with need ≤ 0 does not spawn. The spawn color does not have to be the color just cleared.`,`Chỉ những màu lưới mục tiêu còn cần. Nhu cầu của một màu = số khối mục tiêu màu đó còn lại − số đạn màu đó (trong pháo và đang bay). Màu có nhu cầu ≤ 0 thì không spawn. Màu spawn không nhất thiết là màu vừa xóa.`)],
-        [t('How many','Bao nhiêu'),t(`The same number as the cubes just turned into ammo (5 cleared → 5 new), split between the needed colors. The board keeps the same cube count.`,`Bằng số khối vừa biến thành đạn (xóa 5 → 5 khối mới), chia cho các màu còn cần. Số khối trên bàn giữ nguyên.`)],
+        [t('How many','Bao nhiêu'),t(`The same number as the cubes just turned into ammo (5 cleared → 5 new). The board keeps the same cube count.`,`Bằng số khối vừa biến thành đạn (xóa 5 → 5 khối mới). Số khối trên bàn giữ nguyên.`)],
+        [t('Which colors','Màu nào'),t(`Set by scanning the bottom row of the target grid, in the 4 steps below.`,`Xác định bằng cách scan hàng dưới cùng của lưới mục tiêu, theo 4 bước bên dưới.`)],
         [t('Where','Ở đâu'),t(`Random empty cells spread over the board, often corners and edges. The game does not set up groups on purpose, but a new cube may land next to same-color cubes by chance and make a group right away. That group clears like any other group.`,`Các ô trống ngẫu nhiên rải khắp bàn, thường ở góc và mép. Game không cố ý xếp sẵn nhóm, nhưng khối mới có thể tình cờ đáp cạnh khối cùng màu và tạo nhóm ngay. Nhóm đó được xóa như mọi nhóm khác.`)+' '+inf],
-        [t('Always a group','Luôn tạo được nhóm'),t(`After a spawn, every needed color that is still short must have at least 4 cubes on the board (or 3 that can line up), so the player can always make a new group. Cubes move freely, so enough cubes of one color means a group is possible.`,`Sau mỗi lần spawn, mỗi màu còn cần phải có ít nhất 4 khối trên bàn (hoặc 3 khối xếp thẳng hàng được), để người chơi luôn tạo được nhóm mới. Khối kéo đi tự do, nên đủ khối cùng màu là ghép được.`)],
+        [t('Always a group','Luôn tạo được nhóm'),t(`After a spawn, at least one color on the spawn list must have enough cubes on the board to make a group (4, or 3 that can line up). Cubes move freely, so enough cubes of one color means a group is possible.`,`Sau mỗi lần spawn, ít nhất một màu trong danh sách spawn phải có đủ khối trên bàn để tạo nhóm (4 khối, hoặc 3 khối xếp thẳng hàng được). Khối kéo đi tự do, nên đủ khối cùng màu là ghép được.`)+' '+inf],
         [t('Look','Hình ảnh'),t(`The landing cell first shows rings in the new cube's color. Then the cube flies in from the left or right edge of the screen, large, shrinks and lands.`,`Ô sắp nhận khối hiện vòng tròn đồng tâm cùng màu khối mới. Sau đó khối bay vào từ mép trái hoặc phải màn hình, to rồi thu nhỏ và đáp xuống ô.`)],
-        [t('Leftovers','Khối thừa'),t(`Cubes of a color the grid no longer needs stay on the board. They are not removed.`,`Khối của màu lưới không còn cần vẫn nằm lại trên bàn, không bị xóa.`)]
+        [t('Leftovers','Khối thừa'),t(`Board cubes of a color that is no longer in the bottom row stay on the board. They are not removed.`,`Khối trên bàn của màu không còn ở hàng dưới cùng vẫn nằm lại, không bị xóa.`)]
       ])+
-      `<p class="note">${t(`From the reference video (Shifting Match, levels 2 and 6). There the target grid does not slide down, so the game counts every target cube left. Counting only the bottom rows of the sliding grid is an option: TBD.`,`Rút từ video tham khảo (Shifting Match, màn 2 và 6). Trong video lưới mục tiêu không trượt xuống, nên game tính mọi khối mục tiêu còn lại. Chỉ tính các hàng dưới cùng của lưới trượt là một phương án: TBD.`)}</p>`)+
+      `<div class="gbox"><h5 class="gbox-h blk">${t('Choosing the spawn colors','Chọn màu spawn')}</h5>`+ol([
+        t(`<b>Scan.</b> The game reads every target cube in the bottom row of the target grid: the row closest to the bottom of the target area. If that row is empty, it uses the lowest row that still has cubes.`,`<b>Scan.</b> Game đọc mọi khối mục tiêu ở hàng dưới cùng của lưới mục tiêu, tức hàng gần đáy khu vực mục tiêu nhất. Nếu hàng đó trống, game dùng hàng thấp nhất còn khối.`),
+        t(`<b>Color list.</b> Every color found in that row goes on the spawn list. Colors not in that row do not spawn this time.`,`<b>Danh sách màu.</b> Mọi màu có trong hàng đó được đưa vào danh sách spawn. Màu không có trong hàng đó thì lần này không spawn.`),
+        t(`<b>Percent.</b> % of a color = its cubes in that row ÷ all cubes in that row.`,`<b>Tỉ lệ.</b> % của một màu = số khối màu đó trong hàng ÷ tổng số khối trong hàng.`),
+        t(`<b>Split.</b> Cubes of each color = spawn count × its %. Round down first, then give the cubes left over to the colors with the biggest remainders, so the total always equals the spawn count.`,`<b>Chia.</b> Số khối mỗi màu = số khối spawn × % của màu đó. Làm tròn xuống trước, rồi chia số khối còn dư cho các màu có phần lẻ lớn nhất, để tổng luôn bằng số khối spawn.`)
+      ])+
+        table(t('Spawn split example','Ví dụ chia màu spawn'),[t('Color','Màu'),t('Cubes in bottom row','Khối ở hàng dưới cùng'),'%',t('5 × %','5 × %'),t('Spawned','Spawn')],[
+          [t('Red','Đỏ'),'3','50%','2.5','2'],
+          [t('Blue','Xanh dương'),'2','33%','1.67','2'],
+          [t('Yellow','Vàng'),'1','17%','0.83','1'],
+          [t('Total','Tổng'),'6','100%','5','5']
+        ],'compact')+
+        `<p class="note">${t(`Example: the bottom row has 3 red, 2 blue and 1 yellow, and the player clears 5 cubes. Rounded down: 2 red, 1 blue, 0 yellow = 3. The 2 left over go to the biggest remainders: yellow (0.83) and blue (0.67). Result: 2 red, 2 blue, 1 yellow.`,`Ví dụ: hàng dưới cùng có 3 đỏ, 2 xanh, 1 vàng, người chơi xóa 5 khối. Làm tròn xuống: 2 đỏ, 1 xanh, 0 vàng = 3. 2 khối còn dư chia cho phần lẻ lớn nhất: vàng (0,83) và xanh (0,67). Kết quả: 2 đỏ, 2 xanh, 1 vàng.`)}</p></div>`)+
     ent(nm('Moving cubes (shift)','Di chuyển khối (shift)'),ul([
       t(`The player drags a cube from its cell to the target cell. While dragging, arrows on the grid show the path the cube will take.`,`Người chơi kéo khối từ vị trí ban đầu tới ô đích. Khi kéo, mũi tên trên lưới hiện đường khối sẽ đi.`),
       t(`A cube moves only into empty cells. Cubes never swap.`,`Khối chỉ đi vào ô trống. Các khối không đổi chỗ cho nhau.`),
@@ -1750,7 +1762,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
-        ent(t('Spawn position','Vị trí spawn'),ul([
+        ent(t('Spawn colors','Màu spawn'),ul([
+        t(`Spawn colors now come from a scan of the target grid's bottom row: color list, % per color, then split the spawn count by %. Replaces "needed colors = target cubes left − ammo".`,`Màu spawn giờ lấy từ việc scan hàng dưới cùng của lưới mục tiêu: danh sách màu, % mỗi màu, rồi chia số khối spawn theo %. Thay cho "màu còn cần = khối mục tiêu còn lại − đạn".`)
+      ]))+
+      ent(t('Spawn position','Vị trí spawn'),ul([
         t(`New cubes land in random cells and may make a group right away by chance (was: never makes a group by itself).`,`Khối mới đáp vào ô ngẫu nhiên và có thể tình cờ tạo nhóm ngay (trước: không bao giờ tự tạo nhóm).`)
       ]))+
       ent(t('Spawn count','Số khối spawn'),ul([
