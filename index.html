@@ -906,7 +906,7 @@ const DEMOS={
       let bd='';for(let j=0;j<4;j++)for(let i=0;i<4;i++){bd+=`<g opacity=".35">${jcube(32+35*i,30+35*j,31,[[2,4,2,2],[4,4,2,4],[2,2,4,2],[4,2,2,4]][j][i])}</g>`;}
       const tier=(k,w,word,ammo)=>`<g class="pw${k}" style="opacity:0"><rect class="f7" x="${100-w/2}" y="64" width="${w}" height="36" rx="18"/><text class="bn" x="100" y="82" dy=".35em">${word}</text></g>`+
         `<g class="pa${k}" style="opacity:0"><rect class="f4" x="72" y="108" width="56" height="26" rx="13"/><text class="bn sm l" x="100" y="121" dy=".35em">${ammo}</text></g>`;
-      return bd+tier(0,104,'Great!','+15')+tier(1,128,'Amazing!','+20')+tier(2,124,'Extreme!','+30')+tier(3,92,'Epic!','+TBD');},
+      return bd+tier(0,104,'Great!','+15')+tier(1,128,'Amazing!','+20')+tier(2,124,'Extreme!','+30')+tier(3,92,'Epic!','+40');},
     tracks:()=>[0,1,2,3].flatMap(k=>{const s=.3+k*2.1;return [
       [`.pw${k}`,'opacity',[[0,0],[s,0],[s+.08,1],[s+1.5,1],[s+1.75,0]]],
       [`.pw${k}`,'transform',[[s,'scale(.3)'],[s+.2,'scale(1.15)'],[s+.35,'scale(1)']]],
@@ -1162,11 +1162,15 @@ function view(l){
         [dash,'4','+10'],
         [popup('Great','Tốt'),'5','+15'],
         [popup('Amazing','Tuyệt vời'),'6','+20'],
+        [popup('Amazing','Tuyệt vời'),'7','+25'],
         [popup('Extreme','Cực đỉnh'),'8','+30'],
-        [popup('Epic','Siêu đỉnh'),t('10 or more','Từ 10 trở lên'),'TBD']
+        [popup('Extreme','Cực đỉnh'),'9','+35'],
+        [popup('Epic','Siêu đỉnh'),t('10 or more','Từ 10 trở lên'),t('+40 for 10, then +5 per extra cube','+40 với 10 khối, mỗi khối thêm +5')]
       ],'compact')+
-      `<p>${t(`Each time a group forms, the game maps its cube count to this table to show the praise popup and give the ammo. A straight line of 3 gives +10, the same as a group of 4. Values fit <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches. Epic (10+ cubes): ammo TBD. Groups of 7 and 9 have no tier yet: TBD.`,
-              `Mỗi khi một nhóm được tạo, game map số khối trong nhóm vào bảng này để hiện popup khen và cộng đạn. Hàng thẳng 3 khối được +10, bằng nhóm 4. Số đạn khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn. Epic (từ 10 khối): số đạn TBD. Nhóm 7 và 9 khối chưa có mức khen: TBD.`)}</p>`)+
+      `<p>${t(`Each time a group forms, the game maps its cube count to this table to show the praise popup and give the ammo. A straight line of 3 gives +10, the same as a group of 4. From 4 cubes, every size follows <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches.`,
+              `Mỗi khi một nhóm được tạo, game map số khối trong nhóm vào bảng này để hiện popup khen và cộng đạn. Hàng thẳng 3 khối được +10, bằng nhóm 4. Từ 4 khối trở lên, mọi cỡ nhóm đều theo công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn.`)}</p>`+
+      `<p>${t(`Praise tiers by group size: 5 = Great, 6–7 = Amazing, 8–9 = Extreme, 10 or more = Epic. 3 and 4 cubes show no praise, only the ammo text.`,
+              `Mức khen theo cỡ nhóm: 5 = Great, 6–7 = Amazing, 8–9 = Extreme, từ 10 trở lên = Epic. Nhóm 3 và 4 khối không có lời khen, chỉ hiện số đạn.`)}</p>`)+
     ent(nm('Cannons','Pháo'),ul([
       t(`One cannon per target color, in a row between the target grid and the board. Each shows its ammo count.`,`Mỗi màu mục tiêu có 1 khẩu pháo, xếp thành hàng giữa lưới mục tiêu và bàn chơi. Mỗi pháo hiện số đạn.`),
       t(`Cannon count: 1 in level 1, 2 in levels 2–5, 3 from level 6.`,`Số pháo: 1 ở màn 1, 2 ở màn 2–5, 3 từ màn 6.`),
@@ -1735,6 +1739,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Ammo and praise tiers','Số đạn và mức khen'),ul([
+        t(`Every group size from 4 follows ammo = 5 × (cubes − 2): 7 = +25, 9 = +35, 10 = +40 (1.2).`,`Mọi cỡ nhóm từ 4 theo công thức đạn = 5 × (số khối − 2): 7 = +25, 9 = +35, 10 = +40 (mục 1.2).`),
+        t(`Praise tiers: 5 Great, 6–7 Amazing, 8–9 Extreme, 10+ Epic.`,`Mức khen: 5 Great, 6–7 Amazing, 8–9 Extreme, từ 10 Epic.`)
+      ]))+
       ent(t('Level progression removed','Bỏ tiến trình màn chơi'),ul([
         t(`Removed the Level progression (as recorded) table from 1.2.`,`Bỏ bảng Tiến trình màn chơi (theo video) khỏi mục 1.2.`)
       ]))+
