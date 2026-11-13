@@ -1283,8 +1283,7 @@ function view(l){
   B['game-concept']=`<p>${t(`Glossy jelly cubes in bright colors on a deep purple arena. The player lines them up to load chunky cannons, which blast a hanging wall of jelly cubes with paint-drop shots. Reference: the level 2 screenshot (sketch at the top of this page).`,
     `Các khối thạch bóng, màu tươi, trên nền khung đấu tím đậm. Người chơi xếp khối để nạp đạn cho những khẩu pháo to tròn, pháo bắn đạn giọt sơn vào bức tường khối thạch treo phía trên. Tham khảo: ảnh chụp màn 2 (hình minh họa ở đầu trang).`)}</p>`;
 
-  /* Jelly Smash uses the first 4 colors only (seen in levels 1–10) */
-  const colors=[t('Red','Đỏ'),t('Blue','Xanh dương'),t('Green','Xanh lá'),t('Yellow','Vàng')];
+  const colors=[t('Red','Đỏ'),t('Blue','Xanh dương'),t('Green','Xanh lá'),t('Yellow','Vàng'),t('Pink','Hồng'),t('Orange','Cam'),t('Purple','Tím'),t('Cyan','Xanh ngọc')];
   const anim=n=>t('Animation '+n,'Chuyển động '+n);
   B['core-game-object-concept']=
     ent(t('Color list','Bảng màu'),
@@ -1516,6 +1515,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Color list','Bảng màu'),ul([
+        t(`The color list in 3.2 has the full 8 colors again, the same as earlier games.`,`Bảng màu ở mục 3.2 có lại đủ 8 màu, giống các game trước.`)
+      ]))+
       ent(t('Reference animations','Anim tham khảo'),ul([
         t(`Added a looping reference animation to each core object in 3.2: jelly cube, cannon, wall cube, praise popup and result screen.`,`Thêm anim tham khảo chạy lặp cho từng đối tượng ở mục 3.2: khối thạch, pháo, khối trên tường, popup khen và màn hình kết quả.`)
       ]))+
