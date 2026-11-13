@@ -750,6 +750,29 @@ const DEMOS={
         tr.push([`.dp${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[e,1],[e+.03,0]]],[`.dp${k}`,'transform',[[s,T(0,0)],[e,T(x-130,y-40)]]],
           [`.w${3+k}`,'transform',[[e,'scale(1)'],[e+.1,'scale(1.25)'],[e+.28,'scale(0)']]],[`.w${3+k}`,'opacity',[[0,1],[e+.2,1],[e+.28,0]]]);});
       return tr;}},
+  spawn:{D:5.2, /* Spawning new cubes: scan the bottom row of the target grid, work out % per color, a group of 5 clears, 5 new cubes fly in by those % */
+    svg:()=>{
+      const row=[1,1,2,1,2,4],rx=i=>26+25*i,bx=i=>20+32*i,by=j=>100+32*j;
+      let top='';[2,2,4,4,2,1].forEach((c,i)=>{top+=`<g opacity=".35">${jcube(rx(i),-14,22,c)}</g>`;});
+      row.forEach((c,i)=>{top+=jcube(rx(i),10,22,c);});
+      const scan=`<rect class="scan" x="${rx(0)-2}" y="8" width="26" height="26" rx="7" fill="#fff" opacity="0"/>`;
+      const chip=(x,c,txt,k)=>`<g class="ch${k}" style="opacity:0"><rect class="f${c}" x="${x}" y="44" width="44" height="18" rx="9"/><text class="bn sm${c===4?' l':''}" x="${x+22}" y="53" dy=".35em" style="font-size:11px">${txt}</text></g>`;
+      let cells='';for(let j=0;j<3;j++)for(let i=0;i<5;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="28" height="28" rx="8"/>`;
+      const keep=[[0,0,1],[4,0,2],[0,2,4]].map(([i,j,c])=>jcube(bx(i),by(j),28,c)).join('');
+      const grp=[0,1,2,3,4].map(i=>`<g class="gp${i}">${jcube(bx(i),by(1),28,3)}</g>`).join('');
+      const sp=[[2,0,1],[3,1,1],[1,1,2],[3,2,2],[1,2,4]];
+      const rings=sp.map(([i,j,c],k)=>`<circle class="s${c} rg${k}" cx="${bx(i)+14}" cy="${by(j)+14}" r="11" fill="none" stroke-width="2.5" style="opacity:0"/>`).join('');
+      const nw=sp.map(([i,j,c],k)=>`<g class="nw${k}" style="opacity:0">${jcube(bx(i),by(j),28,c)}</g>`).join('');
+      return top+scan+chip(24,1,'50%',0)+chip(78,2,'33%',1)+chip(132,4,'17%',2)+cells+keep+grp+rings+nw;},
+    tracks:()=>{
+      const rx=i=>26+25*i,tr=[];
+      tr.push(['.scan','opacity',[[0,0],[.2,0],[.3,.45],[1.1,.45],[1.2,0]]],['.scan','transform',[[.3,T(0,0)],[1.1,T(rx(5)-rx(0),0)]]]);
+      [0,1,2].forEach(k=>tr.push([`.ch${k}`,'opacity',[[0,0],[1.2+k*.15,0],[1.35+k*.15,1]]],[`.ch${k}`,'transform',[[1.2+k*.15,'scale(.6)'],[1.4+k*.15,'scale(1.1)'],[1.55+k*.15,'scale(1)']]]));
+      [0,1,2,3,4].forEach(i=>tr.push([`.gp${i}`,'transform',[[2.0,'scale(1)'],[2.15,'scale(1.12)'],[2.45,'scale(0)']]],[`.gp${i}`,'opacity',[[0,1],[2.35,1],[2.45,0]]]));
+      [[2,0],[3,1],[1,1],[3,2],[1,2]].forEach(([i,j],k)=>{const r=2.55+k*.08,f=3.0+k*.12,x=20+32*i,dx=(k%2?220:-60)-x;
+        tr.push([`.rg${k}`,'opacity',[[0,0],[r,0],[r+.1,1],[f+.35,1],[f+.45,0]]],[`.rg${k}`,'transform',[[r,'scale(.4)'],[r+.3,'scale(1.1)'],[r+.5,'scale(.9)'],[r+.7,'scale(1.1)']]],
+          [`.nw${k}`,'opacity',[[0,0],[f,0],[f+.03,1]]],[`.nw${k}`,'transform',[[f,T(dx,-40,1.8)],[f+.35,T(0,0,1.1)],[f+.5,T(0,0,1)]]]);});
+      return tr;}},
   hiddenCube:{D:5.0, /* Hidden Cube: clear a group next to the hidden cube, it flips and shows its real color */
     svg:()=>{
       const bx=i=>36+32*i,by=j=>66+32*j;
@@ -1091,6 +1114,7 @@ function view(l){
     praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
     lockedCannon:t('The blue cannon is locked (2 groups to go). A red group counts it down to 1. A blue group loads 10 ammo and counts it to 0: the lock breaks and the cannon starts firing.','Pháo xanh đang bị khóa (còn 2 nhóm). Một nhóm đỏ đếm xuống 1. Một nhóm xanh nạp 10 đạn và đếm về 0: khóa vỡ và pháo bắt đầu bắn.'),
+    spawn:t('The game scans the bottom row of the target grid: 3 red, 2 blue, 1 yellow, so 50%, 33% and 17%. A group of 5 clears, rings mark 5 random empty cells, and 5 new cubes fly in: 2 red, 2 blue, 1 yellow.','Game scan hàng dưới cùng của lưới mục tiêu: 3 đỏ, 2 xanh, 1 vàng, tức 50%, 33% và 17%. Một nhóm 5 khối bị xóa, vòng tròn đánh dấu 5 ô trống ngẫu nhiên, rồi 5 khối mới bay vào: 2 đỏ, 2 xanh, 1 vàng.'),
     hiddenCube:t('A red line of 3 clears right next to the hidden cube. The hidden cube flips and shows its real color: blue.','Một hàng 3 khối đỏ được xóa ngay cạnh khối ẩn. Khối ẩn lật lại và hiện màu thật: xanh dương.'),
     stacked:t('A stack of 3 blue cubes on the target grid. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên lưới mục tiêu. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
     lockedBlock:t('A red cube slides next to the chained red jelly. The group of 4 matches, the chain breaks and the group flies into the red cannon.','Một khối đỏ trượt tới cạnh khối đỏ bị xích. Nhóm 4 khối được ghép, xích vỡ và cả nhóm bay vào pháo đỏ.'),
@@ -1165,7 +1189,7 @@ function view(l){
           [t('Yellow','Vàng'),'1','17%','0.83','1'],
           [t('Total','Tổng'),'6','100%','5','5']
         ],'compact')+
-        `<p class="note">${t(`Example: the bottom row has 3 red, 2 blue and 1 yellow, and the player clears 5 cubes. Rounded down: 2 red, 1 blue, 0 yellow = 3. The 2 left over go to the biggest remainders: yellow (0.83) and blue (0.67). Result: 2 red, 2 blue, 1 yellow.`,`Ví dụ: hàng dưới cùng có 3 đỏ, 2 xanh, 1 vàng, người chơi xóa 5 khối. Làm tròn xuống: 2 đỏ, 1 xanh, 0 vàng = 3. 2 khối còn dư chia cho phần lẻ lớn nhất: vàng (0,83) và xanh (0,67). Kết quả: 2 đỏ, 2 xanh, 1 vàng.`)}</p></div>`)+
+        `<p class="note">${t(`Example: the bottom row has 3 red, 2 blue and 1 yellow, and the player clears 5 cubes. Rounded down: 2 red, 1 blue, 0 yellow = 3. The 2 left over go to the biggest remainders: yellow (0.83) and blue (0.67). Result: 2 red, 2 blue, 1 yellow.`,`Ví dụ: hàng dưới cùng có 3 đỏ, 2 xanh, 1 vàng, người chơi xóa 5 khối. Làm tròn xuống: 2 đỏ, 1 xanh, 0 vàng = 3. 2 khối còn dư chia cho phần lẻ lớn nhất: vàng (0,83) và xanh (0,67). Kết quả: 2 đỏ, 2 xanh, 1 vàng.`)}</p></div>`,'',demo('spawn'))+
     ent(nm('Moving cubes (shift)','Di chuyển khối (shift)'),ul([
       t(`The player drags a cube from its cell to the target cell. While dragging, arrows on the grid show the path the cube will take.`,`Người chơi kéo khối từ vị trí ban đầu tới ô đích. Khi kéo, mũi tên trên lưới hiện đường khối sẽ đi.`),
       t(`A cube moves only into empty cells. Cubes never swap.`,`Khối chỉ đi vào ô trống. Các khối không đổi chỗ cho nhau.`),
@@ -1762,7 +1786,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
-        ent(t('Spawn colors','Màu spawn'),ul([
+        ent(t('Spawn demo','Minh họa spawn'),ul([
+        t(`Added a reference animation to Spawning new cubes (1.2): bottom-row scan, % per color, and new cubes flying in.`,`Thêm anim tham khảo cho mục Spawn khối mới (1.2): scan hàng dưới cùng, % mỗi màu và khối mới bay vào.`)
+      ]))+
+      ent(t('Spawn colors','Màu spawn'),ul([
         t(`Spawn colors now come from a scan of the target grid's bottom row: color list, % per color, then split the spawn count by %. Replaces "needed colors = target cubes left − ammo".`,`Màu spawn giờ lấy từ việc scan hàng dưới cùng của lưới mục tiêu: danh sách màu, % mỗi màu, rồi chia số khối spawn theo %. Thay cho "màu còn cần = khối mục tiêu còn lại − đạn".`)
       ]))+
       ent(t('Spawn position','Vị trí spawn'),ul([
