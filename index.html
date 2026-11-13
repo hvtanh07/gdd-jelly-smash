@@ -821,13 +821,13 @@ const DEMOS={
       [0,1,2,3,4,5,6,7].forEach(k=>{const a=k*Math.PI/4,r=k%2?30:40;
         tr.push([`.sp${k}`,'transform',[[1.0,T(0,0,.4)],[1.55,T(Math.cos(a)*r,Math.sin(a)*r,1)]]],[`.sp${k}`,'opacity',[[0,0],[1.0,0],[1.04,1],[1.4,1],[1.7,0]]]);});
       return tr;}},
-  praise:{D:6.6, /* Great, Amazing and Extreme pop over the board with the ammo gained */
+  praise:{D:8.8, /* Great, Amazing, Extreme and Epic pop over the board with the ammo gained */
     svg:()=>{
       let bd='';for(let j=0;j<4;j++)for(let i=0;i<4;i++){bd+=`<g opacity=".35">${jcube(32+35*i,30+35*j,31,[[2,4,2,2],[4,4,2,4],[2,2,4,2],[4,2,2,4]][j][i])}</g>`;}
       const tier=(k,w,word,ammo)=>`<g class="pw${k}" style="opacity:0"><rect class="f7" x="${100-w/2}" y="64" width="${w}" height="36" rx="18"/><text class="bn" x="100" y="82" dy=".35em">${word}</text></g>`+
         `<g class="pa${k}" style="opacity:0"><rect class="f4" x="72" y="108" width="56" height="26" rx="13"/><text class="bn sm l" x="100" y="121" dy=".35em">${ammo}</text></g>`;
-      return bd+tier(0,104,'Great!','+15')+tier(1,128,'Amazing!','+20')+tier(2,124,'Extreme!','+30');},
-    tracks:()=>[0,1,2].flatMap(k=>{const s=.3+k*2.1;return [
+      return bd+tier(0,104,'Great!','+15')+tier(1,128,'Amazing!','+20')+tier(2,124,'Extreme!','+30')+tier(3,92,'Epic!','+TBD');},
+    tracks:()=>[0,1,2,3].flatMap(k=>{const s=.3+k*2.1;return [
       [`.pw${k}`,'opacity',[[0,0],[s,0],[s+.08,1],[s+1.5,1],[s+1.75,0]]],
       [`.pw${k}`,'transform',[[s,'scale(.3)'],[s+.2,'scale(1.15)'],[s+.35,'scale(1)']]],
       [`.pa${k}`,'opacity',[[0,0],[s+.35,0],[s+.45,1],[s+1.5,1],[s+1.75,0]]],
@@ -1008,7 +1008,7 @@ function view(l){
     jelly:t('A cube slides in, squashes as it lands, then the group pulses and flies into the cannon.','Khối trượt vào, bẹp lại khi dừng, rồi cả nhóm phồng lên và bay vào pháo.'),
     cannonIn:t('Ammo flies in and the counter ticks up with a bounce. Then a shot: recoil, and a drop flies to the wall.','Đạn bay vào, số đạn tăng kèm cú nảy. Sau đó pháo bắn: giật nhẹ, giọt màu bay lên tường.'),
     pop:t('A drop hits a wall cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối trên tường. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
-    praise:t('Great, Amazing and Extreme pop over the board, with the ammo gained under each.','Great, Amazing và Extreme bật lên trên bàn, bên dưới là số đạn nhận được.'),
+    praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
     jellyLayer:t('Four red layers line up and match. The layers fly into the red cannon, and the jellies inside become normal cubes.','4 lớp đỏ xếp thành hàng và được ghép. Các lớp bay vào pháo đỏ, thạch bên trong thành khối thường.'),
     smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the wall.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên tường.'),
@@ -1090,10 +1090,11 @@ function view(l){
         [dash,'4','+10'],
         [popup('Great','Tốt'),'5','+15'],
         [popup('Amazing','Tuyệt vời'),'6','+20'],
-        [popup('Extreme','Cực đỉnh'),'8','+30']
+        [popup('Extreme','Cực đỉnh'),'8','+30'],
+        [popup('Epic','Siêu đỉnh'),t('10 or more','Từ 10 trở lên'),'TBD']
       ],'compact')+
-      `<p>${t(`A straight line of 3 gives +10, the same as a group of 4. From 4 cubes, ammo values are seen in the recording; the size mapping is inferred and fits <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches.`,
-              `Hàng thẳng 3 khối được +10, bằng nhóm 4. Từ 4 khối trở lên, số đạn lấy từ video; cỡ nhóm là suy luận, khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn.`)} ${inf}</p>`)+
+      `<p>${t(`A straight line of 3 gives +10, the same as a group of 4. From 4 cubes, ammo values are seen in the recording; the size mapping is inferred and fits <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches. Epic (10+ cubes): ammo TBD. Groups of 7 and 9 have no tier yet: TBD.`,
+              `Hàng thẳng 3 khối được +10, bằng nhóm 4. Từ 4 khối trở lên, số đạn lấy từ video; cỡ nhóm là suy luận, khớp công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn. Epic (từ 10 khối): số đạn TBD. Nhóm 7 và 9 khối chưa có mức khen: TBD.`)} ${inf}</p>`)+
     ent(nm('Cannons','Pháo'),ul([
       t(`One cannon per wall color, in a row between the wall and the board. Each shows its ammo count.`,`Mỗi màu trên tường có 1 khẩu pháo, xếp thành hàng giữa tường và bàn chơi. Mỗi pháo hiện số đạn.`),
       t(`Cannon count: 1 in level 1, 2 in levels 2–5, 3 from level 6.`,`Số pháo: 1 ở màn 1, 2 ở màn 2–5, 3 từ màn 6.`),
@@ -1336,7 +1337,7 @@ function view(l){
       [anim(1),t('Hit: the cube pops with a paint-splash particle in its color.','Trúng đạn: khối vỡ kèm hạt sơn bắn tung cùng màu.')]
     ]),'',demo('pop'))+
     ent(nm('Praise popup','Popup khen'),params([
-      [anim(1),t('Great, Amazing or Extreme pops up over the board, with the ammo gained under it.','Great, Amazing hoặc Extreme bật lên trên bàn, bên dưới là số đạn nhận được.')]
+      [anim(1),t('Great, Amazing, Extreme or Epic pops up over the board, with the ammo gained under it.','Great, Amazing, Extreme hoặc Epic bật lên trên bàn, bên dưới là số đạn nhận được.')]
     ]),'',demo('praise'))+
     ent(nm('Result screen','Màn hình kết quả'),params([
       [anim(1),t('Confetti, 3 stars fill in, “Well Done! Level Completed!”, then Tap To Continue.','Pháo giấy, 3 sao lần lượt sáng, “Well Done! Level Completed!”, rồi Tap To Continue.')]
@@ -1365,7 +1366,7 @@ function view(l){
     ['Booster Reward','ui',t('The player earns a booster','Người chơi nhận công cụ hỗ trợ'),0],
     ['Cube Slide','core',t('A cube lands in a cell','Một khối dừng vào ô'),1],
     ['Match Clear','core',t('A group clears','Một nhóm được xóa'),2],
-    ['Praise','core',t('Great, Amazing or Extreme shows','Hiện Great, Amazing hoặc Extreme'),2],
+    ['Praise','core',t('Great, Amazing, Extreme or Epic shows','Hiện Great, Amazing, Extreme hoặc Epic'),2],
     ['Ammo Load','core',t('Cubes reach the cannon and its counter goes up','Khối bay tới pháo và số đạn tăng'),0],
     ['Cannon Shot','core',t('A cannon fires','Pháo bắn'),0],
     ['Wall Cube Pop','core',t('A wall cube is destroyed','Một khối trên tường bị phá'),1],
@@ -1556,6 +1557,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Epic popup','Popup Epic'),ul([
+        t(`Added the Epic praise tier for groups of 10 or more cubes (1.2). Ammo for Epic: TBD. The praise demo, 3.2 and SFX now list Epic too.`,`Thêm mức khen Epic cho nhóm từ 10 khối trở lên (mục 1.2). Số đạn của Epic: TBD. Minh họa popup khen, mục 3.2 và SFX đã có thêm Epic.`)
+      ]))+
       ent(t('Match of 3','Ghép 3 khối'),ul([
         t(`A straight line of 3 same-color cubes now matches and gives +10 ammo (1.2). A bent group of 3 still does not match.`,`Hàng thẳng 3 khối cùng màu giờ được ghép và cho +10 đạn (mục 1.2). Nhóm 3 khối gấp khúc vẫn không được ghép.`)
       ]))+
