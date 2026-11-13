@@ -1183,22 +1183,7 @@ function view(l){
       t(`The grid does not move when the level starts. It starts moving the first time the player touches a board cube (moving cubes).`,`Lưới đứng yên khi bắt đầu màn. Lưới chỉ bắt đầu di chuyển khi người chơi chạm vào khối trên bàn lần đầu tiên (moving cubes).`),
       t(`If any target cube touches the bottom, the level is lost (see Win and lose in 1.1).`,`Nếu có khối mục tiêu chạm đáy thì thua màn (xem Thắng và thua ở mục 1.1).`),
       t(`The board cubes of each color do not have to match the target cubes of that color: new board cubes spawn after each group.`,`Số khối mỗi màu trên bàn không cần khớp với số khối mục tiêu màu đó: khối mới được spawn thêm trên bàn sau mỗi nhóm.`)
-    ]))+
-    ent(t('Level progression (as recorded)','Tiến trình màn chơi (theo video)'),
-      table(t('Level progression','Tiến trình màn chơi'),[t('Level','Màn'),t('Colors','Màu'),t('What is new','Điểm mới')],[
-        ['1',t('Blue','Xanh dương'),t('Tutorial: the hand shows shifts. Line of 4, Great and Amazing matches.','Hướng dẫn: bàn tay chỉ cách shift. Ghép hàng 4, Great và Amazing.')],
-        ['2',t('Blue, Yellow','Xanh dương, Vàng'),t('Second color and cannon. Colors now get in each other’s way.','Màu và pháo thứ hai. Các màu bắt đầu cản nhau.')],
-        ['3',t('Red, Yellow','Đỏ, Vàng'),t('Ring-shaped board.','Bàn hình vòng.')],
-        ['4',t('Red, Blue','Đỏ, Xanh dương'),t('Tight H-shaped board, few empty cells.','Bàn hình chữ H chật, ít ô trống.')],
-        ['5',t('Blue, Yellow','Xanh dương, Vàng'),t('Larger loop board, longer moves.','Bàn vòng lớn hơn, cần đi xa hơn.')],
-        ['6',t('Red, Blue, Yellow','Đỏ, Xanh dương, Vàng'),t('Third cannon. X-shaped board with many holes.','Pháo thứ ba. Bàn hình chữ X có nhiều lỗ.')],
-        ['7',t('Green, Blue, Red','Xanh lá, Xanh dương, Đỏ'),t('Green arrives. Colors are mixed more densely.','Xuất hiện màu xanh lá. Các màu trộn dày hơn.')],
-        ['8',t('Green, Yellow','Xanh lá, Vàng'),t('Big 2-color board with a chance for Extreme (+30).','Bàn lớn 2 màu, có cơ hội ghép Extreme (+30).')],
-        ['9',t('Blue, Yellow','Xanh dương, Vàng'),t('Full 7×7 checker-like scatter, many small groups.','Bàn 7×7 kín, rải kiểu bàn cờ, nhiều nhóm nhỏ.')],
-        ['10',t('Red, Blue, Green','Đỏ, Xanh dương, Xanh lá'),t('8×8 board with a hollow center. Longest level so far.','Bàn 8×8 trống ở giữa. Màn dài nhất tới giờ.')]
-      ],'wide')+
-      `<p>${t(`Difficulty levers: number of colors, board shape and free-cell count, how scattered each color starts, and target grid size.`,
-              `Các đòn bẩy độ khó: số màu, hình bàn và số ô trống, độ phân tán ban đầu của từng màu, và kích thước lưới mục tiêu.`)}</p>`);
+    ]));
 
   /* FIXED: 1.3 is shared logic across projects. Keep it as it is and only change the numbers. */
 
@@ -1750,6 +1735,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 13, 2026','13/11/2026'),
+      ent(t('Level progression removed','Bỏ tiến trình màn chơi'),ul([
+        t(`Removed the Level progression (as recorded) table from 1.2.`,`Bỏ bảng Tiến trình màn chơi (theo video) khỏi mục 1.2.`)
+      ]))+
       ent(t('Moving cubes','Di chuyển khối'),ul([
         t(`Drag from the cube to the target cell; arrows on the grid show the path. Dragged outside the reachable area: the arrow points to the last valid cell and the cube moves there on release. Cannot move at all: the cube stays. Open questions list removed, all answered.`,`Kéo từ khối tới ô đích; mũi tên trên lưới hiện đường đi. Không tới được: khối đứng yên. Bỏ danh sách Câu hỏi còn mở vì đã trả lời hết.`)
       ]))+
