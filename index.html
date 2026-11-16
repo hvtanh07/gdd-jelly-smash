@@ -602,6 +602,41 @@ function tap(cx,cy){return `<circle class="tap" cx="${cx}" cy="${cy}" r="15" sty
 function tapTracks(t){return [['.tap','opacity',[[0,0],[t,0],[t+.1,.9],[t+.55,0]]],['.tap','transform',[[t,'scale(.5)'],[t+.55,'scale(1.35)']]]];}
 function puff(cx,cy){return `<g class="smoke">${[[-9,-4,9],[10,-2,10],[0,9,11],[-3,-10,7]].map(([dx,dy,r])=>`<circle cx="${cx+dx}" cy="${cy+dy}" r="${r}" style="opacity:0"/>`).join('')}</g>`;}
 function puffTracks(t){return [['.smoke circle','transform',[[t,'scale(.3)'],[t+.6,'scale(1.4)']]],['.smoke circle','opacity',[[0,0],[t,0],[t+.15,.95],[t+.6,0]]]];}
+/* Jelly Smash match-3 demos: drawn in the look of the playable demo (purple arena, jelly cubes with faces, slot row, barrel cannons) */
+const DJ=[['#ff5470','#ffa0b0','#c22848'],['#ff9f2e','#ffcd84','#c4650a'],['#ffd93d','#fff2a3','#c49c06'],['#2fd39a','#94f2cc','#0f9060'],['#3d9dff','#a6d3ff','#1a60c0'],['#a66bff','#d5b9ff','#6c34c8']];
+const DFONT='font-family:Fredoka,var(--display),system-ui,sans-serif;font-weight:700';
+function arena(){return `<rect x="0" y="0" width="200" height="196" rx="14" fill="#1d1030"/>`;}
+function dpanel(x,y,w,h){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#0c0518" opacity=".55"/>`;}
+/* a jelly cube: face=true for board cubes (eyes and smile), false for target cubes (candied crust) */
+function dj(x,y,s,c,face){
+  const [b,l,d]=DJ[c],r=f1(s*.26);
+  let o=`<rect x="${x}" y="${f1(y+2)}" width="${s}" height="${f1(s-2)}" rx="${r}" fill="${d}"/>`+
+        `<rect x="${x}" y="${y}" width="${s}" height="${f1(s-3)}" rx="${r}" fill="${b}"/>`+
+        `<rect x="${f1(x+s*.06)}" y="${f1(y+s*.04)}" width="${f1(s*.88)}" height="${f1(s*.42)}" rx="${r}" fill="${l}" opacity=".5"/>`+
+        `<ellipse cx="${f1(x+s*.32)}" cy="${f1(y+s*.22)}" rx="${f1(s*.17)}" ry="${f1(s*.075)}" fill="#fff" opacity=".6"/>`;
+  if(face) o+=`<ellipse cx="${f1(x+s*.36)}" cy="${f1(y+s*.55)}" rx="${f1(s*.06)}" ry="${f1(s*.085)}" fill="#1e0a28" opacity=".8"/>`+
+              `<ellipse cx="${f1(x+s*.64)}" cy="${f1(y+s*.55)}" rx="${f1(s*.06)}" ry="${f1(s*.085)}" fill="#1e0a28" opacity=".8"/>`+
+              `<path d="M${f1(x+s*.44)},${f1(y+s*.68)}q${f1(s*.06)},${f1(s*.06)} ${f1(s*.12)},0" fill="none" stroke="#1e0a28" stroke-opacity=".6" stroke-width="${f1(s*.04)}" stroke-linecap="round"/>`;
+  else o+=`<rect x="${f1(x+s*.2)}" y="${f1(y+s*.24)}" width="${f1(s*.6)}" height="${f1(s*.46)}" rx="${f1(s*.14)}" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="${f1(s*.05)}"/>`;
+  return o;
+}
+/* a cannon in the demo's style: barrel, base and a dark counter; vals[0] shows, the rest are hidden for tracks to swap in */
+function dcan(cx,cy,c,vals,cls,s){
+  s=s||1;const [b,l,d]=DJ[c],k=v=>f1(v*s);
+  return `<g class="${cls||''}"><rect x="${f1(cx-k(7))}" y="${f1(cy-k(22))}" width="${k(14)}" height="${k(20)}" rx="${k(5)}" fill="${d}"/>`+
+    `<rect x="${f1(cx-k(5.5))}" y="${f1(cy-k(22))}" width="${k(11)}" height="${k(17)}" rx="${k(4)}" fill="${b}"/>`+
+    `<rect x="${f1(cx-k(8))}" y="${f1(cy-k(24))}" width="${k(16)}" height="${k(6)}" rx="${k(3)}" fill="${l}"/>`+
+    `<rect x="${f1(cx-k(20))}" y="${f1(cy-k(4))}" width="${k(40)}" height="${k(19)}" rx="${k(9)}" fill="${d}"/>`+
+    `<rect x="${f1(cx-k(20))}" y="${f1(cy-k(6))}" width="${k(40)}" height="${k(18)}" rx="${k(9)}" fill="${b}"/>`+
+    `<rect x="${f1(cx-k(12))}" y="${f1(cy-k(3))}" width="${k(24)}" height="${k(12)}" rx="${k(6)}" fill="#170c28" opacity=".85"/>`+
+    vals.map((v,i)=>`<text class="v${i}" x="${cx}" y="${f1(cy+k(3))}" dy=".35em" text-anchor="middle" fill="#fff" style="${DFONT};font-size:${k(10)}px${i?';opacity:0':''}">${v}</text>`).join('')+`</g>`;
+}
+function dslot(x,y,w,h){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="#0c0518" opacity=".5"/><rect x="${x+.75}" y="${y+.75}" width="${w-1.5}" height="${h-1.5}" rx="9" fill="none" stroke="#b6a3d6" stroke-opacity=".5" stroke-width="1.2" stroke-dasharray="4 4"/>`;}
+function dpill(cls,x,y,w,txt,bg,fg){return `<g class="${cls}" style="opacity:0"><rect x="${x-w/2}" y="${y-9}" width="${w}" height="18" rx="9" fill="${bg}"/><text x="${x}" y="${y}" dy=".35em" text-anchor="middle" fill="${fg}" style="${DFONT};font-size:10px">${txt}</text></g>`;}
+function dtap(cls,cx,cy){return `<circle class="${cls}" cx="${cx}" cy="${cy}" r="14" fill="none" stroke="#fff" stroke-width="2.5" style="opacity:0"/>`;}
+function dtapT(cls,t){return [[`.${cls}`,'opacity',[[0,0],[t,0],[t+.1,.9],[t+.5,0]]],[`.${cls}`,'transform',[[t,'scale(.5)'],[t+.5,'scale(1.35)']]]];}
+/* pulse twice, then pop to nothing */
+function dpopT(sel,p){return [[sel,'transform',[[p,'scale(1)'],[p+.14,'scale(1.13)'],[p+.28,'scale(1)'],[p+.42,'scale(1.13)'],[p+.6,'scale(0)']]],[sel,'opacity',[[0,1],[p+.55,1],[p+.6,0]]]];}
 const DEMOS={
   hidden:{D:6.4,
     svg:()=>dslots(12)+
@@ -877,6 +912,118 @@ const DEMOS={
           [`.t${k}`,'transform',[[e,'scale(1)'],[e+.1,'scale(1.25)'],[e+.3,'scale(0)']]],
           [`.t${k}`,'opacity',[[0,1],[e+.2,1],[e+.3,0]]]];})
       ];}},
+  /* ----- Jelly Smash match-3 mechanics (section 1.2), drawn like the playable demo ----- */
+  swap:{D:5.2, /* a swap with no line slides back; a swap that makes a line of 3 stays, pops, and the column refills */
+    svg:()=>{
+      const G=[[4,2,0,2,3],[4,4,2,4,0],[3,0,1,5,1],[1,3,5,0,2]],N=[5,3,1],bx=i=>22+32*i,by=j=>38+32*j;
+      let o=arena()+dpanel(16,32,168,138)+`<clipPath id="swClip"><rect x="16" y="36" width="168" height="134"/></clipPath><g clip-path="url(#swClip)">`;
+      G.forEach((row,j)=>row.forEach((c,i)=>{o+=`<g class="so${j}${i}"><g class="si${j}${i}">${dj(bx(i),by(j),30,c,true)}</g></g>`;}));
+      N.forEach((c,i)=>{o+=`<g class="sn${i}">${dj(bx(i),by(0),30,c,true)}</g>`;});
+      return o+`</g>`+dtap('st1',bx(1)+15,by(2)+15)+dtap('st2',bx(3)+15,by(1)+15)+
+        dpill('sx',100,17,74,'No match','#3a2456','#ffb3c1')+dpill('sa',69,85,40,'+3','#2fd39a','#0b3a28');},
+    tracks:()=>[
+      ...dtapT('st1',.35),
+      ['.so21','transform',[[.55,T(0,0)],[.85,T(32,0)],[1.25,T(32,0)],[1.55,T(0,0)]]],
+      ['.so22','transform',[[.55,T(0,0)],[.85,T(-32,0)],[1.25,T(-32,0)],[1.55,T(0,0)]]],
+      ['.sx','opacity',[[0,0],[.9,0],[1.0,1],[1.6,1],[1.75,0]]],
+      ...dtapT('st2',2.05),
+      ['.so13','transform',[[2.25,T(0,0)],[2.55,T(-32,0)]]],
+      ['.so12','transform',[[2.25,T(0,0)],[2.55,T(32,0)]]],
+      ...dpopT('.si10,.si11,.si13',2.7),
+      ['.sa','opacity',[[0,0],[3.25,0],[3.35,1],[3.9,1],[4.1,0]]],
+      ['.sa','transform',[[3.25,T(0,0)],[4.1,T(0,-18)]]],
+      ['.so00,.so01,.so02','transform',[[3.5,T(0,0),'ease-in'],[3.8,T(0,32)]]],
+      ['.sn0,.sn1,.sn2','transform',[[3.5,T(0,-32),'ease-in'],[3.8,T(0,0)]]]]},
+  refill:{D:4.8, /* a line clears, cubes fall, new cubes drop in from the top, and the fall makes a cascade */
+    svg:()=>{
+      const C=[[4,2,2,0],[2,4,3,0],[4,2,3,0],[2,4,4,3]],bx=i=>38+32*i,by=j=>44+32*j;
+      let o=arena()+dpanel(32,38,136,138)+`<clipPath id="rfClip"><rect x="32" y="42" width="136" height="134"/></clipPath><g clip-path="url(#rfClip)">`;
+      C.forEach((col,i)=>col.forEach((c,j)=>{o+=`<g class="ro${i}${j}"><g class="ri${i}${j}">${dj(bx(i),by(j),30,c,true)}</g></g>`;}));
+      [[0,3],[1,0],[2,5]].forEach(([i,c])=>{o+=`<g class="ra${i}">${dj(bx(i),by(0),30,c,true)}</g>`;});
+      [[1,1],[2,2],[3,5]].forEach(([i,c])=>{o+=`<g class="rb${i}">${dj(bx(i),by(0),30,c,true)}</g>`;});
+      return o+`</g>`+dpill('rm',100,20,60,'Match','#3a2456','#fff')+dpill('rc',100,20,70,'Combo!','#ffd93d','#3a2400');},
+    tracks:()=>{
+      const f1s=[[.9,T(0,0),'ease-in'],[1.25,T(0,32)]],f2=[[2.1,T(0,32),'ease-in'],[2.45,T(0,64)]];
+      return [
+        ...dpopT('.ri03,.ri13,.ri23',.3),
+        ['.rm','opacity',[[0,0],[.25,0],[.35,1],[.85,1],[.95,0]]],
+        ['.ro00,.ro01,.ro02,.ro12,.ro22','transform',f1s],
+        ['.ro10,.ro11,.ro20,.ro21','transform',f1s.concat(f2)],
+        ['.ro30,.ro31,.ro32','transform',[[2.1,T(0,0),'ease-in'],[2.45,T(0,32)]]],
+        ['.ra0','transform',[[.9,T(0,-32),'ease-in'],[1.25,T(0,0)]]],
+        ['.ra1,.ra2','transform',[[.9,T(0,-32),'ease-in'],[1.25,T(0,0)],[2.1,T(0,0),'ease-in'],[2.45,T(0,32)]]],
+        ['.rb1,.rb2,.rb3','transform',[[2.1,T(0,-32),'ease-in'],[2.45,T(0,0)]]],
+        ...dpopT('.ri12,.ri22,.ri33',1.5),
+        ['.rc','opacity',[[0,0],[1.45,0],[1.55,1],[2.2,1],[2.35,0]]],
+        ['.rc','transform',[[1.45,'scale(.4)'],[1.65,'scale(1.15)'],[1.8,'scale(1)']]]];}},
+  slots:{D:6.6, /* each match puts a cannon in the leftmost free slot; 3 of one color merge; with 5 full, the new cannon is lost */
+    svg:()=>{
+      const sx=i=>7+38*i,cx=i=>sx(i)+17,CY=52;
+      let o=arena();
+      for(let i=0;i<5;i++)o+=dslot(sx(i),26,34,44);
+      o+=dpanel(16,82,168,104);
+      [[0,4,2,5,3],[3,1,4,0,2],[2,5,0,4,1]].forEach((r,j)=>r.forEach((c,i)=>{o+=`<g opacity=".28">${dj(24+32*i,90+32*j,26,c,true)}</g>`;}));
+      const grp=(k,c,n)=>{const x0=100-(28*n-2)/2;let g='';for(let m=0;m<n;m++)g+=dj(f1(x0+28*m),118,26,c,true);return `<g class="g${k}" style="opacity:0"><g class="g${k}i">${g}</g></g>`;};
+      o+=grp(0,0,3)+grp(1,0,4)+grp(2,4,3)+grp(3,5,3)+grp(4,1,3);
+      const hid=(k,i,c,v)=>`<g class="k${k}" style="opacity:0">${dcan(cx(i),CY,c,[v],'',.75)}</g>`;
+      o+=dcan(cx(0),CY,2,['4'],'k0',.75)+dcan(cx(1),CY,0,['3','10'],'k1',.75)+dcan(cx(2),CY,3,['5'],'k2',.75)+
+         hid(3,3,0,'3')+hid(4,4,0,'4')+hid(5,3,4,'3')+hid(6,4,5,'3');
+      return o+dpill('pm',100,13,104,'Merge ×3 = 10 ammo','#ffd93d','#3a2400')+dpill('pf',100,13,76,'Slots full','#ff5470','#fff');},
+    tracks:()=>{
+      const cx=i=>24+38*i,tr=[];
+      const fly=(k,s,slot)=>{tr.push(
+        [`.g${k}`,'opacity',[[0,0],[s,0],[s+.1,1],[s+.75,1],[s+.85,0]]],
+        [`.g${k}i`,'transform',[[s,'scale(1)'],[s+.12,'scale(1.12)'],[s+.24,'scale(1)'],[s+.36,'scale(1.12)'],[s+.48,'scale(1)']]],
+        [`.g${k}`,'transform',[[s+.45,T(0,0,1),'ease-in'],[s+.85,T(cx(slot)-100,-83,.3)]]]);};
+      const popIn=(k,t)=>[[t,T(0,0,0)],[t+.15,T(0,0,1.15)],[t+.25,T(0,0,1)]];
+      fly(0,.4,3);fly(1,1.3,4);fly(2,3.3,3);fly(3,4.0,4);
+      tr.push(['.k3','opacity',[[0,0],[1.2,0],[1.25,1],[2.85,1],[2.95,0]]],['.k3','transform',popIn(3,1.2).concat([[2.6,T(0,0,1),'ease-in'],[2.95,T(-76,0,.5)]])],
+        ['.k4','opacity',[[0,0],[2.1,0],[2.15,1],[2.85,1],[2.95,0]]],['.k4','transform',popIn(4,2.1).concat([[2.6,T(0,0,1),'ease-in'],[2.95,T(-114,0,.5)]])],
+        ['.pm','opacity',[[0,0],[2.55,0],[2.65,1],[3.6,1],[3.75,0]]],
+        ['.k1','transform',[[2.95,'scale(1)'],[3.1,'scale(1.25)'],[3.3,'scale(1)']]],
+        ['.k1 .v0','opacity',[[0,1],[2.95,1],[3.0,0]]],['.k1 .v1','opacity',[[0,0],[2.95,0],[3.0,1]]],
+        ['.k5','opacity',[[0,0],[4.1,0],[4.15,1]]],['.k5','transform',popIn(5,4.1)],
+        ['.k6','opacity',[[0,0],[4.8,0],[4.85,1]]],['.k6','transform',popIn(6,4.8)],
+        ['.g4','opacity',[[0,0],[5.0,0],[5.1,1],[5.75,1],[5.85,0]]],
+        ['.g4i','transform',[[5.0,'scale(1)'],[5.12,'scale(1.12)'],[5.24,'scale(1)'],[5.5,'scale(1)'],[5.85,'scale(0)']]],
+        ['.pf','opacity',[[0,0],[5.3,0],[5.4,1],[6.0,1],[6.15,0]]]);
+      return tr;}},
+  target:{D:5.4, /* the cannon picks blue front cubes in view, lowest first, and disappears at 0 ammo */
+    svg:()=>{
+      const x=i=>22+27*i,y=j=>44+24*j,S=22,G=[[2,4,4],[4,2],[2,4,2,4],[4],[],[4,4,2]];
+      let o=arena()+`<text x="18" y="27" fill="#b6a3d6" style="${DFONT};font-size:9px">out of view</text>`+`<g opacity=".3">${dj(x(4),16,S,4,false)}</g>`+
+        dpanel(14,40,172,100)+`<rect x="14.5" y="40.5" width="171" height="99" rx="10" fill="none" stroke="#b6a3d6" stroke-opacity=".35"/>`+
+        `<rect x="14" y="139" width="172" height="2.5" rx="1" fill="#ff3b5c"/>`;
+      G.forEach((col,i)=>col.forEach((c,j)=>{o+=`<g class="t${i}${j}">${dj(x(i),y(j),S,c,false)}</g>`;}));
+      [[2,3],[0,2],[0,1]].forEach(([i,j],k)=>{o+=dtap(`r${k}`,x(i)+11,y(j)+11)+`<circle class="b${k}" cx="100" cy="146" r="4.5" fill="#3d9dff" stroke="#fff" stroke-width="1.5" style="opacity:0"/>`;});
+      return o+`<g class="cn">${dcan(100,172,4,['3','2','1','0'])}</g>`+dpill('cg',100,170,104,'0 ammo: cannon gone','#3a2456','#fff');},
+    tracks:()=>{
+      const x=i=>22+27*i,y=j=>44+24*j,S=[.7,1.5,2.3],tr=[],rec=[];
+      [[2,3],[0,2],[0,1]].forEach(([i,j],k)=>{const s=S[k];tr.push(...dtapT(`r${k}`,s-.35),
+        [`.b${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[s+.28,1],[s+.3,0]]],
+        [`.b${k}`,'transform',[[s,T(0,0),'ease-in'],[s+.3,T(x(i)+11-100,y(j)+11-146)]]],
+        [`.t${i}${j}`,'transform',[[s+.28,'scale(1)'],[s+.36,'scale(1.3)'],[s+.5,'scale(0)']]],
+        [`.t${i}${j}`,'opacity',[[0,1],[s+.45,1],[s+.5,0]]],
+        [`.cn .v${k}`,'opacity',k?[[0,0],[S[k-1],0],[S[k-1]+.02,1],[s,1],[s+.02,0]]:[[0,1],[s,1],[s+.02,0]]]);
+        rec.push([s,T(0,0,1)],[s+.05,T(0,4,1)],[s+.18,T(0,0,1)]);});
+      tr.push(['.cn .v3','opacity',[[0,0],[S[2],0],[S[2]+.02,1]]],
+        ['.cn','transform',rec.concat([[2.9,T(0,0,1)],[3.15,T(0,0,0)]])],['.cn','opacity',[[0,1],[3.05,1],[3.15,0]]],
+        ['.cg','opacity',[[0,0],[3.2,0],[3.3,1],[4.6,1],[4.75,0]]]);
+      return tr;}},
+  boost:{D:5.6, /* the view is almost empty, so the grid speeds up until it is full again */
+    svg:()=>{
+      const x=i=>24+26*i,y=j=>-110+26*j,G=[[0,2,4,4,3,0],[4,3,0,2,2,4],[2,2,4,0,3,3],[3,0,0,4,2,2],[0,4,3,3,0,2],[2,-1,-1,4,-1,0]];
+      let o=arena()+dpanel(14,16,172,160)+`<rect x="14.5" y="16.5" width="171" height="159" rx="10" fill="none" stroke="#b6a3d6" stroke-opacity=".35"/>`+
+        `<clipPath id="bstClip"><rect x="14" y="16" width="172" height="160" rx="10"/></clipPath><g clip-path="url(#bstClip)"><g class="bg">`;
+      G.forEach((r,j)=>r.forEach((c,i)=>{if(c>=0)o+=dj(x(i),y(j),22,c,false);}));
+      return o+`</g></g><rect x="14" y="175" width="172" height="2.5" rx="1" fill="#ff3b5c"/>`+
+        dpill('bp0',100,152,98,'3 cubes in view','#3a2456','#fff')+dpill('bp1',100,152,84,'Speed-up ×5','#ffd93d','#3a2400')+dpill('bp2',100,152,92,'Normal speed','#3a2456','#fff');},
+    tracks:()=>[
+      ['.bg','transform',[[0,T(0,0),'linear'],[.7,T(0,4),'ease-in'],[1.0,T(0,14),'linear'],[1.9,T(0,82),'ease-out'],[2.2,T(0,86),'linear'],[5.6,T(0,94)]]],
+      ['.bp0','opacity',[[0,0],[.15,0],[.25,1],[.75,1],[.85,0]]],
+      ['.bp1','opacity',[[0,0],[.8,0],[.9,1],[1.9,1],[2.0,0]]],
+      ['.bp1','transform',[[.8,'scale(.5)'],[1.0,'scale(1.1)'],[1.1,'scale(1)']]],
+      ['.bp2','opacity',[[0,0],[2.1,0],[2.2,1],[3.6,1],[3.75,0]]]]},
   /* ----- Jelly Smash reference animations for section 3.2 (one per core object) ----- */
   jelly:{D:4.6, /* slide, squash on landing, then the group pulses and flies into the cannon */
     svg:()=>{
@@ -928,12 +1075,13 @@ const DEMOS={
       [0,1,2,3,4,5,6,7].forEach(k=>{const a=k*Math.PI/4,r=k%2?30:40;
         tr.push([`.sp${k}`,'transform',[[1.0,T(0,0,.4)],[1.55,T(Math.cos(a)*r,Math.sin(a)*r,1)]]],[`.sp${k}`,'opacity',[[0,0],[1.0,0],[1.04,1],[1.4,1],[1.7,0]]]);});
       return tr;}},
-  praise:{D:8.8, /* Great, Amazing, Extreme and Epic pop over the board with the ammo gained */
+  praise:{D:8.8, /* Great, Amazing, Extreme and Epic pop over the board with the ammo gained (ammo = n) */
     svg:()=>{
-      let bd='';for(let j=0;j<4;j++)for(let i=0;i<4;i++){bd+=`<g opacity=".35">${jcube(32+35*i,30+35*j,31,[[2,4,2,2],[4,4,2,4],[2,2,4,2],[4,2,2,4]][j][i])}</g>`;}
-      const tier=(k,w,word,ammo)=>`<g class="pw${k}" style="opacity:0"><rect class="f7" x="${100-w/2}" y="64" width="${w}" height="36" rx="18"/><text class="bn" x="100" y="82" dy=".35em">${word}</text></g>`+
-        `<g class="pa${k}" style="opacity:0"><rect class="f4" x="72" y="108" width="56" height="26" rx="13"/><text class="bn sm l" x="100" y="121" dy=".35em">${ammo}</text></g>`;
-      return bd+tier(0,104,'Great!','+20')+tier(1,128,'Amazing!','+25')+tier(2,124,'Extreme!','+35')+tier(3,92,'Epic!','+45');},
+      let bd=arena();const P=[[2,4,2,2],[4,4,2,4],[2,2,4,2],[4,2,2,4]];
+      for(let j=0;j<4;j++)for(let i=0;i<4;i++)bd+=`<g opacity=".3">${dj(32+35*i,30+35*j,31,P[j][i],true)}</g>`;
+      const tier=(k,w,word,ammo)=>`<g class="pw${k}" style="opacity:0"><rect x="${100-w/2}" y="64" width="${w}" height="36" rx="18" fill="#ffd93d"/><text x="100" y="82" dy=".35em" text-anchor="middle" fill="#3a2400" style="${DFONT};font-size:17px">${word}</text></g>`+
+        `<g class="pa${k}" style="opacity:0"><rect x="72" y="108" width="56" height="26" rx="13" fill="#2fd39a"/><text x="100" y="121" dy=".35em" text-anchor="middle" fill="#0b3a28" style="${DFONT};font-size:13px">${ammo}</text></g>`;
+      return bd+tier(0,104,'Great!','+5')+tier(1,128,'Amazing!','+6')+tier(2,124,'Extreme!','+8')+tier(3,92,'Epic!','+10');},
     tracks:()=>[0,1,2,3].flatMap(k=>{const s=.3+k*2.1;return [
       [`.pw${k}`,'opacity',[[0,0],[s,0],[s+.08,1],[s+1.5,1],[s+1.75,0]]],
       [`.pw${k}`,'transform',[[s,'scale(.3)'],[s+.2,'scale(1.15)'],[s+.35,'scale(1)']]],
@@ -1112,6 +1260,11 @@ function view(l){
 
   /* PER GAME: one caption per entry in DEMOS, same keys. These are the Caps Sorting captions for the example demos. */
   const DCAP={
+    swap:t('A swap that makes no line slides back. The next swap makes a blue line of 3, so it stays: the line pops for 3 ammo, the cubes above fall and new cubes drop in.','Swap không tạo hàng thì 2 khối trượt về. Swap tiếp theo tạo hàng 3 khối xanh nên được giữ: hàng nổ cho 3 đạn, khối phía trên rơi xuống và khối mới rơi vào.'),
+    refill:t('The red line clears. Cubes above fall, new cubes drop in from the top, and the fall makes a green line. That cascade matches on its own.','Hàng đỏ bị xóa. Khối phía trên rơi xuống, khối mới rơi từ trên vào, và cú rơi tạo ra hàng xanh lá. Combo dây chuyền đó tự match.'),
+    slots:t('Each match puts a cannon of its color in the leftmost free slot. The 3 red cannons merge into one with 3 + 3 + 4 = 10 ammo and free 2 slots. With all 5 slots full, the cannon from the orange match is lost.','Mỗi match đặt 1 pháo cùng màu vào slot trống bên trái nhất. 3 pháo đỏ gộp thành 1 pháo với 3 + 3 + 4 = 10 đạn và trả lại 2 slot. Khi đủ 5 slot, pháo của match cam bị mất.'),
+    target:t('The blue cannon has 3 ammo. It only aims at blue front cubes in view, lowest first: column 3, then the two in column 1. Blue cubes behind other cubes and the one above the view are not targets. At 0 ammo the cannon disappears.','Pháo xanh có 3 đạn. Pháo chỉ nhắm khối xanh ở đầu hàng trong khung nhìn thấy, thấp nhất trước: cột 3, rồi 2 khối ở cột 1. Khối xanh nằm sau khối khác và khối ở trên khung không phải target. Hết đạn thì pháo biến mất.'),
+    boost:t('Only 3 cubes are in view, so the grid speeds up (×5 in the demo) until the view is full again. Then it goes back to normal speed.','Khung nhìn thấy chỉ còn 3 khối, nên lưới đi xuống nhanh hơn (demo: ×5) cho đến khi khung đầy lại. Sau đó lưới về tốc độ thường.'),
     jelly:t('A cube slides in, squashes as it lands, then the group pulses and flies into the cannon.','Khối trượt vào, bẹp lại khi dừng, rồi cả nhóm phồng lên và bay vào pháo.'),
     cannonIn:t('Ammo flies in and the counter ticks up with a bounce. Then a shot: recoil, and a drop flies to the target grid.','Đạn bay vào, số đạn tăng kèm cú nảy. Sau đó pháo bắn: giật nhẹ, giọt màu bay lên lưới mục tiêu.'),
     pop:t('A drop hits a target cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối mục tiêu. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
@@ -1175,7 +1328,7 @@ function view(l){
       t(`The player drags a cube onto a neighbor (up, down, left or right), or taps one cube and then its neighbor.`,`Người chơi kéo một khối sang khối bên cạnh (lên, xuống, trái, phải), hoặc chạm một khối rồi chạm khối bên cạnh.`),
       t(`The swap stays only if it makes a match. If not, the two cubes slide back.`,`Swap chỉ được giữ nếu tạo ra match. Nếu không, 2 khối trượt về chỗ cũ.`),
       t(`No move limit.`,`Không giới hạn số move.`)
-    ]))+
+    ]),'',demo('swap'))+
     ent(nm('Matching','Ghép nhóm'),ul([
       t(`A match is a line of 3 or more cubes of one color in a row or a column.`,`Match là hàng từ 3 khối cùng màu trở lên theo hàng ngang hoặc cột dọc.`),
       t(`Lines of one color that touch (T or L shapes) count as one group. n = all cubes in that group.`,`Các hàng cùng màu chạm nhau (hình T, L) tính là 1 nhóm. n = tổng số khối trong nhóm đó.`),
@@ -1187,12 +1340,12 @@ function view(l){
         [t('How many','Bao nhiêu'),t(`One new cube per cleared cell. The board stays full.`,`Mỗi ô vừa xóa có 1 khối mới. Bàn luôn kín.`)],
         [t('Which colors','Màu nào'),t(`Weighted random. Part of the weight comes from the share of each color in the bottom row of the target grid (as in the old spawn rule). The rest is spread evenly over the colors still on the target grid, so the board never floods with one color. The board always has at least 4 colors. Demo split: 40% bottom-row share, 60% even.`,`Random có trọng số. Một phần trọng số theo tỉ lệ từng màu ở hàng dưới cùng của lưới mục tiêu (giống luật spawn cũ). Phần còn lại chia đều cho các màu còn trên lưới mục tiêu, để bàn không bị ngập một màu. Bàn luôn có ít nhất 4 màu. Demo: 40% theo hàng dưới cùng, 60% chia đều.`)],
         [t('Moves for bottom-row colors','Nước đi cho màu hàng dưới cùng'),t(`After every match, the game scans which colors are in the bottom row of the target grid. When new cubes fall in, it tries to give each of those colors at least one swap that makes a line of 3, by recoloring only the new cubes while they are still falling in, so the player does not see it. It never makes a match on its own this way. Minimum guarantee: at least one of those colors always has such a swap. If the new cubes cannot provide it (for example the bottom row changes while the player is thinking), the game recolors a few board cubes and makes them glow.`,`Sau mỗi match, game quét các màu đang có ở hàng dưới cùng của lưới mục tiêu. Khi khối mới rơi vào, game cố tạo cho từng màu đó ít nhất 1 nước swap ra hàng 3, bằng cách chỉ đổi màu khối mới lúc chúng còn đang rơi vào, người chơi không thấy. Cách này không bao giờ tự tạo match. Tối thiểu: luôn có ít nhất 1 màu trong số đó có nước swap như vậy. Nếu khối mới không đủ để tạo (ví dụ hàng dưới cùng đổi màu lúc người chơi đang suy nghĩ), game đổi màu vài khối trên bàn và cho chúng lóe sáng.`)]
-      ]))+
+      ]),'',demo('refill'))+
     ent(t('Ammo','Số đạn'),
       `<p>${t(`Each match gives its cannon <code>ammo = n</code>, n = cubes in the group: a line of 3 gives 3, a group of 5 gives 5. Less ammo per cannon means slots free up sooner.`,
               `Mỗi match cho pháo <code>đạn = n</code>, n = số khối của nhóm: hàng 3 cho 3 đạn, nhóm 5 cho 5 đạn. Đạn mỗi pháo ít hơn nên slot trống nhanh hơn.`)}</p>`+
       `<p>${t(`Praise tiers by group size stay the same: 5 = Great, 6–7 = Amazing, 8–9 = Extreme, 10 or more = Epic. 3 and 4 cubes show no praise, only the ammo text.`,
-              `Mức khen theo cỡ nhóm giữ nguyên: 5 = Great, 6–7 = Amazing, 8–9 = Extreme, từ 10 trở lên = Epic. Nhóm 3 và 4 khối không có lời khen, chỉ hiện số đạn.`)}</p>`)+
+              `Mức khen theo cỡ nhóm giữ nguyên: 5 = Great, 6–7 = Amazing, 8–9 = Extreme, từ 10 trở lên = Epic. Nhóm 3 và 4 khối không có lời khen, chỉ hiện số đạn.`)}</p>`,'',demo('praise'))+
     ent(nm('Cannon slots','Hàng slot pháo'),ul([
       t(`A row of 5 slots between the target grid and the board. No cannons are placed at the start.`,`Một hàng 5 slot nằm giữa lưới mục tiêu và bàn chơi. Đầu màn không có pháo nào.`),
       t(`Each match spawns one cannon of the matched color, with its ammo, into the leftmost free slot.`,`Mỗi match sinh 1 pháo cùng màu nhóm vừa match, kèm số đạn, vào slot trống bên trái nhất.`),
@@ -1201,7 +1354,7 @@ function view(l){
       t(`A cannon disappears when its ammo reaches 0.`,`Pháo biến mất khi hết đạn.`),
       t(`A cannon that still has ammo but no target waits in its slot. There is no way to remove it.`,`Pháo còn đạn nhưng không có target thì đứng chờ trong slot. Không có cách bỏ pháo.`),
       t(`A match of a color that is no longer on the target grid spawns no cannon. A cannon whose color is gone from the target grid disappears.`,`Match màu không còn trên lưới mục tiêu thì không sinh pháo. Pháo có màu đã hết trên lưới mục tiêu thì biến mất.`)
-    ]))+
+    ]),'',demo('slots'))+
     ent(nm('Cannons','Pháo'),ul([
       t(`A cannon only damages cubes of its own color.`,`Pháo chỉ phá khối cùng màu với nó.`),
       t(`Fires on its own while ammo is above 0. Fire rate: TBD (demo: about 6–7 shots per second).`,`Tự bắn khi còn đạn. Tốc độ bắn: TBD (demo: khoảng 6–7 phát mỗi giây).`),
@@ -1210,7 +1363,7 @@ function view(l){
       t(`It fires while it has ammo and a target. No front cube of its color in view: it waits.`,`Pháo bắn khi còn đạn và có target. Không có khối cùng màu ở đầu hàng trong khung nhìn thấy: pháo chờ.`),
       t(`1 ammo = 1 shot = 1 target cube.`,`1 đạn = 1 phát = 1 khối mục tiêu.`),
       t(`Cannons fire in parallel, so the player keeps matching while shots land.`,`Các pháo bắn cùng lúc, nên người chơi vẫn ghép tiếp trong khi đạn bay.`)
-    ]))+
+    ]),'',demo('target'))+
     ent(nm('Target grid','Lưới cube mục tiêu'),ul([
       t(`A grid of colored target cubes at the top of the arena. It is wider than the board and has its own size per level; cubes get smaller as the column count grows.`,`Một lưới gồm các khối mục tiêu nhiều màu ở phía trên khung đấu. Lưới rộng hơn bàn chơi và mỗi màn có kích thước riêng; càng nhiều cột thì khối càng nhỏ.`),
       t(`Size (columns × rows): TBD. Demo: level 1 9×16, level 2 10×20, level 3 11×24, level 4 12×28.`,`Kích thước (cột × hàng): TBD. Demo: màn 1 9×16, màn 2 10×20, màn 3 11×24, màn 4 12×28.`),
@@ -1219,7 +1372,7 @@ function view(l){
       t(`The grid does not move when the level starts. It starts moving on the player's first swap.`,`Lưới đứng yên khi bắt đầu màn. Lưới chỉ bắt đầu di chuyển ở lần swap đầu tiên.`),
       t(`<b>Speed-up:</b> when fewer than 8 cubes are in view, or the grid reaches fewer than 4 rows down into the view, the grid moves faster until it fills the view again, so there is always something to shoot. No speed-up when the lowest cube is within 2 rows of the red line, or when the top row of the level is already in view. Speed-up rate: TBD (demo: ×5).`,`<b>Tăng tốc:</b> khi khung nhìn thấy còn dưới 8 khối, hoặc lưới chỉ phủ dưới 4 hàng tính từ mép trên khung, lưới đi xuống nhanh hơn cho đến khi khung lại đầy, để luôn có khối để bắn. Không tăng tốc khi khối thấp nhất đã cách vạch đỏ từ 2 hàng trở xuống, hoặc khi hàng trên cùng của màn đã lộ ra. Hệ số tăng tốc: TBD (demo: ×5).`),
       t(`If any target cube touches the red line, the level is lost (see Win and lose in 1.1).`,`Nếu có khối mục tiêu chạm vạch đỏ thì thua màn (xem Thắng và thua ở mục 1.1).`)
-    ]));
+    ]),'',demo('boost'));
 
   /* FIXED: 1.3 is shared logic across projects. Keep it as it is and only change the numbers. */
 
@@ -1818,6 +1971,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
+      ent(t('Mechanics demos','Minh họa cơ chế'),ul([
+        t(`Section 1.2 has animated demos again, drawn like the playable demo: swap, refill and cascade, cannon slots with merge and full slots, target choice, and grid speed-up.`,`Mục 1.2 có lại minh họa động, vẽ giống bản demo chơi được: swap, refill và combo, slot pháo có gộp và đầy slot, chọn target, và tăng tốc lưới.`),
+        t(`The praise demo now shows ammo = n: +5, +6, +8, +10.`,`Minh họa khen giờ hiện đạn = n: +5, +6, +8, +10.`)
+      ]))+
       ent(t('Match-3 and cannon slots (from the playable demo)','Match-3 và hàng slot pháo (theo bản demo chơi được)'),ul([
         t(`Core loop is now swap match-3 with gravity and refill (was: sliding cubes into empty cells). Matching is lines of 3+; touching lines of one color count as one group.`,`Lối chơi chính đổi sang swap match-3 có trọng lực và refill (trước: trượt khối vào ô trống). Match là hàng từ 3 khối; các hàng cùng màu chạm nhau tính 1 nhóm.`),
         t(`Fixed cannons per color are replaced by a row of 5 slots: each match spawns a cannon; full slots lose the new cannon; 3 cannons of one color merge with summed ammo.`,`Bỏ pháo cố định theo màu, thay bằng hàng 5 slot: mỗi match sinh 1 pháo; đủ slot thì mất pháo mới; 3 pháo cùng màu gộp lại, cộng đạn.`),
