@@ -650,6 +650,13 @@ function antSVG(x,y,s,fill,vals,cls){
 }
 function dant(x,y,s,c,vals,cls){return antSVG(x,y,s,`fill="${DJ[c][0]}"`,vals,cls);}
 function jant(x,y,s,c,vals,cls){return antSVG(x,y,s,`class="f${c}"`,vals,cls);}
+/* a Jelly Bottle: a round glass bottle of jelly with a cork and a gold ribbon, in a cell of size s */
+function dbottle(x,y,s,c){const [b,l,d]=DJ[c],cx=f1(x+s/2),k=v=>f1(v*s);
+  return `<rect x="${f1(x+s*.4)}" y="${f1(y+s*.2)}" width="${k(.2)}" height="${k(.22)}" fill="${l}" stroke="${d}" stroke-width="1"/>`+
+    `<circle cx="${cx}" cy="${f1(y+s*.62)}" r="${k(.33)}" fill="${b}" stroke="${d}" stroke-width="1.2"/>`+
+    `<ellipse cx="${f1(x+s*.38)}" cy="${f1(y+s*.5)}" rx="${k(.08)}" ry="${k(.12)}" fill="#fff" opacity=".55"/>`+
+    `<rect x="${f1(x+s*.33)}" y="${f1(y+s*.33)}" width="${k(.34)}" height="${k(.07)}" rx="${k(.03)}" fill="#ffc53d"/>`+
+    `<rect x="${f1(x+s*.38)}" y="${f1(y+s*.08)}" width="${k(.24)}" height="${k(.14)}" rx="${k(.04)}" fill="#c98a4b"/>`;}
 function dslot(x,y,w,h){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="#0c0518" opacity=".5"/><rect x="${x+.75}" y="${y+.75}" width="${w-1.5}" height="${h-1.5}" rx="9" fill="none" stroke="#b6a3d6" stroke-opacity=".5" stroke-width="1.2" stroke-dasharray="4 4"/>`;}
 function dpill(cls,x,y,w,txt,bg,fg){return `<g class="${cls}" style="opacity:0"><rect x="${x-w/2}" y="${y-9}" width="${w}" height="18" rx="9" fill="${bg}"/><text x="${x}" y="${y}" dy=".35em" text-anchor="middle" fill="${fg}" style="${DFONT};font-size:10px">${txt}</text></g>`;}
 function dtap(cls,cx,cy){return `<circle class="${cls}" cx="${cx}" cy="${cy}" r="14" fill="none" stroke="#fff" stroke-width="2.5" style="opacity:0"/>`;}
@@ -1180,6 +1187,31 @@ const DEMOS={
         ['.spn','transform',[[1.8,T(0,0,1)],[1.95,T(0,-6,1.4)],[2.5,T(bx(1)+13-x(3)-12,by(1)+13-ty(1)-12,1.2)]]],['.spn','opacity',[[0,1],[2.5,1],[2.65,0]]],
         ['.ice','opacity',[[0,1],[2.55,1],[2.95,0]]],['.ice','transform',[[2.55,T(0,0,1)],[2.95,T(0,6,1)]]],
         ['.iu','opacity',[[0,0],[2.9,0],[3.0,1],[4.2,1],[4.35,0]]]];}},
+  bottle:{D:5.2, /* Jelly Bottle: a blue line of 3 next to the tray breaks the blue bottle and gives +5 ammo */
+    svg:()=>{
+      const ST='transform-box:fill-box;transform-origin:center',bx=i=>17+34*i,by=j=>84+34*j;
+      let o=arena();for(let i=0;i<5;i++)o+=dslot(7+38*i,16,34,44);
+      o+=dpanel(12,78,176,112);
+      const G=[[3,2,0],[0,3,2],[2,4,0,4,4]];
+      G.forEach((r,j)=>r.forEach((c,i)=>{o+=`<g class="bo${j}${i}"><g class="bi${j}${i}" style="${ST}">${dj(bx(i),by(j),30,c,true)}</g></g>`;}));
+      o+=`<rect x="${bx(3)-3}" y="${by(0)-3}" width="70" height="70" rx="9" fill="#ff9f2e" stroke="#c4650a" stroke-width="2"/><rect x="${bx(3)+1}" y="${by(0)+1}" width="62" height="62" rx="6" fill="#c4650a" opacity=".45"/>`;
+      [[0,0,0],[1,0,2],[0,1,3],[1,1,4]].forEach(([i,j,c])=>{o+=`<g class="${c===4?'bb':''}" style="${ST}">${dbottle(bx(3+i),by(j),30,c)}</g>`;});
+      o+=[0,1,2,3,4,5].map(k=>`<path class="bs${k}" d="M${bx(4)+15},${by(1)+18}l4,-6l3,7z" fill="${DJ[4][1]}" stroke="${DJ[4][2]}" stroke-width=".8" style="opacity:0"/>`).join('');
+      o+=dpill('bp',bx(4)+15,by(1)+18,40,'+5','#2fd39a','#0b3a28');
+      return o+`<g class="bc" style="opacity:0;${ST}">${dcan(24,42,4,['8'],'',.75)}</g>`+dpill('bm',100,70,96,'3 + 5 = 8 ammo','#ffd93d','#3a2400')+dtap('bt',bx(1)+15,by(2)+15);},
+    tracks:()=>{
+      const tr=[...dtapT('bt',.3),['.bo21','transform',[[.5,T(0,0)],[.8,T(34,0)]]],['.bo22','transform',[[.5,T(0,0)],[.8,T(-34,0)]]]];
+      const pulse=[[1.0,'scale(1)'],[1.15,'scale(1.12)'],[1.3,'scale(1)'],[1.45,'scale(1.12)'],[1.6,'scale(1)']];
+      [['21',2],['23',3],['24',4]].forEach(([id,col],k)=>{const s=2.4+k*.08,x0=17+34*col+15,dx=id==='21'?34:0,base=id==='21'?[[.5,T(0,0)],[.8,T(34,0)]]:[[0,T(0,0)]];
+        tr.push([`.bi${id}`,'transform',pulse],
+          [`.bo${id}`,'transform',base.concat([[s,T(dx,0,1),'ease-in'],[s+.4,T(24-x0,42-(152+15),.3)]])],[`.bo${id}`,'opacity',[[0,1],[s+.35,1],[s+.4,0]]]);});
+      tr.push(['.bb','transform',[[1.6,T(0,0,1)],[1.68,T(-2,0,1)],[1.76,T(2,0,1)],[1.84,T(0,0,1.15)],[1.98,T(0,0,0)]]],['.bb','opacity',[[0,1],[1.94,1],[1.98,0]]]);
+      [0,1,2,3,4,5].forEach(k=>{const a=k*Math.PI/3+.3,r=22;
+        tr.push([`.bs${k}`,'transform',[[1.92,T(0,0,.6)],[2.4,T(Math.cos(a)*r,Math.sin(a)*r,1)]]],[`.bs${k}`,'opacity',[[0,0],[1.92,0],[1.95,1],[2.2,1],[2.45,0]]]);});
+      tr.push(['.bp','opacity',[[0,0],[2.0,0],[2.1,1],[2.6,1],[2.8,0]]],['.bp','transform',[[2.0,T(0,0)],[2.8,T(0,-18)]]],
+        ['.bc','opacity',[[0,0],[2.95,0],[3.0,1]]],['.bc','transform',[[2.95,'scale(0)'],[3.1,'scale(1.2)'],[3.22,'scale(1)']]],
+        ['.bm','opacity',[[0,0],[3.1,0],[3.2,1],[4.6,1],[4.8,0]]]);
+      return tr;}},
   /* ----- booster demos (section 1.5), drawn like the playable demo ----- */
   jHand:{D:5.4, /* Hand: the cannon with the most ammo fires it all at once, at any cube of its color, nearest first */
     svg:()=>{
@@ -1556,8 +1588,8 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Chocolate Layer','Lớp chocolate'),el2:nm('Stacked Cube','Khối chồng'),el3:nm('Locked Slot','Slot khóa'),el4:nm('Chocolate Fountain','Vòi chocolate'),el5:nm('Ice Cream Lock','Khóa kem'),bo1:nm('Hand','Hand'),bo2:nm('Shuffle','Shuffle'),bo3:nm('Bomb','Bomb')};
-  const P={el1:t('Chocolate Layer','Lớp chocolate'),el2:t('Stacked Cube','Khối chồng'),el3:t('Locked Slot','Slot khóa'),el4:t('Chocolate Fountain','Vòi chocolate'),el5:t('Ice Cream Lock','Khóa kem'),bo1:t('Hand','Hand'),bo2:t('Shuffle','Shuffle'),bo3:t('Bomb','Bomb')};
+  const N={el1:nm('Chocolate Layer','Lớp chocolate'),el2:nm('Stacked Cube','Khối chồng'),el3:nm('Locked Slot','Slot khóa'),el4:nm('Chocolate Fountain','Vòi chocolate'),el5:nm('Ice Cream Lock','Khóa kem'),el6:nm('Jelly Bottle','Lọ thạch'),bo1:nm('Hand','Hand'),bo2:nm('Shuffle','Shuffle'),bo3:nm('Bomb','Bomb')};
+  const P={el1:t('Chocolate Layer','Lớp chocolate'),el2:t('Stacked Cube','Khối chồng'),el3:t('Locked Slot','Slot khóa'),el4:t('Chocolate Fountain','Vòi chocolate'),el5:t('Ice Cream Lock','Khóa kem'),el6:t('Jelly Bottle','Lọ thạch'),bo1:t('Hand','Hand'),bo2:t('Shuffle','Shuffle'),bo3:t('Bomb','Bomb')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
   const withEl=t('With elements','Khi gặp yếu tố đặc biệt');
@@ -1576,6 +1608,7 @@ function view(l){
     stack3:t('A group of 4 gave this cannon 5 ammo. The stack of 3 takes 3 shots, so only 2 are left for the other blue cubes.','Nhóm 4 khối cho pháo này 5 đạn. Chồng 3 khối tốn 3 phát, nên chỉ còn 2 đạn cho các khối xanh khác.'),
     lockSlot:t('Two slots are locked (2 and 3). Each cannon sent to a slot counts both down. The first opens after 2 cannons and gets the next one; the second opens after 3.','2 slot bị khóa (2 và 3). Mỗi pháo vào slot làm cả 2 giảm. Slot đầu mở sau 2 pháo và nhận pháo kế tiếp; slot sau mở sau 3 pháo.'),
     fountain:t('Every 2 moves the fountain makes chocolate: first next to itself, then next to that chocolate.','Cứ 2 move vòi tạo chocolate: lần đầu cạnh vòi, lần sau cạnh miếng chocolate đó.'),
+    bottle:t('A swap makes a blue line of 3 right under the tray. The blue bottle breaks, and the match gets +5 ammo: the blue cannon comes in with 3 + 5 = 8.','Một lần swap tạo hàng 3 khối xanh ngay dưới khay. Lọ xanh vỡ, và match đó được +5 đạn: pháo xanh vào với 3 + 5 = 8 đạn.'),
     iceLock:t('The cubes under the green ice cream are locked. The blue cannon defeats the ant carrying the green spoon, and the spoon flies down to remove the lock.','Các khối dưới kem xanh lá bị khóa. Pháo xanh diệt con kiến mang muỗng xanh lá, muỗng bay xuống gỡ khóa.'),
     swap:t('A swap that makes no line slides back. The next swap makes a blue line of 3, so it stays: the line pops for 3 ammo, the cubes above fall and new cubes drop in.','Swap không tạo hàng thì 2 khối trượt về. Swap tiếp theo tạo hàng 3 khối xanh nên được giữ: hàng nổ cho 3 đạn, khối phía trên rơi xuống và khối mới rơi vào.'),
     refill:t('The red line clears. Cubes above fall, new cubes drop in from the top, and the fall makes a green line. That cascade matches on its own.','Hàng đỏ bị xóa. Khối phía trên rơi xuống, khối mới rơi từ trên vào, và cú rơi tạo ra hàng xanh lá. Combo dây chuyền đó tự match.'),
@@ -1823,7 +1856,14 @@ function view(l){
       t(`The key is a spoon carried by one ant. Spoon and ice cream share a color.`,`Chìa là cái muỗng do 1 con kiến mang. Muỗng và kem cùng màu.`),
       t(`Defeat that ant: the spoon flies down and removes the lock. The cubes become normal.`,`Diệt con kiến đó: muỗng bay xuống gỡ khóa. Các khối thành khối thường.`),
       t(`Locked cubes stay in place; cubes above don't fall through. Shapes per level: TBD.`,`Khối bị khóa đứng yên; khối phía trên không rơi xuyên qua. Hình khóa mỗi màn: TBD.`)
-    ]),unlock('TBD'),demo('iceLock'));
+    ]),unlock('TBD'),demo('iceLock'))+
+    ent(N.el6,ul([
+      t(`Board. 1 tray takes 2×2 cells and holds 4 bottles, each a different color.`,`Trên bàn. 1 khay chiếm 2×2 ô, chứa 4 lọ, mỗi lọ 1 màu khác nhau.`),
+      t(`Can't be swapped or matched. Cubes above don't fall through.`,`Không swap, không match được. Khối phía trên không rơi xuyên qua.`),
+      t(`A match next to the tray (up, down, left, right) breaks the bottle of the same color.`,`Match cạnh khay (trên, dưới, trái, phải) làm vỡ lọ cùng màu với match.`),
+      t(`That match gets +5 ammo: ammo = 2n − 3 + 5.`,`Match đó được +5 đạn: đạn = 2n − 3 + 5.`),
+      t(`No bottle of that color left: no bonus. All 4 broken: the tray disappears and cubes fall into its cells.`,`Không còn lọ màu đó: không có thưởng. Vỡ hết 4 lọ: khay biến mất, khối rơi vào 4 ô đó.`)
+    ]),unlock('TBD'),demo('bottle'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). */
   B['booster-mechanics']=
@@ -1839,7 +1879,7 @@ function view(l){
       t(`Clears every cube on the board and fills it with a new board.`,`Xóa hết khối trên bàn và thay bằng bàn mới.`),
       t(`Cleared cubes give no cannon and no ammo.`,`Khối bị xóa không sinh pháo, không cho đạn.`),
       t(`The new board has no ready match. Each color in the bottom row of the ant grid gets a swap that makes a line of 3.`,`Bàn mới không có match sẵn. Mỗi màu ở hàng dưới cùng của lưới kiến có 1 nước swap ra hàng 3.`),
-      withEl+':'+ul([t(`${P.el1}, ${P.el4} and ${P.el5} stay where they are. Only normal cubes are replaced.`,`${P.el1}, ${P.el4} và ${P.el5} giữ nguyên chỗ. Chỉ thay khối thường.`)])
+      withEl+':'+ul([t(`${P.el1}, ${P.el4}, ${P.el5} and ${P.el6} stay where they are. Only normal cubes are replaced.`,`${P.el1}, ${P.el4}, ${P.el5} và ${P.el6} giữ nguyên chỗ. Chỉ thay khối thường.`)])
     ]),unlockB('TBD'),demo('jShuffle'))+
     ent(N.bo3,ul([
       t(`The game takes 3 colors from the bottom row of the ant grid. Fewer than 3 colors there: the rest come from the next rows up.`,`Game lấy 3 màu từ hàng dưới cùng của lưới kiến. Hàng đó ít hơn 3 màu: lấy thêm từ các hàng phía trên.`),
@@ -1897,6 +1937,7 @@ function view(l){
       [N.el3,popup('Send cannons to the slots<br>to unlock the locked one.','Đưa pháo lên các ô<br>để mở khóa ô bị khóa.'),lvl('TBD')],
       [N.el4,popup('Clear chocolate fast<br>before it spreads.','Phá chocolate thật nhanh<br>trước khi nó lan ra.'),lvl('TBD')],
       [N.el5,popup('Defeat the ant with the spoon<br>to unlock the ice cream.','Diệt kiến mang muỗng<br>để mở khóa kem.'),lvl('TBD')],
+      [N.el6,popup('Match next to a same-color bottle<br>to break it for +5 ammo.','Ghép cạnh lọ cùng màu<br>để làm vỡ và được +5 đạn.'),lvl('TBD')],
     ]);
 
   /* PER GAME: one row per booster */
@@ -1915,6 +1956,7 @@ function view(l){
     ['TBD',P.el3,'elem','elements-mechanics'],
     ['TBD',P.el4,'elem','elements-mechanics'],
     ['TBD',P.el5,'elem','elements-mechanics'],
+    ['TBD',P.el6,'elem','elements-mechanics'],
     ['TBD',P.bo1,'boost','booster-mechanics'],
     ['TBD',P.bo2,'boost','booster-mechanics'],
     ['TBD',P.bo3,'boost','booster-mechanics']
@@ -1972,7 +2014,11 @@ function view(l){
     ]))+
     ent(N.el5,params([
       [look,t('Scoops of ice cream in one color over the locked cubes. A spoon of the same color sits on an ant.','Các viên kem một màu phủ trên khối bị khóa. Muỗng cùng màu nằm trên 1 kiến.')],
-      [an,t('Tap a locked cube: it shakes. Spoon cube destroyed: the spoon flies to the lock and the ice cream melts away.','Chạm khối bị khóa: rung. Khối có muỗng bị phá: muỗng bay tới khóa, kem tan đi.')]
+      [an,t('Tap a locked cube: it shakes. Spoon ant defeated: the spoon flies to the lock and the ice cream melts away.','Chạm khối bị khóa: rung. Kiến mang muỗng bị diệt: muỗng bay tới khóa, kem tan đi.')]
+    ]))+
+    ent(N.el6,params([
+      [look,t('An orange tray over 2×2 cells with 4 round jelly bottles in different colors. Each has a cork and a gold ribbon.','Khay cam phủ 2×2 ô, chứa 4 lọ thạch tròn khác màu. Mỗi lọ có nút bần và dải ruy băng vàng.')],
+      [an,t('Break: the bottle shakes, shatters into glass bits of its color, and +5 floats up. All 4 broken: the tray pops away.','Vỡ: lọ rung, vỡ thành mảnh thủy tinh cùng màu, chữ +5 bay lên. Vỡ hết 4 lọ: khay bật mất.')]
     ]));
 
   B['booster-object-concept']=
@@ -2003,6 +2049,7 @@ function view(l){
     ['Slot Unlock','el',t('A locked slot counts down or opens','Slot khóa đếm ngược hoặc mở'),1],
     ['Chocolate Spread','el',t('The fountain makes new chocolate','Vòi tạo chocolate mới'),0],
     ['Ice Cream Unlock','el',t('A spoon removes an ice cream lock','Muỗng gỡ một khóa kem'),1],
+    ['Bottle Break','el',t('A Jelly Bottle breaks and gives +5 ammo','Lọ thạch vỡ và cho +5 đạn'),1],
     ['Hand','bo',t('The chosen cannon fires all its ammo','Pháo được chọn xả hết đạn'),2],
     ['Shuffle','bo',t('The board clears and refills','Bàn được xóa và thay mới'),2],
     ['Bomb','bo',t('3 bomb cannons appear and fire','3 pháo Bomb xuất hiện và bắn'),3]
@@ -2296,6 +2343,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
+      ent(t('Jelly Bottle','Lọ thạch'),ul([
+        t(`Added the element Jelly Bottle: a 2×2 tray with 4 bottles of different colors. A match next to it breaks the bottle of its color and gets +5 ammo. Rules, tutorial, look, SFX and a demo. Unlock level: TBD.`,`Thêm element Lọ thạch: khay 2×2 chứa 4 lọ khác màu. Match cạnh khay làm vỡ lọ cùng màu và được +5 đạn. Có luật, hướng dẫn, hình ảnh, SFX và demo. Màn mở: TBD.`)
+      ]))+
       ent(t('Ant theme','Theme kiến'),ul([
         t(`The target grid is now a grid of armored ants. The number on each ant is its HP; 1 shot = 1 HP. At 0 HP the ant swells up and disappears. HP per ant: TBD.`,`Lưới mục tiêu giờ là lưới kiến mặc giáp. Số trên kiến là HP; 1 phát = 1 HP. Về 0 HP, kiến mập lên rồi biến mất. HP mỗi kiến: TBD.`),
         t(`Stacked Cube is removed: ant HP already covers it.`,`Bỏ Stacked Cube: HP của kiến đã thay cho element này.`),
