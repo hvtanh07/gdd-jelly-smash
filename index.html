@@ -817,7 +817,7 @@ const DEMOS={
       let wall='';[1,1,1,1,2,2,2].forEach((c,i)=>{wall+=jcube(16+24*i,4,20,c);});
       let cells='';for(let j=0;j<4;j++)for(let i=0;i<4;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="30" height="30" rx="8"/>`;
       const chain=`<g class="ch"><rect class="veil" x="${bx(1)}" y="${by(1)}" width="30" height="30" rx="8"/>${padlock(bx(1)+15,by(1)+13)}</g>`;
-      return wall+cannon(80,28,1,['0','10'],'rc')+cannon(120,28,2,['0'],'')+cells+
+      return wall+cannon(80,28,1,['0','15'],'rc')+cannon(120,28,2,['0'],'')+cells+
         `<g class="g0">${jcube(bx(1),by(1),30,1)}${chain}</g><g class="g1"><g class="mv">${jcube(bx(3),by(1),30,1)}</g></g>`+
         `<g class="g2">${jcube(bx(1),by(2),30,1)}</g><g class="g3">${jcube(bx(2),by(2),30,1)}</g>`+puff(83,113)+tap(147,113);},
     tracks:()=>{
@@ -835,7 +835,7 @@ const DEMOS={
       const lay=(x,y,o,c,k)=>`<g class="lo${k}">${jcube(x,y,30,o)}</g><g class="li${k}">${jcube(x+7,y+7,16,c)}</g>`;
       let wall='';[1,1,1,1,2,2,2].forEach((c,i)=>{wall+=jcube(16+24*i,4,20,c);});
       let cells='';for(let j=0;j<4;j++)for(let i=0;i<4;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="30" height="30" rx="8"/>`;
-      return wall+cannon(80,28,1,['0','10'],'rc')+cannon(120,28,2,['0'],'')+cells+
+      return wall+cannon(80,28,1,['0','15'],'rc')+cannon(120,28,2,['0'],'')+cells+
         lay(bx(1),by(0),1,3,0)+`<g class="mv">${lay(bx(2),by(1),1,2,1)}</g>`+lay(bx(1),by(2),1,2,2)+lay(bx(1),by(3),1,2,3)+tap(115,113);},
     tracks:()=>{
       const cy=[81,113,145,177],tr=[...tapTracks(.4),['.mv','transform',[[.65,T(0,0)],[1.05,T(-32,0)]]]];
@@ -858,7 +858,7 @@ const DEMOS={
       const rest=jcube(bx(2),by(0),28,4)+jcube(bx(3),by(0),28,4)+jcube(bx(0),by(2),28,4)+jcube(bx(2),by(2),28,4);
       const grp=`<g class="grp">${jcube(bx(0),by(0),28,2)+jcube(bx(1),by(0),28,2)+jcube(bx(0),by(1),28,2)}<g class="mv">${jcube(bx(3),by(1),28,2)}</g></g>`;
       const drops=[0,1,2,3].map(k=>`<circle class="f2 dp${k}" cx="70" cy="62" r="4" style="opacity:0"/>`).join('');
-      return wall+cannon(70,62,2,['0','10','9','8','7','6'],'bc')+cannon(130,62,4,['6'],'yc')+cells+rest+grp+drops+tap(150,150);},
+      return wall+cannon(70,62,2,['0','15','14','13','12','11'],'bc')+cannon(130,62,4,['6'],'yc')+cells+rest+grp+drops+tap(150,150);},
     tracks:()=>{
       const tgt=[[56,46],[84,46],[28,18],[168,18]],cv=[.0,2.35,2.95,3.35,3.75,4.15];
       return [
@@ -879,7 +879,7 @@ const DEMOS={
     svg:()=>{
       const bx=i=>40+40*i,by=j=>60+40*j;let cells='';
       for(let j=0;j<3;j++)for(let i=0;i<3;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="36" height="36" rx="9"/>`;
-      return cannon(100,4,2,['0','10'],'gc')+cells+jcube(bx(2),by(0),36,4)+jcube(bx(0),by(2),36,4)+jcube(bx(2),by(2),36,4)+
+      return cannon(100,4,2,['0','15'],'gc')+cells+jcube(bx(2),by(0),36,4)+jcube(bx(0),by(2),36,4)+jcube(bx(2),by(2),36,4)+
         `<g class="grp"><g class="c0">${jcube(bx(0),by(0),36,2)}</g><g class="c1">${jcube(bx(1),by(0),36,2)}</g><g class="c2">${jcube(bx(0),by(1),36,2)}</g>`+
         `<g class="c3"><g class="mv"><g class="mvs">${jcube(bx(2),by(1),36,2)}</g></g></g></g>`+tap(138,118);},
     tracks:()=>{
@@ -930,7 +930,7 @@ const DEMOS={
       let bd='';for(let j=0;j<4;j++)for(let i=0;i<4;i++){bd+=`<g opacity=".35">${jcube(32+35*i,30+35*j,31,[[2,4,2,2],[4,4,2,4],[2,2,4,2],[4,2,2,4]][j][i])}</g>`;}
       const tier=(k,w,word,ammo)=>`<g class="pw${k}" style="opacity:0"><rect class="f7" x="${100-w/2}" y="64" width="${w}" height="36" rx="18"/><text class="bn" x="100" y="82" dy=".35em">${word}</text></g>`+
         `<g class="pa${k}" style="opacity:0"><rect class="f4" x="72" y="108" width="56" height="26" rx="13"/><text class="bn sm l" x="100" y="121" dy=".35em">${ammo}</text></g>`;
-      return bd+tier(0,104,'Great!','+15')+tier(1,128,'Amazing!','+20')+tier(2,124,'Extreme!','+30')+tier(3,92,'Epic!','+40');},
+      return bd+tier(0,104,'Great!','+20')+tier(1,128,'Amazing!','+25')+tier(2,124,'Extreme!','+35')+tier(3,92,'Epic!','+45');},
     tracks:()=>[0,1,2,3].flatMap(k=>{const s=.3+k*2.1;return [
       [`.pw${k}`,'opacity',[[0,0],[s,0],[s+.08,1],[s+1.5,1],[s+1.75,0]]],
       [`.pw${k}`,'transform',[[s,'scale(.3)'],[s+.2,'scale(1.15)'],[s+.35,'scale(1)']]],
@@ -1207,16 +1207,16 @@ function view(l){
     ent(t('Ammo by group size','Số đạn theo cỡ nhóm'),
       table(t('Ammo by group size','Số đạn theo cỡ nhóm'),[t('Popup','Popup'),t('Group size','Cỡ nhóm'),t('Ammo','Đạn')],[
         [dash,t('3, straight line only','3, chỉ khi thẳng hàng'),'+10'],
-        [dash,'4','+10'],
-        [popup('Great','Tốt'),'5','+15'],
-        [popup('Amazing','Tuyệt vời'),'6','+20'],
-        [popup('Amazing','Tuyệt vời'),'7','+25'],
-        [popup('Extreme','Cực đỉnh'),'8','+30'],
-        [popup('Extreme','Cực đỉnh'),'9','+35'],
-        [popup('Epic','Siêu đỉnh'),t('10 or more','Từ 10 trở lên'),t('+40 for 10, then +5 per extra cube','+40 với 10 khối, mỗi khối thêm +5')]
+        [dash,'4','+15'],
+        [popup('Great','Tốt'),'5','+20'],
+        [popup('Amazing','Tuyệt vời'),'6','+25'],
+        [popup('Amazing','Tuyệt vời'),'7','+30'],
+        [popup('Extreme','Cực đỉnh'),'8','+35'],
+        [popup('Extreme','Cực đỉnh'),'9','+40'],
+        [popup('Epic','Siêu đỉnh'),t('10 or more','Từ 10 trở lên'),t('+45 for 10, then +5 per extra cube','+45 với 10 khối, mỗi khối thêm +5')]
       ],'compact')+
-      `<p>${t(`Each time a group forms, the game maps its cube count to this table to show the praise popup and give the ammo. A straight line of 3 gives +10, the same as a group of 4. From 4 cubes, every size follows <code>ammo = 5 × (cubes − 2)</code>, so bigger groups are worth more per cube. This rewards setting up large matches.`,
-              `Mỗi khi một nhóm được tạo, game map số khối trong nhóm vào bảng này để hiện popup khen và cộng đạn. Hàng thẳng 3 khối được +10, bằng nhóm 4. Từ 4 khối trở lên, mọi cỡ nhóm đều theo công thức <code>đạn = 5 × (số khối − 2)</code>, nên nhóm càng lớn càng lời. Điều này khuyến khích người chơi dựng nhóm lớn.`)}</p>`+
+      `<p>${t(`Each time a group forms, the game maps its cube count (n) to this table to show the praise popup and give the ammo. Every size follows <code>ammo = 10 + 5 × (n − 3)</code>: a straight line of 3 gives +10, and each extra cube adds +5. This rewards setting up large matches.`,
+              `Mỗi khi một nhóm được tạo, game map số khối trong nhóm (n) vào bảng này để hiện popup khen và cộng đạn. Mọi cỡ nhóm theo công thức <code>đạn = 10 + 5 × (n − 3)</code>: hàng thẳng 3 khối được +10, mỗi khối thêm được +5. Điều này khuyến khích người chơi dựng nhóm lớn.`)}</p>`+
       `<p>${t(`Praise tiers by group size: 5 = Great, 6–7 = Amazing, 8–9 = Extreme, 10 or more = Epic. 3 and 4 cubes show no praise, only the ammo text.`,
               `Mức khen theo cỡ nhóm: 5 = Great, 6–7 = Amazing, 8–9 = Extreme, từ 10 trở lên = Epic. Nhóm 3 và 4 khối không có lời khen, chỉ hiện số đạn.`)}</p>`)+
     ent(nm('Cannons','Pháo'),ul([
@@ -1833,6 +1833,11 @@ function view(l){
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
+    day(t('November 16, 2026','16/11/2026'),
+      ent(t('Ammo formula','Công thức số đạn'),ul([
+        t(`Ammo is now 10 + 5 × (n − 3), n = cubes in the group (was 5 × (n − 2) from 4 cubes). Group of 4: +15, 5: +20, 6: +25, 7: +30, 8: +35, 9: +40, 10: +45. A line of 3 stays +10.`,`Số đạn giờ là 10 + 5 × (n − 3), n = số khối trong nhóm (trước là 5 × (n − 2) từ 4 khối). Nhóm 4: +15, 5: +20, 6: +25, 7: +30, 8: +35, 9: +40, 10: +45. Hàng thẳng 3 vẫn +10.`),
+        t(`Praise demo and the group-of-4 demos now show the new numbers.`,`Minh họa khen và các minh họa nhóm 4 khối đã đổi theo số mới.`)
+      ])))+
     day(t('November 13, 2026','13/11/2026'),
         ent(t('Leaderboard','Bảng xếp hạng'),ul([
         t(`Added the Leaderboard (7.4) from the Meowdoku screen recording: daily round, stars by rank, 8 leagues by stars, inactivity demotion. Values added to remote config (5).`,`Thêm Bảng xếp hạng (mục 7.4) từ video quay màn hình Meowdoku: vòng theo ngày, sao theo hạng, 8 giải đấu theo sao, hạ bậc khi không chơi. Thêm thông số vào cấu hình từ xa (mục 5).`)
