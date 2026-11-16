@@ -1212,6 +1212,35 @@ const DEMOS={
         ['.bc','opacity',[[0,0],[2.95,0],[3.0,1]]],['.bc','transform',[[2.95,'scale(0)'],[3.1,'scale(1.2)'],[3.22,'scale(1)']]],
         ['.bm','opacity',[[0,0],[3.1,0],[3.2,1],[4.6,1],[4.8,0]]]);
       return tr;}},
+  queen:{D:4.6, /* Queen Ant: 2×2 cells, rainbow armor; red, blue and yellow cannons all hit her until 0 HP, then she swells and disappears */
+    svg:()=>{
+      const ST='transform-box:fill-box;transform-origin:center',x=i=>26+30*i,y=j=>16+30*j;
+      let o=arena()+`<defs><linearGradient id="qrb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5470"/><stop offset=".25" stop-color="#ffd93d"/><stop offset=".5" stop-color="#2fd39a"/><stop offset=".75" stop-color="#3d9dff"/><stop offset="1" stop-color="#a66bff"/></linearGradient></defs>`;
+      o+=dpanel(14,10,172,100)+`<rect x="14" y="109" width="172" height="2.5" rx="1" fill="#ff3b5c"/>`;
+      [[0,0,4],[1,0,3],[2,0,5],[3,0,2],[4,0,0],[0,1,5],[3,1,4],[4,1,3],[0,2,3],[3,2,5],[4,2,3]].forEach(([i,j,c])=>{o+=dant(x(i),y(j),28,c,['1']);});
+      const qs=58,qx=x(1),qy=y(1),cx=qx+qs/2;
+      o+=`<g class="qa" style="${ST}">`+antSVG(qx,qy,qs,'fill="url(#qrb)"',['6','5','4','3','2','1','0'])+
+        `<path d="M${cx-11},${qy+3}l3,-9l5,6l3,-8l3,8l5,-6l3,9z" fill="#ffd93d" stroke="#c49c06" stroke-width="1"/></g>`;
+      for(let i=0;i<5;i++)o+=dslot(7+38*i,124,34,44);
+      [[0,0],[1,4],[2,2]].forEach(([i,c])=>{o+=`<g class="qc${i}" style="${ST}">${dcan(24+38*i,150,c,['2','1','0'],'',.75)}</g>`;});
+      [0,1,2,3,4,5].forEach(k=>{const c=[0,4,2][k%3];o+=`<circle class="qb${k}" cx="${24+38*(k%3)}" cy="133" r="4.5" fill="${DJ[c][0]}" stroke="#fff" stroke-width="1.5" style="opacity:0"/>`;});
+      return o+[0,1,2,3,4,5,6,7].map(k=>`<circle class="qs${k}" cx="${cx}" cy="${qy+19}" r="${k%2?4:6}" fill="${DJ[k%6][0]}" style="opacity:0"/>`).join('');},
+    tracks:()=>{
+      const cx=56+29,ty=46+19,tr=[],S=[.5,.7,.9,1.5,1.7,1.9],q=[[0,T(0,0,1)]];
+      S.forEach((s,k)=>{const i=k%3,a=s+.3;
+        tr.push([`.qb${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[a-.02,1],[a,0]]],[`.qb${k}`,'transform',[[s,T(0,0),'ease-in'],[a,T(cx-(24+38*i),ty-133)]]],
+          [`.qa .hp${k}`,'opacity',k?[[0,0],[S[k-1]+.3,0],[S[k-1]+.32,1],[a,1],[a+.02,0]]:[[0,1],[a,1],[a+.02,0]]]);
+        if(k<5)q.push([a,T(0,0,1)],[a+.06,T(0,-3,1)],[a+.16,T(0,0,1)]);});
+      tr.push(['.qa .hp6','opacity',[[0,0],[S[5]+.3,0],[S[5]+.32,1]]]);
+      [0,1,2].forEach(i=>{const s1=S[i],s2=S[i+3];
+        tr.push([`.qc${i} .v0`,'opacity',[[0,1],[s1,1],[s1+.02,0]]],[`.qc${i} .v1`,'opacity',[[0,0],[s1,0],[s1+.02,1],[s2,1],[s2+.02,0]]],[`.qc${i} .v2`,'opacity',[[0,0],[s2,0],[s2+.02,1]]],
+          [`.qc${i}`,'transform',[[s1,T(0,0,1)],[s1+.05,T(0,5,1)],[s1+.2,T(0,0,1)],[s2,T(0,0,1)],[s2+.05,T(0,5,1)],[s2+.2,T(0,0,1)],[s2+.35,T(0,0,1)],[s2+.5,T(0,0,0)]]],
+          [`.qc${i}`,'opacity',[[0,1],[s2+.45,1],[s2+.5,0]]]);});
+      const e=S[5]+.3;q.push([e,T(0,0,1)],[e+.3,T(0,0,1.3)],[e+.55,T(0,0,1.42)],[e+.7,T(0,0,0)]);
+      tr.push(['.qa','transform',q],['.qa','opacity',[[0,1],[e+.66,1],[e+.7,0]]]);
+      [0,1,2,3,4,5,6,7].forEach(k=>{const a=k*Math.PI/4,r=k%2?32:44;
+        tr.push([`.qs${k}`,'transform',[[e+.66,T(0,0,.4)],[e+1.2,T(Math.cos(a)*r,Math.sin(a)*r,1)]]],[`.qs${k}`,'opacity',[[0,0],[e+.66,0],[e+.7,1],[e+1.05,1],[e+1.35,0]]]);});
+      return tr;}},
   /* ----- booster demos (section 1.5), drawn like the playable demo ----- */
   jHand:{D:5.4, /* Hand: the cannon with the most ammo fires it all at once, at any cube of its color, nearest first */
     svg:()=>{
@@ -1588,8 +1617,8 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Chocolate Layer','Lớp chocolate'),el2:nm('Stacked Cube','Khối chồng'),el3:nm('Locked Slot','Slot khóa'),el4:nm('Chocolate Fountain','Vòi chocolate'),el5:nm('Ice Cream Lock','Khóa kem'),el6:nm('Jelly Bottle','Lọ thạch'),bo1:nm('Hand','Hand'),bo2:nm('Shuffle','Shuffle'),bo3:nm('Bomb','Bomb')};
-  const P={el1:t('Chocolate Layer','Lớp chocolate'),el2:t('Stacked Cube','Khối chồng'),el3:t('Locked Slot','Slot khóa'),el4:t('Chocolate Fountain','Vòi chocolate'),el5:t('Ice Cream Lock','Khóa kem'),el6:t('Jelly Bottle','Lọ thạch'),bo1:t('Hand','Hand'),bo2:t('Shuffle','Shuffle'),bo3:t('Bomb','Bomb')};
+  const N={el1:nm('Chocolate Layer','Lớp chocolate'),el2:nm('Stacked Cube','Khối chồng'),el3:nm('Locked Slot','Slot khóa'),el4:nm('Chocolate Fountain','Vòi chocolate'),el5:nm('Ice Cream Lock','Khóa kem'),el6:nm('Jelly Bottle','Lọ thạch'),el7:nm('Queen Ant','Kiến chúa'),bo1:nm('Hand','Hand'),bo2:nm('Shuffle','Shuffle'),bo3:nm('Bomb','Bomb')};
+  const P={el1:t('Chocolate Layer','Lớp chocolate'),el2:t('Stacked Cube','Khối chồng'),el3:t('Locked Slot','Slot khóa'),el4:t('Chocolate Fountain','Vòi chocolate'),el5:t('Ice Cream Lock','Khóa kem'),el6:t('Jelly Bottle','Lọ thạch'),el7:t('Queen Ant','Kiến chúa'),bo1:t('Hand','Hand'),bo2:t('Shuffle','Shuffle'),bo3:t('Bomb','Bomb')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
   const withEl=t('With elements','Khi gặp yếu tố đặc biệt');
@@ -1608,6 +1637,7 @@ function view(l){
     stack3:t('A group of 4 gave this cannon 5 ammo. The stack of 3 takes 3 shots, so only 2 are left for the other blue cubes.','Nhóm 4 khối cho pháo này 5 đạn. Chồng 3 khối tốn 3 phát, nên chỉ còn 2 đạn cho các khối xanh khác.'),
     lockSlot:t('Two slots are locked (2 and 3). Each cannon sent to a slot counts both down. The first opens after 2 cannons and gets the next one; the second opens after 3.','2 slot bị khóa (2 và 3). Mỗi pháo vào slot làm cả 2 giảm. Slot đầu mở sau 2 pháo và nhận pháo kế tiếp; slot sau mở sau 3 pháo.'),
     fountain:t('Every 2 moves the fountain makes chocolate: first next to itself, then next to that chocolate.','Cứ 2 move vòi tạo chocolate: lần đầu cạnh vòi, lần sau cạnh miếng chocolate đó.'),
+    queen:t('The queen takes 2×2 cells and has 6 HP in the demo. Her rainbow armor takes any color: the red, blue and yellow cannons all hit her. At 0 HP she swells up and disappears.','Kiến chúa chiếm 2×2 ô, demo có 6 HP. Giáp cầu vồng nhận mọi màu: pháo đỏ, xanh và vàng đều bắn trúng. Về 0 HP, kiến chúa mập lên rồi biến mất.'),
     bottle:t('A swap makes a blue line of 3 right under the tray. The blue bottle breaks, and the match gets +5 ammo: the blue cannon comes in with 3 + 5 = 8.','Một lần swap tạo hàng 3 khối xanh ngay dưới khay. Lọ xanh vỡ, và match đó được +5 đạn: pháo xanh vào với 3 + 5 = 8 đạn.'),
     iceLock:t('The cubes under the green ice cream are locked. The blue cannon defeats the ant carrying the green spoon, and the spoon flies down to remove the lock.','Các khối dưới kem xanh lá bị khóa. Pháo xanh diệt con kiến mang muỗng xanh lá, muỗng bay xuống gỡ khóa.'),
     swap:t('A swap that makes no line slides back. The next swap makes a blue line of 3, so it stays: the line pops for 3 ammo, the cubes above fall and new cubes drop in.','Swap không tạo hàng thì 2 khối trượt về. Swap tiếp theo tạo hàng 3 khối xanh nên được giữ: hàng nổ cho 3 đạn, khối phía trên rơi xuống và khối mới rơi vào.'),
@@ -1863,7 +1893,14 @@ function view(l){
       t(`A match next to the tray (up, down, left, right) breaks the bottle of the same color.`,`Match cạnh khay (trên, dưới, trái, phải) làm vỡ lọ cùng màu với match.`),
       t(`That match gets +5 ammo: ammo = 2n − 3 + 5.`,`Match đó được +5 đạn: đạn = 2n − 3 + 5.`),
       t(`No bottle of that color left: no bonus. All 4 broken: the tray disappears and cubes fall into its cells.`,`Không còn lọ màu đó: không có thưởng. Vỡ hết 4 lọ: khay biến mất, khối rơi vào 4 ô đó.`)
-    ]),unlock('TBD'),demo('bottle'));
+    ]),unlock('TBD'),demo('bottle'))+
+    ent(N.el7,ul([
+      t(`Ant grid. A big ant that takes 2×2 cells and marches down with the grid.`,`Trên lưới kiến. Kiến lớn chiếm 2×2 ô, đi xuống cùng lưới.`),
+      t(`Rainbow armor: cannons of any color can hit her. 1 shot = 1 HP. HP: TBD.`,`Giáp cầu vồng: pháo màu nào cũng bắn được. 1 phát = 1 HP. HP: TBD.`),
+      t(`Target rules stay: she must be the front ant in her 2 columns and in view. Her bottom row sets how low she is.`,`Luật target giữ nguyên: kiến chúa phải ở đầu hàng ở cả 2 cột và trong khung nhìn thấy. Hàng dưới của kiến chúa quyết định độ thấp.`),
+      t(`Hand and Bomb cannons can hit her too.`,`Pháo của Hand và Bomb cũng bắn được kiến chúa.`),
+      t(`At 0 HP she swells up and disappears, and her 4 cells empty. She touches the red line: lose.`,`Về 0 HP, kiến chúa mập lên rồi biến mất, 4 ô trống ra. Chạm vạch đỏ: thua.`)
+    ]),unlock('TBD'),demo('queen'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). */
   B['booster-mechanics']=
@@ -1938,6 +1975,7 @@ function view(l){
       [N.el4,popup('Clear chocolate fast<br>before it spreads.','Phá chocolate thật nhanh<br>trước khi nó lan ra.'),lvl('TBD')],
       [N.el5,popup('Defeat the ant with the spoon<br>to unlock the ice cream.','Diệt kiến mang muỗng<br>để mở khóa kem.'),lvl('TBD')],
       [N.el6,popup('Match next to a same-color bottle<br>to break it for +5 ammo.','Ghép cạnh lọ cùng màu<br>để làm vỡ và được +5 đạn.'),lvl('TBD')],
+      [N.el7,popup('Hit the queen with any cannon<br>to defeat her.','Bắn kiến chúa bằng pháo bất kỳ<br>để hạ kiến chúa.'),lvl('TBD')],
     ]);
 
   /* PER GAME: one row per booster */
@@ -1957,6 +1995,7 @@ function view(l){
     ['TBD',P.el4,'elem','elements-mechanics'],
     ['TBD',P.el5,'elem','elements-mechanics'],
     ['TBD',P.el6,'elem','elements-mechanics'],
+    ['TBD',P.el7,'elem','elements-mechanics'],
     ['TBD',P.bo1,'boost','booster-mechanics'],
     ['TBD',P.bo2,'boost','booster-mechanics'],
     ['TBD',P.bo3,'boost','booster-mechanics']
@@ -2019,6 +2058,10 @@ function view(l){
     ent(N.el6,params([
       [look,t('An orange tray over 2×2 cells with 4 round jelly bottles in different colors. Each has a cork and a gold ribbon.','Khay cam phủ 2×2 ô, chứa 4 lọ thạch tròn khác màu. Mỗi lọ có nút bần và dải ruy băng vàng.')],
       [an,t('Break: the bottle shakes, shatters into glass bits of its color, and +5 floats up. All 4 broken: the tray pops away.','Vỡ: lọ rung, vỡ thành mảnh thủy tinh cùng màu, chữ +5 bay lên. Vỡ hết 4 lọ: khay bật mất.')]
+    ]))+
+    ent(N.el7,params([
+      [look,t('A big armored ant over 2×2 cells. Rainbow armor, a gold crown and her HP on her back.','Kiến lớn mặc giáp phủ 2×2 ô. Giáp cầu vồng, vương miện vàng, số HP trên lưng.')],
+      [an,t('Hit: she flinches and her HP goes down 1. At 0 HP: she swells up, then bursts in a rainbow splash.','Trúng đạn: khựng lại, HP giảm 1. Về 0 HP: mập lên, rồi nổ thành vệt sơn cầu vồng.')]
     ]));
 
   B['booster-object-concept']=
@@ -2049,6 +2092,7 @@ function view(l){
     ['Slot Unlock','el',t('A locked slot counts down or opens','Slot khóa đếm ngược hoặc mở'),1],
     ['Chocolate Spread','el',t('The fountain makes new chocolate','Vòi tạo chocolate mới'),0],
     ['Ice Cream Unlock','el',t('A spoon removes an ice cream lock','Muỗng gỡ một khóa kem'),1],
+    ['Queen Pop','el',t('The Queen Ant reaches 0 HP and disappears','Kiến chúa hết HP và biến mất'),2],
     ['Bottle Break','el',t('A Jelly Bottle breaks and gives +5 ammo','Lọ thạch vỡ và cho +5 đạn'),1],
     ['Hand','bo',t('The chosen cannon fires all its ammo','Pháo được chọn xả hết đạn'),2],
     ['Shuffle','bo',t('The board clears and refills','Bàn được xóa và thay mới'),2],
@@ -2343,6 +2387,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
+      ent(t('Queen Ant','Kiến chúa'),ul([
+        t(`Added the element Queen Ant: a 2×2 ant with rainbow armor, so cannons of any color can hit her. Rules, tutorial, look, SFX and a demo. HP and unlock level: TBD.`,`Thêm element Kiến chúa: kiến 2×2 giáp cầu vồng, pháo màu nào cũng bắn được. Có luật, hướng dẫn, hình ảnh, SFX và demo. HP và màn mở: TBD.`)
+      ]))+
       ent(t('Jelly Bottle','Lọ thạch'),ul([
         t(`Added the element Jelly Bottle: a 2×2 tray with 4 bottles of different colors. A match next to it breaks the bottle of its color and gets +5 ammo. Rules, tutorial, look, SFX and a demo. Unlock level: TBD.`,`Thêm element Lọ thạch: khay 2×2 chứa 4 lọ khác màu. Match cạnh khay làm vỡ lọ cùng màu và được +5 đạn. Có luật, hướng dẫn, hình ảnh, SFX và demo. Màn mở: TBD.`)
       ]))+
