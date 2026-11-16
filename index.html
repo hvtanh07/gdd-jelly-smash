@@ -1161,6 +1161,71 @@ const DEMOS={
         ['.spn','transform',[[1.8,T(0,0,1)],[1.95,T(0,-6,1.4)],[2.5,T(bx(1)+13-x(3)-12,by(1)+13-ty(1)-12,1.2)]]],['.spn','opacity',[[0,1],[2.5,1],[2.65,0]]],
         ['.ice','opacity',[[0,1],[2.55,1],[2.95,0]]],['.ice','transform',[[2.55,T(0,0,1)],[2.95,T(0,6,1)]]],
         ['.iu','opacity',[[0,0],[2.9,0],[3.0,1],[4.2,1],[4.35,0]]]];}},
+  /* ----- booster demos (section 1.5), drawn like the playable demo ----- */
+  jHand:{D:5.4, /* Hand: the cannon with the most ammo fires it all at once, at any cube of its color, nearest first */
+    svg:()=>{
+      const ST='transform-box:fill-box;transform-origin:center',x=i=>22+27*i,y=j=>j<0?6:34+24*j,S=22;
+      const G=[[[0,2],[1,4]],[[0,4],[1,2]],[[-1,4],[0,0]],[[0,2],[1,0]],[[0,4]],[[-1,2],[0,4],[1,2]]];
+      let o=arena()+`<text x="18" y="20" fill="#b6a3d6" style="${DFONT};font-size:9px">out of view</text>`+dpanel(14,30,172,62)+
+        `<rect x="14.5" y="30.5" width="171" height="61" rx="10" fill="none" stroke="#b6a3d6" stroke-opacity=".35"/><rect x="14" y="91" width="172" height="2.5" rx="1" fill="#ff3b5c"/>`;
+      G.forEach((col,i)=>col.forEach(([j,c])=>{o+=`<g class="h${i}${j<0?'m':j}" style="${j<0?'opacity:.35;':''}${ST}">${dj(x(i),y(j),S,c,false)}</g>`;}));
+      for(let i=0;i<5;i++)o+=dslot(7+38*i,104,34,40);
+      o+=dcan(24,130,0,['3'],'',.75)+`<g class="hc" style="${ST}">${dcan(62,130,4,['5','4','3','2','1','0'],'',.75)}</g>`+dcan(100,130,2,['1'],'',.75);
+      o+=`<rect class="hl" x="43" y="102" width="38" height="44" rx="10" fill="none" stroke="#ffd93d" stroke-width="2.5" style="opacity:0"/>`;
+      [0,1,2,3,4].forEach(k=>{o+=`<circle class="hb${k}" cx="62" cy="112" r="4.5" fill="#3d9dff" stroke="#fff" stroke-width="1.5" style="opacity:0"/>`;});
+      return o+`<g class="hbtn" style="${ST}"><rect x="70" y="162" width="60" height="24" rx="12" fill="#ffd93d"/><text x="100" y="174" dy=".35em" text-anchor="middle" fill="#3a2400" style="${DFONT};font-size:11px">HAND</text></g>`+
+        dtap('ht',100,174)+dpill('hf',100,152,72,'Slot freed','#3a2456','#fff');},
+    tracks:()=>{
+      const x=i=>22+27*i,y=j=>j<0?6:34+24*j,Q=[[0,1],[1,0],[4,0],[5,0],[2,-1]],tr=[...dtapT('ht',.3)];
+      tr.push(['.hbtn','transform',[[.35,'scale(1)'],[.45,'scale(.9)'],[.6,'scale(1)']]],['.hl','opacity',[[0,0],[.6,0],[.7,1],[.85,.3],[1.0,1],[3.1,1],[3.25,0]]]);
+      Q.forEach(([i,j],k)=>{const s=1.1+.4*k,a=s+.25,sel=`.h${i}${j<0?'m':j}`;
+        tr.push([`.hb${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[a-.02,1],[a,0]]],[`.hb${k}`,'transform',[[s,T(0,0),'ease-in'],[a,T(x(i)+11-62,y(j)+11-112)]]],
+          [sel,'transform',[[a-.02,'scale(1)'],[a+.08,'scale(1.3)'],[a+.22,'scale(0)']]],[sel,'opacity',[[0,j<0?.35:1],[a-.02,j<0?.35:1],[a,1],[a+.18,1],[a+.22,0]]],
+          [`.hc .v${k}`,'opacity',k?[[0,0],[1.1+.4*(k-1),0],[1.12+.4*(k-1),1],[s,1],[s+.02,0]]:[[0,1],[s,1],[s+.02,0]]]);});
+      tr.push(['.hc .v5','opacity',[[0,0],[2.7,0],[2.72,1]]],['.hc','transform',[[2.95,'scale(1)'],[3.2,'scale(0)']]],['.hc','opacity',[[0,1],[3.1,1],[3.2,0]]],
+        ['.hf','opacity',[[0,0],[3.3,0],[3.4,1],[4.6,1],[4.75,0]]]);
+      return tr;}},
+  jShuffle:{D:5.0, /* Shuffle: the whole board clears and a new one comes in, with a swap ready for each bottom-row color */
+    svg:()=>{
+      const ST='transform-box:fill-box;transform-origin:center',bx=i=>32+28*i,by=j=>60+28*j;
+      const OLD=[[1,3,5,1,3],[5,1,3,5,1],[3,5,1,3,5]],NEW=[[0,0,4,0,2],[4,4,2,4,1],[2,2,3,2,5]];
+      let o=arena()+dpanel(14,8,172,38)+`<text x="20" y="20" fill="#b6a3d6" style="${DFONT};font-size:8px">bottom row</text>`;
+      [0,4,2,0,4,2].forEach((c,i)=>{o+=dj(26+27*i,22,20,c,false);});
+      o+=dpanel(24,54,152,94);
+      OLD.forEach((r,j)=>r.forEach((c,i)=>{o+=`<g class="so${j}${i}" style="${ST}">${dj(bx(i),by(j),26,c,true)}</g>`;}));
+      NEW.forEach((r,j)=>r.forEach((c,i)=>{o+=`<g class="sn${j}${i}" style="opacity:0;${ST}">${dj(bx(i),by(j),26,c,true)}</g>`;}));
+      o+=[[0,'#ff5470'],[1,'#3d9dff'],[2,'#ffd93d']].map(([j,col],k)=>`<rect class="sh${k}" x="${bx(2)-3}" y="${by(j)-3}" width="60" height="32" rx="9" fill="none" stroke="${col}" stroke-width="2.5" style="opacity:0"/>`).join('');
+      return o+`<g class="sbtn" style="${ST}"><rect x="62" y="162" width="76" height="24" rx="12" fill="#ffd93d"/><text x="100" y="174" dy=".35em" text-anchor="middle" fill="#3a2400" style="${DFONT};font-size:11px">SHUFFLE</text></g>`+dtap('st',100,174);},
+    tracks:()=>{
+      const tr=[...dtapT('st',.3),['.sbtn','transform',[[.35,'scale(1)'],[.45,'scale(.9)'],[.6,'scale(1)']]]];
+      for(let j=0;j<3;j++)for(let i=0;i<5;i++){const k=i+5*j,a=.6+.03*k,b=1.3+.03*k;
+        tr.push([`.so${j}${i}`,'transform',[[a,'scale(1)'],[a+.1,'scale(1.15)'],[a+.25,'scale(0)']]],[`.so${j}${i}`,'opacity',[[0,1],[a+.2,1],[a+.25,0]]],
+          [`.sn${j}${i}`,'opacity',[[0,0],[b,0],[b+.05,1]]],[`.sn${j}${i}`,'transform',[[b,T(0,-24,.5)],[b+.25,T(0,0,1)]]]);}
+      [0,1,2].forEach(k=>{const s=2.3+.75*k;tr.push([`.sh${k}`,'opacity',[[0,0],[s,0],[s+.1,1],[s+.6,1],[s+.7,0]]]);});
+      return tr;}},
+  jBomb:{D:5.6, /* Bomb: 3 cannons of the bottom-row colors, 15 ammo each, off the slots; leftover ammo is lost */
+    svg:()=>{
+      const ST='transform-box:fill-box;transform-origin:center',x=i=>22+27*i,y=j=>18+26*j,G=[[0,3,5,2,5,3],[3,2,0,3,4,5],[4,0,2,0,4,2]];
+      let o=arena()+dpanel(14,12,172,88)+`<rect x="14" y="99" width="172" height="2.5" rx="1" fill="#ff3b5c"/>`;
+      G.forEach((r,j)=>r.forEach((c,i)=>{o+=`<g class="m${i}${j}" style="${ST}">${dj(x(i),y(j),22,c,false)}</g>`;}));
+      for(let i=0;i<5;i++)o+=dslot(7+38*i,106,34,38);
+      o+=dcan(24,130,5,['7'],'',.65)+dcan(62,130,3,['3'],'',.65);
+      [[50,0],[100,4],[150,2]].forEach(([cx,c],k)=>{o+=`<g class="mc${k}" style="opacity:0;${ST}">${dcan(cx,176,c,['15','14','13','12','11'],'',.85)}</g>`;
+        [0,1,2,3].forEach(q=>{o+=`<circle class="mb${k}${q}" cx="${cx}" cy="158" r="4.5" fill="${DJ[c][0]}" stroke="#fff" stroke-width="1.5" style="opacity:0"/>`;});});
+      return o+dpill('mp',100,152,58,'Bomb!','#ff5470','#fff')+dpill('ml',100,152,130,'All cleared: leftover ammo lost','#3a2456','#fff');},
+    tracks:()=>{
+      const x=i=>22+27*i,y=j=>18+26*j,G=[[0,3,5,2,5,3],[3,2,0,3,4,5],[4,0,2,0,4,2]],tr=[];
+      tr.push(['.mp','opacity',[[0,0],[.2,0],[.3,1],[.9,1],[1.0,0]]],['.mp','transform',[[.2,'scale(.4)'],[.4,'scale(1.15)'],[.5,'scale(1)']]]);
+      [[50,0],[100,4],[150,2]].forEach(([cx,c],k)=>{
+        const t0=.6+.1*k;tr.push([`.mc${k}`,'opacity',[[0,0],[t0,0],[t0+.05,1],[3.1,1],[3.35,0]]],[`.mc${k}`,'transform',[[t0,'scale(0)'],[t0+.15,'scale(1.15)'],[t0+.25,'scale(1)'],[3.1,'scale(1)'],[3.35,'scale(0)']]]);
+        const tg=[];for(let j=2;j>=0;j--)for(let i=0;i<6;i++)if(G[j][i]===c)tg.push([i,j]);
+        tg.forEach(([i,j],q)=>{const s=1.2+.35*q,a=s+.25;
+          tr.push([`.mb${k}${q}`,'opacity',[[0,0],[s,0],[s+.03,1],[a-.02,1],[a,0]]],[`.mb${k}${q}`,'transform',[[s,T(0,0),'ease-in'],[a,T(x(i)+11-cx,y(j)+11-158)]]],
+            [`.m${i}${j}`,'transform',[[a-.02,'scale(1)'],[a+.08,'scale(1.3)'],[a+.22,'scale(0)']]],[`.m${i}${j}`,'opacity',[[0,1],[a+.18,1],[a+.22,0]]],
+            [`.mc${k} .v${q}`,'opacity',q?[[0,0],[1.2+.35*(q-1),0],[1.22+.35*(q-1),1],[s,1],[s+.02,0]]:[[0,1],[s,1],[s+.02,0]]]);});
+        tr.push([`.mc${k} .v4`,'opacity',[[0,0],[1.2+.35*3,0],[1.22+.35*3,1]]]);});
+      tr.push(['.ml','opacity',[[0,0],[2.8,0],[2.9,1],[4.3,1],[4.45,0]]]);
+      return tr;}},
   /* ----- Jelly Smash reference animations for section 3.2 (one per core object) ----- */
   jelly:{D:4.6, /* slide, squash on landing, then the group pulses and flies into the cannon */
     svg:()=>{
@@ -1465,10 +1530,11 @@ function view(l){
   const ph=(en,v)=>`<span class="ph">${t(en,v)}</span>`;
 
   /* names reused across sections. Jelly Smash has no elements or boosters yet: add keys here when they are designed */
-  const N={el1:nm('Chocolate Layer','Lớp chocolate'),el2:nm('Stacked Cube','Khối chồng'),el3:nm('Locked Slot','Slot khóa'),el4:nm('Chocolate Fountain','Vòi chocolate'),el5:nm('Ice Cream Lock','Khóa kem')};
-  const P={el1:t('Chocolate Layer','Lớp chocolate'),el2:t('Stacked Cube','Khối chồng'),el3:t('Locked Slot','Slot khóa'),el4:t('Chocolate Fountain','Vòi chocolate'),el5:t('Ice Cream Lock','Khóa kem')};
+  const N={el1:nm('Chocolate Layer','Lớp chocolate'),el2:nm('Stacked Cube','Khối chồng'),el3:nm('Locked Slot','Slot khóa'),el4:nm('Chocolate Fountain','Vòi chocolate'),el5:nm('Ice Cream Lock','Khóa kem'),bo1:nm('Hand','Hand'),bo2:nm('Shuffle','Shuffle'),bo3:nm('Bomb','Bomb')};
+  const P={el1:t('Chocolate Layer','Lớp chocolate'),el2:t('Stacked Cube','Khối chồng'),el3:t('Locked Slot','Slot khóa'),el4:t('Chocolate Fountain','Vòi chocolate'),el5:t('Ice Cream Lock','Khóa kem'),bo1:t('Hand','Hand'),bo2:t('Shuffle','Shuffle'),bo3:t('Bomb','Bomb')};
   const none=(en,v)=>`<p class="note">${t(en,v)}</p>`;
   const noEl=none('No elements yet. To be added later.','Chưa có yếu tố đặc biệt. Sẽ bổ sung sau.');
+  const withEl=t('With elements','Khi gặp yếu tố đặc biệt');
   const noBo=none('No boosters yet. To be added later.','Chưa có booster. Sẽ bổ sung sau.');
   const verify=t('to verify','cần kiểm chứng');
   const inf=`<span class="dash">(${verify})</span>`;
@@ -1477,6 +1543,9 @@ function view(l){
 
   /* PER GAME: one caption per entry in DEMOS, same keys. These are the Caps Sorting captions for the example demos. */
   const DCAP={
+    jHand:t('Tap Hand: the blue cannon has the most ammo (5). It fires all 5 at once, nearest first, including cubes behind others and one above the view. Then its slot frees up.','Chạm Hand: pháo xanh nhiều đạn nhất (5). Pháo xả cả 5 phát, gần nhất trước, kể cả khối nằm sau và khối ở trên khung. Rồi slot được trả lại.'),
+    jShuffle:t('Tap Shuffle: the board clears and a new one drops in. It has a swap ready for red, blue and yellow, the bottom-row colors.','Chạm Shuffle: bàn được xóa và bàn mới rơi vào. Bàn mới có sẵn nước swap cho đỏ, xanh và vàng, các màu ở hàng dưới cùng.'),
+    jBomb:t('Bomb: 3 cannons of the bottom-row colors appear outside the slots, 15 ammo each. Each color has only 4 cubes, so they clear them and leave with 11 ammo unused.','Bomb: 3 pháo màu hàng dưới cùng xuất hiện ngoài slot, mỗi pháo 15 đạn. Mỗi màu chỉ có 4 khối, nên pháo phá hết rồi biến mất, dư 11 đạn.'),
     choco:t('Tap the chocolate: it shakes, it can\'t be swapped. A swap makes a red line next to it: the chocolate breaks and shows a blue jelly, then the column refills.','Chạm chocolate: nó rung, không swap được. Một swap tạo hàng đỏ cạnh nó: chocolate vỡ, lộ khối thạch xanh, rồi cột được refill.'),
     stack3:t('A group of 4 gave this cannon 5 ammo. The stack of 3 takes 3 shots, so only 2 are left for the other blue cubes.','Nhóm 4 khối cho pháo này 5 đạn. Chồng 3 khối tốn 3 phát, nên chỉ còn 2 đạn cho các khối xanh khác.'),
     lockSlot:t('Two slots are locked (2 and 3). Each cannon sent to a slot counts both down. The first opens after 2 cannons and gets the next one; the second opens after 3.','2 slot bị khóa (2 và 3). Mỗi pháo vào slot làm cả 2 giảm. Slot đầu mở sau 2 pháo và nhận pháo kế tiếp; slot sau mở sau 3 pháo.'),
@@ -1694,7 +1763,7 @@ function view(l){
         ],'compact'))+
       panel(t('On revive','Khi hồi sinh'),ul([
         t(`Continue from where it stopped. No restart, no life lost.`,`Chơi tiếp từ chỗ dừng. Không chơi lại, không mất tim.`),
-        t(`What revive gives to get a stuck board moving again: TBD (the game has no boosters yet).`,`Hồi sinh cho gì để bàn đang kẹt chơi tiếp được: TBD (game chưa có booster).`),
+        t(`What revive gives to get a stuck board moving again: TBD.`,`Hồi sinh cho gì để bàn đang kẹt chơi tiếp được: TBD.`),
         t(`Revive count and price reset on a new attempt.`,`Số lần và giá hồi sinh tính lại khi bắt đầu lượt mới.`),
         t(`Ad or purchase fails: back to the popup.`,`Quảng cáo hoặc giao dịch lỗi: quay lại popup.`)
       ])));
@@ -1732,8 +1801,30 @@ function view(l){
       t(`Locked cubes stay in place; cubes above don't fall through. Shapes per level: TBD.`,`Khối bị khóa đứng yên; khối phía trên không rơi xuyên qua. Hình khóa mỗi màn: TBD.`)
     ]),unlock('TBD'),demo('iceLock'));
 
-  /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). Jelly Smash has none yet. */
-  B['booster-mechanics']=noBo;
+  /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). */
+  B['booster-mechanics']=
+    ent(N.bo1,ul([
+      t(`The game picks the cannon in the slots with the most ammo. Tie: the leftmost.`,`Game chọn pháo trong slot có nhiều đạn nhất. Bằng nhau: pháo bên trái nhất.`),
+      t(`It fires all its ammo at once, at cubes of its color, nearest first.`,`Pháo xả hết đạn ngay, bắn khối cùng màu, gần nhất trước.`),
+      t(`It ignores the target rules: any cube of its color, front or not, in view or not.`,`Bỏ qua luật target: khối cùng màu nào cũng bắn, ở đầu hàng hay không, trong khung hay không.`),
+      t(`The cannon then leaves and its slot frees up. Its color runs out first: it leaves with the rest of its ammo.`,`Sau đó pháo biến mất, trả lại slot. Hết khối màu đó trước: pháo biến mất cùng số đạn còn lại.`),
+      t(`No cannon in the slots: the booster can't be used and is not spent.`,`Không có pháo trong slot: không dùng được, không mất lượt.`),
+      withEl+':'+ul([t(`${P.el2}: each shot removes 1 cube of the stack.`,`${P.el2}: mỗi phát phá 1 khối của chồng.`),
+        t(`${P.el5}: hitting the spoon cube unlocks the ice cream.`,`${P.el5}: bắn trúng khối có muỗng thì mở khóa kem.`)])
+    ]),unlockB('TBD'),demo('jHand'))+
+    ent(N.bo2,ul([
+      t(`Clears every cube on the board and fills it with a new board.`,`Xóa hết khối trên bàn và thay bằng bàn mới.`),
+      t(`Cleared cubes give no cannon and no ammo.`,`Khối bị xóa không sinh pháo, không cho đạn.`),
+      t(`The new board has no ready match. Each color in the bottom row of the target grid gets a swap that makes a line of 3.`,`Bàn mới không có match sẵn. Mỗi màu ở hàng dưới cùng của lưới mục tiêu có 1 nước swap ra hàng 3.`),
+      withEl+':'+ul([t(`${P.el1}, ${P.el4} and ${P.el5} stay where they are. Only normal cubes are replaced.`,`${P.el1}, ${P.el4} và ${P.el5} giữ nguyên chỗ. Chỉ thay khối thường.`)])
+    ]),unlockB('TBD'),demo('jShuffle'))+
+    ent(N.bo3,ul([
+      t(`The game takes 3 colors from the bottom row of the target grid. Fewer than 3 colors there: the rest come from the next rows up.`,`Game lấy 3 màu từ hàng dưới cùng của lưới mục tiêu. Hàng đó ít hơn 3 màu: lấy thêm từ các hàng phía trên.`),
+      t(`It spawns 3 cannons of those colors, 15 ammo each. They don't take a slot.`,`Sinh 3 pháo của 3 màu đó, mỗi pháo 15 đạn. Không chiếm slot.`),
+      t(`They fire like Hand: any cube of their color, nearest first, until the ammo runs out.`,`Bắn như Hand: khối cùng màu nào cũng bắn, gần nhất trước, cho tới khi hết đạn.`),
+      t(`A color runs out before its ammo: that cannon leaves, and the leftover ammo is lost.`,`Hết khối màu đó trước khi hết đạn: pháo biến mất, đạn dư bị mất.`),
+      withEl+':'+ul([t(`${P.el3}: Bomb cannons don't enter a slot, so they don't count the lock down.`,`${P.el3}: pháo của Bomb không vào slot nên không làm khóa giảm.`)])
+    ]),unlockB('TBD'),demo('jBomb'));
 
   /* ===== 2. FTUE & tutorial ===== */
   B['ftue--tutorial']=`<p class="sec-intro">${t(
@@ -1786,8 +1877,14 @@ function view(l){
       [N.el5,popup('Hit the spoon cube<br>to free the jelly!','Bắn khối có muỗng<br>để mở khóa kem!'),lvl('TBD')],
     ]);
 
-  /* PER GAME: one row per booster. Jelly Smash has none yet. */
-  B['booster-tutorial']=noBo;
+  /* PER GAME: one row per booster */
+  B['booster-tutorial']=table(t('Booster tutorial','Hướng dẫn công cụ hỗ trợ'),
+    [t('Booster','Công cụ'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn'),t('Free boosters','Số lượt tặng')],
+    [
+      [N.bo1,popup('Your fullest cannon<br>fires everything!','Pháo nhiều đạn nhất<br>xả hết đạn!'),lvl('TBD'),lvl(3)],
+      [N.bo2,popup('A new board with<br>matches ready!','Bàn mới có sẵn<br>nước match!'),lvl('TBD'),lvl(3)],
+      [N.bo3,popup('3 big cannons<br>clear the way!','3 pháo lớn<br>dọn đường!'),lvl('TBD'),lvl(3)]
+    ]);
 
   /* PER GAME: every element and booster with its unlock level, sorted by level. Add rows when elements and boosters exist. */
   const stops=[
@@ -1796,7 +1893,10 @@ function view(l){
     ['TBD',P.el2,'elem','elements-mechanics'],
     ['TBD',P.el3,'elem','elements-mechanics'],
     ['TBD',P.el4,'elem','elements-mechanics'],
-    ['TBD',P.el5,'elem','elements-mechanics']
+    ['TBD',P.el5,'elem','elements-mechanics'],
+    ['TBD',P.bo1,'boost','booster-mechanics'],
+    ['TBD',P.bo2,'boost','booster-mechanics'],
+    ['TBD',P.bo3,'boost','booster-mechanics']
   ];
   B['ftue--tutorial:after']=`<div class="glance">
     <h4>${t('Unlock order at a glance','Thứ tự mở khóa theo màn')}</h4>
@@ -1856,7 +1956,10 @@ function view(l){
       [an,t('Tap a locked cube: it shakes. Spoon cube destroyed: the spoon flies to the lock and the ice cream melts away.','Chạm khối bị khóa: rung. Khối có muỗng bị phá: muỗng bay tới khóa, kem tan đi.')]
     ]));
 
-  B['booster-object-concept']=noBo;
+  B['booster-object-concept']=
+    ent(N.bo1,params([[an,t('The chosen cannon glows, then fires a fast stream of shots across the grid and pops out of its slot.','Pháo được chọn sáng lên, bắn một loạt đạn nhanh khắp lưới rồi bật khỏi slot.')]]))+
+    ent(N.bo2,params([[an,t('Board cubes pop in a wave, new cubes drop in, then the ready swaps flash once.','Khối trên bàn nổ lần lượt, khối mới rơi vào, rồi các nước swap có sẵn lóe lên 1 lần.')]]))+
+    ent(N.bo3,params([[an,t('“Bomb!” pops up and 3 big cannons pop in under the slots. They fire together; any that run out of targets shrink away.','Hiện chữ “Bomb!” và 3 pháo lớn bật ra dưới hàng slot. Cả 3 cùng bắn; pháo hết mục tiêu thì thu nhỏ biến mất.')]]));
 
   /* ===== 4. SFX & haptics ===== */
   /* FIXED: the UI rows are the same in every project. PER GAME: replace the core, element and booster rows.
@@ -1880,7 +1983,10 @@ function view(l){
     ['Stacked Cube Hit','el',t('A shot pops a cube of a stack','Một phát bắn phá 1 khối của chồng'),0],
     ['Slot Unlock','el',t('A locked slot counts down or opens','Slot khóa đếm ngược hoặc mở'),1],
     ['Chocolate Spread','el',t('The fountain makes new chocolate','Vòi tạo chocolate mới'),0],
-    ['Ice Cream Unlock','el',t('A spoon removes an ice cream lock','Muỗng gỡ một khóa kem'),1]
+    ['Ice Cream Unlock','el',t('A spoon removes an ice cream lock','Muỗng gỡ một khóa kem'),1],
+    ['Hand','bo',t('The chosen cannon fires all its ammo','Pháo được chọn xả hết đạn'),2],
+    ['Shuffle','bo',t('The board clears and refills','Bàn được xóa và thay mới'),2],
+    ['Bomb','bo',t('3 bomb cannons appear and fire','3 pháo Bomb xuất hiện và bắn'),3]
   ];
   B['sfx--haptics']=table(t('SFX and haptics','Âm thanh và rung'),
     [t('Name','Tên'),t('Category','Nhóm'),t('Plays when','Phát khi'),t('Haptic','Rung')],
@@ -1923,9 +2029,9 @@ function view(l){
       ['lives_refill_ad_amount',t('Refill with ads — REWARD: lives given','Nạp bằng quảng cáo — THƯỞNG: số mạng nhận'),'1',rew(lives)]
     ])+
     rc(t('Boosters — cost and reward','Công cụ hỗ trợ — giá và thưởng'),[
-      ...boost('weak','Weak','yếu','900'),
-      ...boost('medium','Medium','vừa','1,200'),
-      ...boost('strong','Strong','mạnh','1,500')
+      ...boost('shuffle','Shuffle','Shuffle','900'),
+      ...boost('hand','Hand','Hand','1,200'),
+      ...boost('bomb','Bomb','Bomb','1,500')
     ])+
     rc(t('Unlock popups — offer unlock level','Popup mở khóa — màn mở ưu đãi'),[
       ['starter_pack_unlock_level',t('Starter Pack (IAP) — level from which the offer popup can show','Gói Khởi đầu (IAP) — màn bắt đầu có thể hiện popup ưu đãi'),'12',t('level','màn')],
@@ -2141,9 +2247,9 @@ function view(l){
       panel(t('Progress & rewards','Tiến độ & phần thưởng'),
         table(t('Collection Event milestones','Các mốc của Sự kiện thu thập'),[t('Milestone','Mốc'),t('Total jelly','Tổng thạch'),t('Reward','Phần thưởng')],[
           ['1','50',t('100 coins','100 xu')],
-          ['2','150',t('1 Weak booster','1 booster yếu')],
-          ['3','300',t('200 coins + 1 Medium booster','200 xu + 1 booster vừa')],
-          ['4','500',t('30 min unlimited lives + 1 Strong booster','30 phút tim vô hạn + 1 booster mạnh')],
+          ['2','150',t('1 Shuffle','1 Shuffle')],
+          ['3','300',t('200 coins + 1 Hand','200 xu + 1 Hand')],
+          ['4','500',t('30 min unlimited lives + 1 Bomb','30 phút tim vô hạn + 1 Bomb')],
           ['5',t('800 (final)','800 (cuối)'),t('Big chest: 500 coins + 1 of each booster','Rương lớn: 500 xu + mỗi loại booster 1 cái')]
         ],'compact')+
         ul([
@@ -2171,6 +2277,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
+      ent(t('Boosters','Booster'),ul([
+        t(`Added 3 boosters: Hand (the fullest cannon fires everything, at any cube of its color), Shuffle (new board with a swap for each bottom-row color), Bomb (3 off-slot cannons with 15 ammo each). Rules, tutorial, look, SFX and a demo for each. Unlock levels: TBD.`,`Thêm 3 booster: Hand (pháo nhiều đạn nhất xả hết, bắn mọi khối cùng màu), Shuffle (bàn mới có nước swap cho từng màu hàng dưới cùng), Bomb (3 pháo ngoài slot, mỗi pháo 15 đạn). Mỗi booster có luật, hướng dẫn, hình ảnh, SFX và minh họa. Màn mở khóa: TBD.`),
+        t(`Remote config and event rewards use the booster names (was Weak, Medium, Strong).`,`Remote config và phần thưởng sự kiện dùng tên booster (trước: Yếu, Vừa, Mạnh).`)
+      ]))+
       ent(t('Elements, ammo and shorter rules','Element, số đạn và luật gọn hơn'),ul([
         t(`Elements replaced: Chocolate Layer, Stacked Cube, Locked Slot, Chocolate Fountain, Ice Cream Lock (was: Jelly Layer, Lock Cube, Stacked Cube, Hidden Cube, Locked Cannon). Rules, tutorial, look, SFX and a demo for each. Unlock levels: TBD.`,`Thay element: Lớp chocolate, Khối chồng, Slot khóa, Vòi chocolate, Khóa kem (trước: Lớp thạch, Khối khóa, Khối chồng, Khối ẩn, Pháo bị khóa). Mỗi element có luật, hướng dẫn, hình ảnh, SFX và minh họa. Màn mở khóa: TBD.`),
         t(`Ammo is now 2n − 3 (was n): 3 → 3, 4 → 5, 5 → 7. Demos and the hero sketch use the new numbers.`,`Đạn giờ là 2n − 3 (trước: n): 3 → 3, 4 → 5, 5 → 7. Minh họa và hình đầu trang dùng số mới.`),
