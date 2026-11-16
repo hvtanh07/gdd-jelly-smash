@@ -1763,7 +1763,9 @@ function view(l){
         ],'compact'))+
       panel(t('On revive','Khi hồi sinh'),ul([
         t(`Continue from where it stopped. No restart, no life lost.`,`Chơi tiếp từ chỗ dừng. Không chơi lại, không mất tim.`),
-        t(`What revive gives to get a stuck board moving again: TBD.`,`Hồi sinh cho gì để bàn đang kẹt chơi tiếp được: TBD.`),
+        t(`1. The target grid is pushed back up, away from the red line. Rows pushed: TBD.`,`1. Lưới mục tiêu bị đẩy lùi lên, xa vạch đỏ. Số hàng đẩy lùi: TBD.`),
+        t(`2. The game uses Hand 3 times for free, one after another. The player's own Hands are not spent. Slots empty: the uses left are skipped.`,`2. Game dùng Hand miễn phí 3 lần liên tiếp. Không trừ Hand của người chơi. Slot trống: bỏ qua các lần còn lại.`),
+        t(`3. Play goes on as normal.`,`3. Chơi tiếp như bình thường.`),
         t(`Revive count and price reset on a new attempt.`,`Số lần và giá hồi sinh tính lại khi bắt đầu lượt mới.`),
         t(`Ad or purchase fails: back to the popup.`,`Quảng cáo hoặc giao dịch lỗi: quay lại popup.`)
       ])));
@@ -2277,6 +2279,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
+      ent(t('Revive','Hồi sinh'),ul([
+        t(`On revive: the target grid is pushed back up, then 3 free Hands fire, then play goes on. Rows pushed: TBD.`,`Khi hồi sinh: lưới mục tiêu bị đẩy lùi lên, rồi dùng 3 Hand miễn phí, rồi chơi tiếp. Số hàng đẩy lùi: TBD.`)
+      ]))+
       ent(t('Boosters','Booster'),ul([
         t(`Added 3 boosters: Hand (the fullest cannon fires everything, at any cube of its color), Shuffle (new board with a swap for each bottom-row color), Bomb (3 off-slot cannons with 15 ammo each). Rules, tutorial, look, SFX and a demo for each. Unlock levels: TBD.`,`Thêm 3 booster: Hand (pháo nhiều đạn nhất xả hết, bắn mọi khối cùng màu), Shuffle (bàn mới có nước swap cho từng màu hàng dưới cùng), Bomb (3 pháo ngoài slot, mỗi pháo 15 đạn). Mỗi booster có luật, hướng dẫn, hình ảnh, SFX và minh họa. Màn mở khóa: TBD.`),
         t(`Remote config and event rewards use the booster names (was Weak, Medium, Strong).`,`Remote config và phần thưởng sự kiện dùng tên booster (trước: Yếu, Vừa, Mạnh).`)
