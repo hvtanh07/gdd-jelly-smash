@@ -1149,26 +1149,106 @@ const DEMOS={
       ['.nq','transform',[[3.3,T(0,0)],[4.0,T(0,-96)]]]
     ]}
 };
-/* play-screen sketch (from the level 2 screenshot): HUD, cube wall, two cannons (the yellow one firing), the 4×4 puzzle board */
+/* play-screen sketch: one loop of the current rules on a level 2 screen.
+   Swap → a line of 3+ pops → a cannon with ammo = n takes the leftmost free slot → cubes fall and refill →
+   each cannon fires at the lowest front cube of its color in view, left to right on ties, and leaves at 0 ammo.
+   The blue cannon waits until a blue cube becomes a front cube. Everything below is simulated, so the sketch follows the rules. */
+function heroBuild(){
+  const D=10,N=7,BS=28,bx=i=>65+30*i,by=j=>250+30*j;
+  const B=[[1,2,1,2,2,1,1],[1,3,1,1,3,4,4],[2,4,3,4,1,2,4],[4,2,3,4,4,2,2],[1,4,1,2,1,1,3],[4,4,2,1,1,4,1],[3,1,4,4,3,4,4]];
+  const SW=[{t:.8,a:[4,2],b:[4,3],nw:[4,4,1]},{t:5.2,a:[3,0],b:[3,1],nw:[2,2,1,4]}];
+  const TG=[[3,2,3,4,1],[2,3,4,1,0],[4,3,2,4,4],[3,4,2,2,4],[2,3,3,1,1],[4,2,3,4,0],[3,3,4,2,4],[2,4,3,0,0],[4,3,1,3,0]];
+  const TS=30,tx=i=>17+34*i,ty=j=>-6+34*j,VIEW=42,DRIFT=10,off=t=>DRIFT*t/D;
+  const sx=i=>14+64*i,MZ=202,ST='transform-box:fill-box;transform-origin:center';
+  const tr=[],P=v=>f1(v);
+  /* ---- board: elements keep the cell they were drawn in; tracks move them ---- */
+  const els=[],cell=[...Array(N)].map(()=>Array(N).fill(null));
+  B.forEach((r,j)=>r.forEach((c,i)=>{const e={id:els.length,c,r0:j,c0:i,r:j,cc:i,mv:[[0,0,0]],pop:null};els.push(e);cell[j][i]=e;}));
+  const move=(e,t0,t1,r,c,ease)=>{e.mv.push([t0,(e.cc-e.c0)*30,(e.r-e.r0)*30,ease]);e.r=r;e.cc=c;e.mv.push([t1,(c-e.c0)*30,(r-e.r0)*30]);};
+  const lines=()=>{const m=new Set();
+    for(let r=0;r<N;r++)for(let c=0;c<N-2;c++){const k=cell[r][c].c;if(cell[r][c+1].c===k&&cell[r][c+2].c===k)[0,1,2].forEach(d=>m.add(cell[r][c+d]));}
+    for(let c=0;c<N;c++)for(let r=0;r<N-2;r++){const k=cell[r][c].c;if(cell[r+1][c].c===k&&cell[r+2][c].c===k)[0,1,2].forEach(d=>m.add(cell[r+d][c]));}
+    return [...m];};
+  const taps=[],spawns=[];
+  SW.forEach(s=>{
+    const A=cell[s.a[0]][s.a[1]],Bc=cell[s.b[0]][s.b[1]];taps.push([s.t-.25,s.a]);
+    move(A,s.t,s.t+.25,s.b[0],s.b[1]);move(Bc,s.t,s.t+.25,s.a[0],s.a[1]);cell[s.b[0]][s.b[1]]=A;cell[s.a[0]][s.a[1]]=Bc;
+    const m=lines(),p=s.t+.4;m.forEach(e=>{e.pop=p;cell[e.r][e.cc]=null;});
+    spawns.push({c:m[0].c,ammo:m.length,t:p+.65});
+    const nw=s.nw.slice(),f0=p+.65;
+    for(let c=0;c<N;c++){
+      const keep=[];for(let r=0;r<N;r++)if(cell[r][c])keep.push(cell[r][c]);
+      const k=N-keep.length;if(!k)continue;
+      const add=[];for(let q=0;q<k;q++){const e={id:els.length,c:nw.shift(),r0:q-k,c0:c,r:q-k,cc:c,mv:[[0,0,0]],pop:null};els.push(e);add.push(e);}
+      add.concat(keep).forEach((e,r)=>{if(e.r!==r)move(e,f0,f0+.3,r,c,'ease-in');cell[r][c]=e;});
+    }
+  });
+  let board='';
+  els.forEach(e=>{board+=`<g class="hb${e.id}"><g class="hq${e.id}" style="${ST}">${jcube(bx(e.c0),by(e.r0),BS,e.c)}</g></g>`;
+    tr.push([`.hb${e.id}`,'transform',e.mv.map(([t,dx,dy,ea])=>[t,T(dx,dy),ea])]);
+    if(e.pop!=null){const p=e.pop;tr.push([`.hq${e.id}`,'transform',[[p,'scale(1)'],[p+.15,'scale(1.15)'],[p+.3,'scale(1)'],[p+.45,'scale(1.15)'],[p+.6,'scale(0)']]],[`.hq${e.id}`,'opacity',[[0,1],[p+.55,1],[p+.6,0]]]);}});
+  board+=taps.map(([t,[r,c]],k)=>{tr.push([`.hk${k}`,'opacity',[[0,0],[t,0],[t+.1,.9],[t+.5,0]]],[`.hk${k}`,'transform',[[t,'scale(.5)'],[t+.5,'scale(1.4)']]]);
+    return `<circle class="hk${k}" cx="${bx(c)+BS/2}" cy="${by(r)+BS/2}" r="15" fill="none" stroke="var(--ink)" stroke-width="2.5" style="opacity:0;${ST}"/>`;}).join('');
+  /* ---- cannons and shots: a small time-step simulation ---- */
+  const col=TG.map(c=>c.slice()),slot=Array(5).fill(null),cans=[{c:2,ammo:2,t:0}],shots=[];
+  let pend=spawns.slice();
+  for(let t=0;t<D-1;t=+(t+.05).toFixed(2)){
+    pend=pend.filter(s=>{if(t<s.t)return true;const i=slot.indexOf(null);if(i<0)return false;const k=cans.length;cans.push(Object.assign({},s,{t}));slot[i]=k;return false;});
+    if(t===0)slot[0]=0;
+    slot.forEach((k,i)=>{if(k==null)return;const cn=cans[k];cn.slot=i;cn.fires=cn.fires||[];cn.next=cn.next||cn.t+.35;
+      if(cn.out!=null){if(t>=cn.out)slot[i]=null;return;}
+      if(cn.ammo<=cn.fires.length||t<cn.next)return;
+      let best=null;col.forEach((cs,ci)=>{let j=cs.length-1;while(j>=0&&!cs[j])j--;if(j<0||cs[j]!==cn.c)return;
+        if(ty(j)+TS/2+off(t)<VIEW)return;if(!best||j>best[1])best=[ci,j];});
+      if(!best)return;
+      col[best[0]][best[1]]=0;cn.fires.push(t);cn.next=t+.4;shots.push({k,t,ci:best[0],j:best[1],c:cn.c,cx:sx(i)+28});
+      if(cn.fires.length===cn.ammo)cn.out=t+.4;});
+  }
+  let grid='',guns='',fx='';
+  TG.forEach((cs,i)=>cs.forEach((c,j)=>{if(c)grid+=`<g class="ht${i}${j}" style="${ST}">${jcube(tx(i),ty(j),TS,c)}</g>`;}));
+  shots.forEach((s,q)=>{const a=s.t+.25,dx=tx(s.ci)+TS/2-s.cx,dy=ty(s.j)+TS/2+off(a)-MZ;
+    fx+=`<circle class="hs${q} f${s.c}" cx="${s.cx}" cy="${MZ}" r="5.5" stroke="var(--surface)" stroke-width="1.5" style="opacity:0"/>`;
+    tr.push([`.hs${q}`,'opacity',[[0,0],[s.t,0],[s.t+.03,1],[a-.02,1],[a,0]]],[`.hs${q}`,'transform',[[s.t,T(0,0),'ease-in'],[a,T(P(dx),P(dy))]]],
+      [`.ht${s.ci}${s.j}`,'transform',[[a-.02,'scale(1)'],[a+.08,'scale(1.3)'],[a+.22,'scale(0)']]],[`.ht${s.ci}${s.j}`,'opacity',[[0,1],[a+.18,1],[a+.22,0]]]);});
+  cans.forEach((cn,k)=>{
+    if(cn.slot==null)return;
+    const vals=[];for(let v=cn.ammo;v>=0;v--)vals.push(String(v));
+    guns+=`<g class="hc${k}" style="${cn.t?'opacity:0;':''}${ST}">${cannon(sx(cn.slot)+28,200,cn.c,vals,'',1.2)}</g>`;
+    const out=cn.out!=null?cn.out:D,fr=cn.t?[[cn.t,'scale(0)'],[cn.t+.15,'scale(1.15)'],[cn.t+.25,'scale(1)']]:[[0,'scale(1)']];
+    cn.fires.forEach(t=>fr.push([t,'scale(1)'],[t+.05,'scale(.92,1.08)'],[t+.15,'scale(1)']));
+    fr.push([out-.2,'scale(1)'],[out,'scale(0)']);
+    tr.push([`.hc${k}`,'transform',fr]);
+    if(cn.t)tr.push([`.hc${k}`,'opacity',[[0,0],[cn.t,0],[cn.t+.05,1]]]);
+    vals.forEach((v,i)=>{if(!cn.fires.length||i>cn.fires.length)return;const a=i?cn.fires[i-1]:0,b=cn.fires[i];
+      tr.push([`.hc${k} .v${i}`,'opacity',i?(b!=null?[[0,0],[a,0],[a+.02,1],[b,1],[b+.02,0]]:[[0,0],[a,0],[a+.02,1]]):[[0,1],[b,1],[b+.02,0]]]);});
+  });
+  tr.push(['.hg','transform',[[0,T(0,0),'linear'],[D,T(0,DRIFT)]]]);
+  tr.push(['.hf','opacity',[[0,0],[.35,1],[D-.45,1],[D,0]]]);
+  return {D,grid,board,guns,fx,tracks:tr};
+}
 function fieldSVG(label){
-  const wall=[[2,2,2,4,4,0,2,2],[2,2,2,2,4,0,2,2],[2,2,2,2,0,0,0,2],[2,2,2,0,0,0,0,0]];
-  let cubes='';
-  wall.forEach((r,j)=>r.forEach((c,i)=>{if(c)cubes+=jcube(24+37*i,46+36*j,34,c);}));
+  const H=heroBuild();
   const hud=`<circle class="trackfill" cx="26" cy="22" r="13"/><circle class="trackfill" cx="314" cy="22" r="13"/>`+
     `<rect class="f7" x="122" y="9" width="96" height="26" rx="13"/><text class="bn sm" x="170" y="22" dy=".35em">LEVEL 2</text>`;
-  const frame=`<rect class="f7" x="14" y="42" width="312" height="158" rx="16" opacity=".16"/>`;
-  const shot=`<path class="belt-dot s4" d="M220 208L189 120" pathLength="48" stroke-dasharray="0.001 7.999" style="--o:0px;stroke-width:9;animation-duration:1.4s"/>`;
-  const guns=cannon(120,208,2,['0'],'',1.6)+cannon(220,208,4,['16'],'',1.6);
-  const B=[[0,2,4,2],[0,0,2,2],[4,2,0,0],[0,4,0,0]],bx=i=>78+46*i,by=j=>276+46*j;
-  let cells='',board='';
-  B.forEach((r,j)=>r.forEach((c,i)=>{cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="42" height="42" rx="10"/>`;if(c)board+=jcube(bx(i),by(j),42,c);}));
+  const frame=`<rect class="f7" x="14" y="42" width="312" height="150" rx="16" opacity=".16"/>`;
+  const slots=[0,1,2,3,4].map(i=>`<rect class="slot" x="${14+64*i}" y="198" width="56" height="44" rx="10"/>`).join('');
+  const cells=`<rect class="f7" opacity=".16" x="59" y="244" width="222" height="220" rx="14"/>`;
   return `<svg viewBox="0 0 340 466" role="img" aria-label="${esc(label)}">
+    <clipPath id="heroGrid"><rect x="14" y="42" width="312" height="148"/></clipPath><clipPath id="heroBoard"><rect x="59" y="248" width="222" height="218"/></clipPath>
     <g class="part part-A">${hud}${pin(62,22,'A')}</g>
-    <g class="part part-B">${frame}${cubes}${pin(280,182,'B')}</g>
-    <g class="part part-C">${guns}${shot}${pin(70,243,'C')}</g>
-    <g class="part part-E">${cells}${pin(237,435,'E')}</g>
-    <g class="part part-D">${board}${pin(40,345,'D')}</g>
+    <g class="part part-B">${frame}<g clip-path="url(#heroGrid)"><g class="hf"><g class="hg">${H.grid}</g></g></g>${pin(329,60,'B')}</g>
+    <g class="part part-E"><rect x="14" y="189" width="312" height="3" rx="1.5" fill="#ff3b5c"/>${pin(329,190,'E')}</g>
+    <g class="part part-C">${slots}<g class="hf">${H.guns}${H.fx}</g>${pin(329,220,'C')}</g>
+    <g class="part part-D">${cells}<g clip-path="url(#heroBoard)"><g class="hf">${H.board}</g></g>${pin(40,345,'D')}</g>
   </svg>`;
+}
+let heroAnims=[];
+function startHero(){
+  heroAnims.forEach(a=>{try{a.cancel();}catch(e){}});heroAnims=[];
+  const fig=$('#field');if(!fig||reduceMotion||!Element.prototype.animate)return;
+  const H=heroBuild();
+  H.tracks.forEach(([sel,prop,frames])=>fig.querySelectorAll(sel).forEach(el=>{try{heroAnims.push(el.animate(kfs(frames,prop,H.D),{duration:H.D*1000,iterations:Infinity}));}catch(e){}}));
+  if(paused)heroAnims.forEach(a=>a.pause());
 }
 
 /* ---------- win-screen bonus gauge ---------- */
@@ -1973,7 +2053,8 @@ function view(l){
     day(t('November 16, 2026','16/11/2026'),
       ent(t('Mechanics demos','Minh họa cơ chế'),ul([
         t(`Section 1.2 has animated demos again, drawn like the playable demo: swap, refill and cascade, cannon slots with merge and full slots, target choice, and grid speed-up.`,`Mục 1.2 có lại minh họa động, vẽ giống bản demo chơi được: swap, refill và combo, slot pháo có gộp và đầy slot, chọn target, và tăng tốc lưới.`),
-        t(`The praise demo now shows ammo = n: +5, +6, +8, +10.`,`Minh họa khen giờ hiện đạn = n: +5, +6, +8, +10.`)
+        t(`The praise demo now shows ammo = n: +5, +6, +8, +10.`,`Minh họa khen giờ hiện đạn = n: +5, +6, +8, +10.`),
+        t(`The hero sketch at the top is redrawn and animated by the current rules: full 7×7 board, 5 slots, swaps that spawn cannons, shots at the lowest front cube in view. Legend E is now the red line.`,`Hình minh họa đầu trang được vẽ lại và chạy theo luật hiện tại: bàn 7×7 kín, 5 slot, swap sinh pháo, pháo bắn khối thấp nhất ở đầu hàng trong khung. Chú thích E giờ là vạch đỏ.`)
       ]))+
       ent(t('Match-3 and cannon slots (from the playable demo)','Match-3 và hàng slot pháo (theo bản demo chơi được)'),ul([
         t(`Core loop is now swap match-3 with gravity and refill (was: sliding cubes into empty cells). Matching is lines of 3+; touching lines of one color count as one group.`,`Lối chơi chính đổi sang swap match-3 có trọng lực và refill (trước: trượt khối vào ô trống). Match là hàng từ 3 khối; các hàng cùng màu chạm nhau tính 1 nhóm.`),
@@ -2083,7 +2164,7 @@ function view(l){
     ['B',t('Target grid','Lưới cube mục tiêu'),t('Target cubes at the top. They slide down together from the first swap. Clear them all before they reach the red line.','Các khối mục tiêu ở phía trên. Cả lưới trượt xuống từ lần swap đầu tiên. Phá hết trước khi chạm vạch đỏ.')],
     ['C',t('Cannon slots','Hàng slot pháo'),t('5 slots. Each match spawns a cannon of its color here, with its ammo count. It fires on its own and disappears when empty.','5 slot. Mỗi match sinh 1 pháo cùng màu vào đây, kèm số đạn. Pháo tự bắn và biến mất khi hết đạn.')],
     ['D',t('Board cubes','Khối trên bàn'),t('Swap two neighbors to make a line of 3 or more of one color.','Đổi chỗ 2 khối cạnh nhau để tạo hàng từ 3 khối cùng màu.')],
-    ['E',t('Empty cells (old sketch)','Ô trống (hình cũ)'),t('From the earlier sliding version. The match-3 board is always full.','Từ bản trượt khối trước đây. Bàn match-3 luôn kín.')]
+    ['E',t('Red line','Vạch đỏ'),t('The bottom edge of the target area. If a target cube touches it, the level is lost.','Mép dưới khu vực mục tiêu. Khối mục tiêu chạm vạch là thua màn.')]
   ];
   const hero=`<div class="hero" id="top" data-sec="top" data-spy="top">
     <div>
@@ -2094,10 +2175,10 @@ function view(l){
       <ul class="legend">${legend.map(g=>`<li><button type="button" data-part="${g[0]}" aria-pressed="false"><span class="pinl" data-nosearch>${g[0]}</span><span><b>${g[1]}</b><span class="d">${g[2]}</span></span></button></li>`).join('')}</ul>
     </div>
     <figure class="field${paused?' paused':''}" id="field">
-      <div class="field-box">${fieldSVG(t('Sketch of level 2: a target grid of blue and yellow cubes on top, a blue cannon with 0 ammo and a yellow cannon with 16 firing at the target grid, and a 4 by 4 board of cubes and empty cells below.','Hình minh họa màn 2: lưới mục tiêu xanh và vàng ở trên, pháo xanh 0 đạn và pháo vàng 16 đạn đang bắn lên lưới mục tiêu, bên dưới là bàn 4×4 gồm khối và ô trống.'))}</div>
+      <div class="field-box">${fieldSVG(t('Sketch of level 2: a 9-column target grid moving down toward the red line, a row of 5 cannon slots, and a full 7 by 7 board. Two swaps make a red line of 3 and a yellow line of 4; each spawns a cannon that fires at the lowest front cube of its color.','Hình minh họa màn 2: lưới mục tiêu 9 cột đi xuống về phía vạch đỏ, hàng 5 slot pháo, và bàn 7×7 kín khối. Hai lần swap tạo hàng đỏ 3 khối và hàng vàng 4 khối; mỗi hàng sinh 1 pháo bắn khối thấp nhất cùng màu ở đầu hàng.'))}</div>
       <div class="field-foot"><button type="button" class="pause" id="pauseBtn">${paused?ui.play:ui.pause}</button></div>
-      <figcaption>${t(`Sketch of level 2 from the earlier sliding version (not yet redrawn for match-3 and the slot row).`,
-                       `Minh họa màn 2 của bản trượt khối trước đây (chưa vẽ lại theo match-3 và hàng slot).`)}</figcaption>
+      <figcaption>${t(`Level 2, played by the current rules. The blue cannon waits until a blue cube comes to the front. The red cannon (3 ammo) and the yellow one (4 ammo) take the leftmost free slot, hit the lowest front cube first and leave at 0 ammo.`,
+                       `Màn 2, chạy theo luật hiện tại. Pháo xanh chờ đến khi có khối xanh ở đầu hàng. Pháo đỏ (3 đạn) và pháo vàng (4 đạn) vào slot trống bên trái nhất, bắn khối thấp nhất ở đầu hàng trước và biến mất khi hết đạn.`)}</figcaption>
     </figure>
   </div>`;
 
@@ -2349,6 +2430,7 @@ function render(){
   runSearch(false);
   spy();
   startDemos();
+  startHero();
   gaugeUI();
   if(G.swing&&!G.raf)G.raf=requestAnimationFrame(gaugeTick);
 }
@@ -2395,7 +2477,7 @@ document.addEventListener('click',e=>{
   }
   if(tg.closest('#gNext')){G.res='next';startSwing();gaugeUI();return;}
   const pb=tg.closest('#pauseBtn');
-  if(pb){paused=!paused;$('#field').classList.toggle('paused',paused);pb.textContent=paused?UI[lang].play:UI[lang].pause;return;}
+  if(pb){paused=!paused;$('#field').classList.toggle('paused',paused);pb.textContent=paused?UI[lang].play:UI[lang].pause;heroAnims.forEach(a=>{try{paused?a.pause():a.play();}catch(e){}});return;}
   const lg=tg.closest('.legend button');
   if(lg){
     const was=lg.getAttribute('aria-pressed')==='true';
