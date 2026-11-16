@@ -1224,7 +1224,9 @@ function view(l){
       t(`Cannon count: 1 in level 1, 2 in levels 2–5, 3 from level 6.`,`Số pháo: 1 ở màn 1, 2 ở màn 2–5, 3 từ màn 6.`),
       t(`A cannon only damages cubes of its own color.`,`Pháo chỉ phá khối cùng màu với nó.`),
       t(`Fires on its own while ammo is above 0, several shots per second. Fire rate: TBD.`,`Tự bắn khi còn đạn, vài phát mỗi giây. Tốc độ bắn: TBD.`),
-      t(`Targets the nearest target cube of its color and fires at it while it has ammo. No ammo: it waits.`,`Nhắm vào khối mục tiêu cùng màu gần nhất và bắn khi còn đạn. Hết đạn: pháo chờ.`),
+      t(`<b>Target choice:</b> a cannon only aims at front cubes of its color: the lowest cube in each column of the target grid, with no cube in front of it. Among those, it picks the leftmost one first, then moves right.`,`<b>Chọn target:</b> pháo chỉ nhắm vào khối cùng màu ở đầu hàng: khối thấp nhất của mỗi cột trong lưới mục tiêu, không có khối nào đứng trước. Trong số đó, pháo chọn khối bên trái trước, rồi lần lượt sang phải.`),
+      t(`Shots never pass through a cube in front. A cube of the cannon's color that is behind another cube is not a target until the cubes in front are gone.`,`Đạn không bao giờ bắn xuyên khối đứng trước. Khối cùng màu nằm sau khối khác chưa phải target cho tới khi các khối phía trước bị phá.`),
+      t(`It fires while it has ammo and a target. No ammo, or no front cube of its color: it waits.`,`Pháo bắn khi còn đạn và có target. Hết đạn, hoặc không có khối cùng màu ở đầu hàng: pháo chờ.`),
       t(`1 ammo = 1 shot = 1 target cube.`,`1 đạn = 1 phát = 1 khối mục tiêu.`),
       t(`Cannons fire in parallel, so the player keeps matching while shots land.`,`Các pháo bắn cùng lúc, nên người chơi vẫn ghép tiếp trong khi đạn bay.`)
     ]))+
@@ -1834,6 +1836,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
+      ent(t('Cannon targeting','Chọn target của pháo'),ul([
+        t(`Cannons now aim only at front cubes of their color (lowest in each column), leftmost first, and never shoot through a cube in front (was: nearest cube of its color).`,`Pháo giờ chỉ nhắm khối cùng màu ở đầu hàng (thấp nhất mỗi cột), ưu tiên từ trái sang, và không bắn xuyên khối đứng trước (trước: khối cùng màu gần nhất).`)
+      ]))+
       ent(t('Ammo formula','Công thức số đạn'),ul([
         t(`Ammo is now 10 + 5 × (n − 3), n = cubes in the group (was 5 × (n − 2) from 4 cubes). Group of 4: +15, 5: +20, 6: +25, 7: +30, 8: +35, 9: +40, 10: +45. A line of 3 stays +10.`,`Số đạn giờ là 10 + 5 × (n − 3), n = số khối trong nhóm (trước là 5 × (n − 2) từ 4 khối). Nhóm 4: +15, 5: +20, 6: +25, 7: +30, 8: +35, 9: +40, 10: +45. Hàng thẳng 3 vẫn +10.`),
         t(`Praise demo and the group-of-4 demos now show the new numbers.`,`Minh họa khen và các minh họa nhóm 4 khối đã đổi theo số mới.`)
