@@ -607,8 +607,9 @@ const DJ=[['#ff5470','#ffa0b0','#c22848'],['#ff9f2e','#ffcd84','#c4650a'],['#ffd
 const DFONT='font-family:Fredoka,var(--display),system-ui,sans-serif;font-weight:700';
 function arena(){return `<rect x="0" y="0" width="200" height="196" rx="14" fill="#1d1030"/>`;}
 function dpanel(x,y,w,h){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#0c0518" opacity=".55"/>`;}
-/* a jelly cube: face=true for board cubes (eyes and smile), false for target cubes (candied crust) */
+/* a jelly cube for the board; face=false draws an armored ant with 1 HP instead */
 function dj(x,y,s,c,face){
+  if(face===false)return dant(x,y,s,c,['1']);
   const [b,l,d]=DJ[c],r=f1(s*.26);
   let o=`<rect x="${x}" y="${f1(y+2)}" width="${s}" height="${f1(s-2)}" rx="${r}" fill="${d}"/>`+
         `<rect x="${x}" y="${y}" width="${s}" height="${f1(s-3)}" rx="${r}" fill="${b}"/>`+
@@ -631,6 +632,24 @@ function dcan(cx,cy,c,vals,cls,s){
     `<rect x="${f1(cx-k(12))}" y="${f1(cy-k(3))}" width="${k(24)}" height="${k(12)}" rx="${k(6)}" fill="#170c28" opacity=".85"/>`+
     vals.map((v,i)=>`<text class="v${i}" x="${cx}" y="${f1(cy+k(3))}" dy=".35em" text-anchor="middle" fill="#fff" style="${DFONT};font-size:${k(10)}px${i?';opacity:0':''}">${v}</text>`).join('')+`</g>`;
 }
+/* an armored ant in a cell of size s, facing down toward the red line. fill: the armor fill attribute; vals: HP texts (vals[0] shows, the rest are hidden for tracks) */
+function antSVG(x,y,s,fill,vals,cls){
+  const cx=x+s/2,k=v=>f1(v*s),D='#2a1630',lw=Math.max(1,f1(s*.055));
+  let o=`<g class="${cls||''}">`;
+  [[.3,.46],[.55,.5],[.8,.44]].forEach(([yy,xx])=>{o+=`<path d="M${f1(cx-s*.08)},${f1(y+s*.56)}L${f1(cx-s*xx)},${f1(y+s*yy)}M${f1(cx+s*.08)},${f1(y+s*.56)}L${f1(cx+s*xx)},${f1(y+s*yy)}" stroke="${D}" stroke-width="${lw}" stroke-linecap="round"/>`;});
+  o+=`<path d="M${f1(cx-s*.06)},${f1(y+s*.88)}q${k(-.06)},${k(.08)} ${k(-.16)},${k(.08)}M${f1(cx+s*.06)},${f1(y+s*.88)}q${k(.06)},${k(.08)} ${k(.16)},${k(.08)}" fill="none" stroke="${D}" stroke-width="${lw}" stroke-linecap="round"/>`;
+  o+=`<ellipse cx="${cx}" cy="${f1(y+s*.33)}" rx="${k(.31)}" ry="${k(.28)}" ${fill} stroke="${D}" stroke-width="${lw}"/>`+
+     `<path d="M${f1(cx-s*.27)},${f1(y+s*.4)}Q${cx},${f1(y+s*.52)} ${f1(cx+s*.27)},${f1(y+s*.4)}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="${lw}"/>`+
+     `<ellipse cx="${f1(cx-s*.1)}" cy="${f1(y+s*.17)}" rx="${k(.11)}" ry="${k(.05)}" fill="#fff" opacity=".5"/>`+
+     `<ellipse cx="${cx}" cy="${f1(y+s*.62)}" rx="${k(.12)}" ry="${k(.08)}" ${fill} stroke="${D}" stroke-width="${lw}"/>`+
+     `<circle cx="${cx}" cy="${f1(y+s*.77)}" r="${k(.15)}" ${fill} stroke="${D}" stroke-width="${lw}"/>`+
+     `<rect x="${f1(cx-s*.13)}" y="${f1(y+s*.76)}" width="${k(.26)}" height="${k(.08)}" rx="${k(.04)}" fill="${D}"/>`+
+     `<circle cx="${f1(cx-s*.06)}" cy="${f1(y+s*.8)}" r="${k(.025)}" fill="#fff"/><circle cx="${f1(cx+s*.06)}" cy="${f1(y+s*.8)}" r="${k(.025)}" fill="#fff"/>`;
+  o+=(vals||['1']).map((v,i)=>`<text class="hp${i}" x="${cx}" y="${f1(y+s*.33)}" dy=".36em" text-anchor="middle" fill="#fff" stroke="${D}" stroke-width="${k(.09)}" paint-order="stroke" style="font-family:Fredoka,var(--display),system-ui,sans-serif;font-weight:800;font-size:${k(.36)}px${i?';opacity:0':''}">${v}</text>`).join('');
+  return o+`</g>`;
+}
+function dant(x,y,s,c,vals,cls){return antSVG(x,y,s,`fill="${DJ[c][0]}"`,vals,cls);}
+function jant(x,y,s,c,vals,cls){return antSVG(x,y,s,`class="f${c}"`,vals,cls);}
 function dslot(x,y,w,h){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="#0c0518" opacity=".5"/><rect x="${x+.75}" y="${y+.75}" width="${w-1.5}" height="${h-1.5}" rx="9" fill="none" stroke="#b6a3d6" stroke-opacity=".5" stroke-width="1.2" stroke-dasharray="4 4"/>`;}
 function dpill(cls,x,y,w,txt,bg,fg){return `<g class="${cls}" style="opacity:0"><rect x="${x-w/2}" y="${y-9}" width="${w}" height="18" rx="9" fill="${bg}"/><text x="${x}" y="${y}" dy=".35em" text-anchor="middle" fill="${fg}" style="${DFONT};font-size:10px">${txt}</text></g>`;}
 function dtap(cls,cx,cy){return `<circle class="${cls}" cx="${cx}" cy="${cy}" r="14" fill="none" stroke="#fff" stroke-width="2.5" style="opacity:0"/>`;}
@@ -1227,55 +1246,62 @@ const DEMOS={
       tr.push(['.ml','opacity',[[0,0],[2.8,0],[2.9,1],[4.3,1],[4.45,0]]]);
       return tr;}},
   /* ----- Jelly Smash reference animations for section 3.2 (one per core object) ----- */
-  jelly:{D:4.6, /* slide, squash on landing, then the group pulses and flies into the cannon */
+  jelly:{D:5.0, /* swap, land with a wobble, the line pulses and flies up, the cannon pops into a slot */
     svg:()=>{
-      const bx=i=>40+40*i,by=j=>60+40*j;let cells='';
-      for(let j=0;j<3;j++)for(let i=0;i<3;i++)cells+=`<rect class="f7" opacity=".22" x="${bx(i)}" y="${by(j)}" width="36" height="36" rx="9"/>`;
-      return cannon(100,4,2,['0','15'],'gc')+cells+jcube(bx(2),by(0),36,4)+jcube(bx(0),by(2),36,4)+jcube(bx(2),by(2),36,4)+
-        `<g class="grp"><g class="c0">${jcube(bx(0),by(0),36,2)}</g><g class="c1">${jcube(bx(1),by(0),36,2)}</g><g class="c2">${jcube(bx(0),by(1),36,2)}</g>`+
-        `<g class="c3"><g class="mv"><g class="mvs">${jcube(bx(2),by(1),36,2)}</g></g></g></g>`+tap(138,118);},
+      const ST='transform-box:fill-box;transform-origin:center',bx=i=>40+40*i,by=j=>72+40*j;
+      let o=arena();for(let i=0;i<5;i++)o+=dslot(7+38*i,16,34,44);
+      o+=dpanel(32,66,136,126);
+      const G=[[4,4,2],[2,3,4],[3,2,5]];
+      G.forEach((r,j)=>r.forEach((c,i)=>{o+=`<g class="jo${j}${i}"><g class="ji${j}${i}" style="${ST}">${dj(bx(i),by(j),36,c,true)}</g></g>`;}));
+      return o+`<g class="jc" style="opacity:0;${ST}">${dcan(24,42,4,['3'],'',.75)}</g>`+dtap('jt',bx(2)+18,by(0)+18);},
     tracks:()=>{
-      const from=[[58,78],[98,78],[58,118],[98,118]];
-      return [
-        ...tapTracks(.3),
-        ['.mv','transform',[[.55,T(0,0)],[.95,T(-40,0)]]],
-        ['.mvs','transform',[[.95,'scale(1)'],[1.05,'scale(1.2,.8)'],[1.18,'scale(.9,1.1)'],[1.3,'scale(1.05,.95)'],[1.42,'scale(1)']]],
-        ['.grp','transform',[[1.7,'scale(1)'],[1.85,'scale(1.08)'],[2.0,'scale(1)']]],
-        ...from.flatMap(([x,y],k)=>{const s=2.15+k*.12;return [
-          [`.c${k}`,'transform',[[s,T(0,0)],[s+.45,T(100-x,26-y,.3)]]],
-          [`.c${k}`,'opacity',[[0,1],[s+.4,1],[s+.45,0]]]];}),
-        ['.gc .v0','opacity',[[0,1],[2.95,1],[3.0,0]]],['.gc .v1','opacity',[[0,0],[2.95,0],[3.0,1]]],
-        ['.gc','transform',[[2.95,'scale(1)'],[3.05,'scale(1.15)'],[3.25,'scale(1)']]]
-      ];}},
-  cannonIn:{D:4.6, /* ammo flies in and the counter ticks up, then one shot with recoil */
+      const tr=[...dtapT('jt',.3),['.jo02','transform',[[.5,T(0,0)],[.8,T(0,40)]]],
+        ['.ji02','transform',[[.8,'scale(1)'],[.9,'scale(1.15,.85)'],[1.02,'scale(.92,1.08)'],[1.14,'scale(1)']]]];
+      const pulse=[[1.2,'scale(1)'],[1.35,'scale(1.12)'],[1.5,'scale(1)'],[1.65,'scale(1.12)'],[1.8,'scale(1)']];
+      [['00',0],['01',1],['12',2]].forEach(([id,k])=>{const s=1.9+k*.08;
+        tr.push([`.ji${id}`,'transform',(id==='12'?[[.8,'scale(1)'],[.9,'scale(1.15,.85)'],[1.02,'scale(.92,1.08)'],[1.14,'scale(1)']]:[]).concat(pulse)]);
+        tr.push([`.jo${id}`,'transform',(id==='12'?[[.5,T(0,0)],[.8,T(0,-40)]]:[[0,T(0,0)]]).concat([[s,T(0,id==='12'?-40:0,1),'ease-in'],[s+.4,T(24-(40+40*(+id[1])+18),42-(72+40*(id==='12'?0:+id[0])+18)+(id==='12'?-40:0),.3)]])],
+          [`.jo${id}`,'opacity',[[0,1],[s+.35,1],[s+.4,0]]]);});
+      tr.push(['.jc','opacity',[[0,0],[2.45,0],[2.5,1]]],['.jc','transform',[[2.45,'scale(0)'],[2.6,'scale(1.2)'],[2.72,'scale(1)']]]);
+      return tr;}},
+  cannonIn:{D:4.2, /* the cannon fires: recoil, a drop flies up, the ant loses 1 HP per hit */
     svg:()=>{
-      let wall='';[0,1,2,3,4].forEach(i=>{wall+=`<g class="${i===2?'wt':''}">${jcube(26+30*i,8,26,i===2?2:[4,2,0,2,4][i]||4)}</g>`;});
-      let ammo='';[0,1,2,3].forEach(k=>{ammo+=`<g class="am${k}">${jcube(66+18*k,176,16,2)}</g>`;});
-      return wall+`<g class="rc">${cannon(100,104,2,['6','7','8','9','10','9'],'cn',1.4)}</g>`+ammo+`<circle class="f2 dp" cx="100" cy="104" r="5" style="opacity:0"/>`;},
+      const ST='transform-box:fill-box;transform-origin:center';
+      let o=arena()+dpanel(14,12,172,92)+`<rect x="14" y="103" width="172" height="2.5" rx="1" fill="#ff3b5c"/>`;
+      [[0,2],[1,4],[3,3],[4,2]].forEach(([i,c])=>{o+=dant(26+30*i,58,28,c,['1']);});
+      o+=`<g class="ca" style="${ST}">${dant(86,58,28,0,['3','2','1','0'])}</g>`;
+      for(let i=0;i<5;i++)o+=dslot(7+38*i,124,34,44);
+      o+=`<g class="cc" style="${ST}">${dcan(100,150,0,['5','4','3','2'],'',.75)}</g>`;
+      [0,1,2].forEach(k=>{o+=`<circle class="cb${k}" cx="100" cy="133" r="4.5" fill="#ff5470" stroke="#fff" stroke-width="1.5" style="opacity:0"/>`;});
+      return o;},
+    tracks:()=>{
+      const S=[.6,1.4,2.2],tr=[],rec=[];
+      S.forEach((s,k)=>{const a=s+.3;
+        tr.push([`.cb${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[a-.02,1],[a,0]]],[`.cb${k}`,'transform',[[s,T(0,0),'ease-in'],[a,T(0,-61)]]],
+          [`.cc .v${k}`,'opacity',k?[[0,0],[S[k-1],0],[S[k-1]+.02,1],[s,1],[s+.02,0]]:[[0,1],[s,1],[s+.02,0]]],
+          [`.ca .hp${k}`,'opacity',k?[[0,0],[S[k-1]+.3,0],[S[k-1]+.32,1],[a,1],[a+.02,0]]:[[0,1],[a,1],[a+.02,0]]]);
+        rec.push([s,T(0,0,1)],[s+.05,T(0,5,1)],[s+.2,T(0,0,1)]);});
+      tr.push(['.cc .v3','opacity',[[0,0],[S[2],0],[S[2]+.02,1]]],['.cc','transform',rec],
+        ['.ca .hp3','opacity',[[0,0],[S[2]+.3,0],[S[2]+.32,1]]],
+        ['.ca','transform',[[S[0]+.3,T(0,0,1)],[S[0]+.36,T(0,-3,1)],[S[0]+.46,T(0,0,1)],[S[1]+.3,T(0,0,1)],[S[1]+.36,T(0,-3,1)],[S[1]+.46,T(0,0,1)],[S[2]+.3,T(0,0,1)],[S[2]+.5,T(0,0,1.45)],[2.75,T(0,0,1.55)],[2.9,T(0,0,0)]]],
+        ['.ca','opacity',[[0,1],[2.85,1],[2.9,0]]]);
+      return tr;}},
+  pop:{D:4.4, /* an ant at 1 HP: the last hit makes it swell up, then it disappears with a splash */
+    svg:()=>{
+      const ST='transform-box:fill-box;transform-origin:center';
+      let o=arena()+dpanel(14,12,172,140)+`<rect x="14" y="151" width="172" height="2.5" rx="1" fill="#ff3b5c"/>`;
+      [[0,0,4],[1,0,2],[3,0,3],[0,1,2],[3,1,4],[1,2,3],[2,2,4]].forEach(([i,j,c])=>{o+=dant(30+36*i,22+40*j,34,c,['1']);});
+      o+=`<g class="aa" style="${ST}">${dant(102,62,34,2,['2','1','0'])}</g>`;
+      o+=[0,1,2,3,4,5,6,7].map(k=>`<circle class="as${k}" cx="119" cy="79" r="${k%2?3.5:5}" fill="${DJ[2][0]}" style="opacity:0"/>`).join('');
+      return o+[0,1].map(k=>`<circle class="ad${k}" cx="119" cy="186" r="5" fill="${DJ[2][0]}" stroke="#fff" stroke-width="1.5" style="opacity:0"/>`).join('');},
     tracks:()=>{
       const tr=[];
-      [0,1,2,3].forEach(k=>{const s=.4+k*.3,e=s+.35,x=74+18*k;
-        tr.push([`.am${k}`,'transform',[[s,T(0,0)],[e,T(100-x,140-184,.5)]]],[`.am${k}`,'opacity',[[0,1],[e-.03,1],[e,0]]]);});
-      const at=[0,.75,1.05,1.35,1.65,2.45];
-      at.forEach((a,i)=>{const n=at[i+1];tr.push([`.cn .v${i}`,'opacity',i===0?[[0,1],[n,1],[n+.04,0]]:[[0,0],[a,0],[a+.04,1]].concat(n?[[n,1],[n+.04,0]]:[[4.6,1]])]);});
-      tr.push(['.cn','transform',[[.75,'scale(1)'],[.85,'scale(1.08)'],[1.05,'scale(1)'],[1.15,'scale(1.08)'],[1.35,'scale(1)'],[1.45,'scale(1.08)'],[1.65,'scale(1)'],[1.75,'scale(1.08)'],[1.95,'scale(1)']]]);
-      tr.push(['.rc','transform',[[2.4,T(0,0)],[2.48,T(0,6)],[2.75,T(0,0)]]]);
-      tr.push(['.dp','opacity',[[0,0],[2.42,0],[2.45,1],[2.8,1],[2.83,0]]],['.dp','transform',[[2.45,T(0,0)],[2.8,T(0,-74)]]]);
-      tr.push(['.wt','transform',[[2.8,'scale(1)'],[2.9,'scale(1.25)'],[3.1,'scale(0)']]],['.wt','opacity',[[0,1],[3.0,1],[3.1,0]]]);
-      return tr;}},
-  pop:{D:3.6, /* a drop hits a wall cube: it swells, pops and splashes paint in its color */
-    svg:()=>{
-      let wall='';
-      for(let j=0;j<3;j++)for(let i=0;i<4;i++){const c=[[2,4,2,4],[4,2,2,4],[2,4,4,2]][j][i],x=36+33*i,y=30+33*j;wall+=(i===1&&j===2)?'':jcube(x,y,30,c);}
-      const tgt=`<g class="tg">${jcube(69,96,30,2)}</g>`;
-      const sp=[0,1,2,3,4,5,6,7].map(k=>`<circle class="f2 sp${k}" cx="84" cy="111" r="${k%2?3.5:5}" style="opacity:0"/>`).join('');
-      return wall+tgt+sp+`<circle class="f2 dp" cx="84" cy="190" r="5" style="opacity:0"/>`;},
-    tracks:()=>{
-      const tr=[['.dp','opacity',[[0,0],[.4,0],[.45,1],[.85,1],[.88,0]]],['.dp','transform',[[.45,T(0,0)],[.85,T(0,-64)]]],
-        ['.tg','transform',[[.85,'scale(1)'],[.97,'scale(1.3)'],[1.12,'scale(0)'],[2.6,'scale(0)'],[2.9,'scale(1)']]],
-        ['.tg','opacity',[[0,1],[1.05,1],[1.12,0],[2.6,0],[2.75,1]]]];
-      [0,1,2,3,4,5,6,7].forEach(k=>{const a=k*Math.PI/4,r=k%2?30:40;
-        tr.push([`.sp${k}`,'transform',[[1.0,T(0,0,.4)],[1.55,T(Math.cos(a)*r,Math.sin(a)*r,1)]]],[`.sp${k}`,'opacity',[[0,0],[1.0,0],[1.04,1],[1.4,1],[1.7,0]]]);});
+      [[.4,0],[1.3,1]].forEach(([s,k])=>tr.push([`.ad${k}`,'opacity',[[0,0],[s,0],[s+.03,1],[s+.33,1],[s+.35,0]]],[`.ad${k}`,'transform',[[s,T(0,0),'ease-in'],[s+.35,T(0,-107)]]]));
+      tr.push(['.aa .hp0','opacity',[[0,1],[.75,1],[.77,0]]],['.aa .hp1','opacity',[[0,0],[.75,0],[.77,1],[1.65,1],[1.67,0]]],['.aa .hp2','opacity',[[0,0],[1.65,0],[1.67,1]]],
+        ['.aa','transform',[[.75,'scale(1)'],[.82,T(0,-3,1)],[.95,'scale(1)'],[1.65,'scale(1)'],[1.95,'scale(1.45,1.35)'],[2.2,'scale(1.6,1.5)'],[2.35,'scale(0)']]],
+        ['.aa','opacity',[[0,1],[2.3,1],[2.35,0]]]);
+      [0,1,2,3,4,5,6,7].forEach(k=>{const a=k*Math.PI/4,r=k%2?28:38;
+        tr.push([`.as${k}`,'transform',[[2.3,T(0,0,.4)],[2.8,T(Math.cos(a)*r,Math.sin(a)*r,1)]]],[`.as${k}`,'opacity',[[0,0],[2.3,0],[2.34,1],[2.65,1],[2.95,0]]]);});
       return tr;}},
   praise:{D:8.8, /* Great, Amazing, Extreme and Epic pop over the board with the ammo gained (ammo = 2n − 3) */
     svg:()=>{
@@ -1407,7 +1433,7 @@ function heroBuild(){
       if(cn.fires.length===cn.ammo)cn.out=t+.4;});
   }
   let grid='',guns='',fx='';
-  TG.forEach((cs,i)=>cs.forEach((c,j)=>{if(c)grid+=`<g class="ht${i}${j}" style="${ST}">${jcube(tx(i),ty(j),TS,c)}</g>`;}));
+  TG.forEach((cs,i)=>cs.forEach((c,j)=>{if(c)grid+=`<g class="ht${i}${j}" style="${ST}">${jant(tx(i),ty(j),TS,c,['1'])}</g>`;}));
   shots.forEach((s,q)=>{const a=s.t+.25,dx=tx(s.ci)+TS/2-s.cx,dy=ty(s.j)+TS/2+off(a)-MZ;
     fx+=`<circle class="hs${q} f${s.c}" cx="${s.cx}" cy="${MZ}" r="5.5" stroke="var(--surface)" stroke-width="1.5" style="opacity:0"/>`;
     tr.push([`.hs${q}`,'opacity',[[0,0],[s.t,0],[s.t+.03,1],[a-.02,1],[a,0]]],[`.hs${q}`,'transform',[[s.t,T(0,0),'ease-in'],[a,T(P(dx),P(dy))]]],
@@ -1543,31 +1569,31 @@ function view(l){
 
   /* PER GAME: one caption per entry in DEMOS, same keys. These are the Caps Sorting captions for the example demos. */
   const DCAP={
-    jHand:t('Tap Hand: the blue cannon has the most ammo (5). It fires all 5 at once, nearest first, including cubes behind others and one above the view. Then its slot frees up.','Chạm Hand: pháo xanh nhiều đạn nhất (5). Pháo xả cả 5 phát, gần nhất trước, kể cả khối nằm sau và khối ở trên khung. Rồi slot được trả lại.'),
+    jHand:t('Tap Hand: the blue cannon has the most ammo (5). It fires all 5 at once, nearest first, including ants behind others and one above the view. Then its slot frees up.','Chạm Hand: pháo xanh nhiều đạn nhất (5). Pháo xả cả 5 phát, gần nhất trước, kể cả kiến nằm sau và con ở trên khung. Rồi slot được trả lại.'),
     jShuffle:t('Tap Shuffle: the board clears and a new one drops in. It has a swap ready for red, blue and yellow, the bottom-row colors.','Chạm Shuffle: bàn được xóa và bàn mới rơi vào. Bàn mới có sẵn nước swap cho đỏ, xanh và vàng, các màu ở hàng dưới cùng.'),
-    jBomb:t('Bomb: 3 cannons of the bottom-row colors appear outside the slots, 15 ammo each. Each color has only 4 cubes, so they clear them and leave with 11 ammo unused.','Bomb: 3 pháo màu hàng dưới cùng xuất hiện ngoài slot, mỗi pháo 15 đạn. Mỗi màu chỉ có 4 khối, nên pháo phá hết rồi biến mất, dư 11 đạn.'),
+    jBomb:t('Bomb: 3 cannons of the bottom-row colors appear outside the slots, 15 ammo each. Each color has only 4 ants with 1 HP, so they defeat them and leave with 11 ammo unused.','Bomb: 3 pháo màu hàng dưới cùng xuất hiện ngoài slot, mỗi pháo 15 đạn. Mỗi màu chỉ có 4 con kiến 1 HP, nên pháo diệt hết rồi biến mất, dư 11 đạn.'),
     choco:t('Tap the chocolate: it shakes, it can\'t be swapped. A swap makes a red line next to it: the chocolate breaks and shows a blue jelly, then the column refills.','Chạm chocolate: nó rung, không swap được. Một swap tạo hàng đỏ cạnh nó: chocolate vỡ, lộ khối thạch xanh, rồi cột được refill.'),
     stack3:t('A group of 4 gave this cannon 5 ammo. The stack of 3 takes 3 shots, so only 2 are left for the other blue cubes.','Nhóm 4 khối cho pháo này 5 đạn. Chồng 3 khối tốn 3 phát, nên chỉ còn 2 đạn cho các khối xanh khác.'),
     lockSlot:t('Two slots are locked (2 and 3). Each cannon sent to a slot counts both down. The first opens after 2 cannons and gets the next one; the second opens after 3.','2 slot bị khóa (2 và 3). Mỗi pháo vào slot làm cả 2 giảm. Slot đầu mở sau 2 pháo và nhận pháo kế tiếp; slot sau mở sau 3 pháo.'),
     fountain:t('Every 2 moves the fountain makes chocolate: first next to itself, then next to that chocolate.','Cứ 2 move vòi tạo chocolate: lần đầu cạnh vòi, lần sau cạnh miếng chocolate đó.'),
-    iceLock:t('The cubes under the green ice cream are locked. The blue cannon destroys the cube with the green spoon, and the spoon flies down to remove the lock.','Các khối dưới kem xanh lá bị khóa. Pháo xanh phá khối có muỗng xanh lá, muỗng bay xuống gỡ khóa.'),
+    iceLock:t('The cubes under the green ice cream are locked. The blue cannon defeats the ant carrying the green spoon, and the spoon flies down to remove the lock.','Các khối dưới kem xanh lá bị khóa. Pháo xanh diệt con kiến mang muỗng xanh lá, muỗng bay xuống gỡ khóa.'),
     swap:t('A swap that makes no line slides back. The next swap makes a blue line of 3, so it stays: the line pops for 3 ammo, the cubes above fall and new cubes drop in.','Swap không tạo hàng thì 2 khối trượt về. Swap tiếp theo tạo hàng 3 khối xanh nên được giữ: hàng nổ cho 3 đạn, khối phía trên rơi xuống và khối mới rơi vào.'),
     refill:t('The red line clears. Cubes above fall, new cubes drop in from the top, and the fall makes a green line. That cascade matches on its own.','Hàng đỏ bị xóa. Khối phía trên rơi xuống, khối mới rơi từ trên vào, và cú rơi tạo ra hàng xanh lá. Combo dây chuyền đó tự match.'),
     slots:t('Each match puts a cannon of its color in the leftmost free slot. The 3 red cannons merge into one with 3 + 3 + 5 = 11 ammo and free 2 slots. With all 5 slots full, the cannon from the orange match is lost.','Mỗi match đặt 1 pháo cùng màu vào slot trống bên trái nhất. 3 pháo đỏ gộp thành 1 pháo với 3 + 3 + 5 = 11 đạn và trả lại 2 slot. Khi đủ 5 slot, pháo của match cam bị mất.'),
-    target:t('The blue cannon has 3 ammo. It only aims at blue front cubes in view, lowest first: column 3, then the two in column 1. Blue cubes behind other cubes and the one above the view are not targets. At 0 ammo the cannon disappears.','Pháo xanh có 3 đạn. Pháo chỉ nhắm khối xanh ở đầu hàng trong khung nhìn thấy, thấp nhất trước: cột 3, rồi 2 khối ở cột 1. Khối xanh nằm sau khối khác và khối ở trên khung không phải target. Hết đạn thì pháo biến mất.'),
-    boost:t('Only 3 cubes are in view, so the grid speeds up (×5 in the demo) until the view is full again. Then it goes back to normal speed.','Khung nhìn thấy chỉ còn 3 khối, nên lưới đi xuống nhanh hơn (demo: ×5) cho đến khi khung đầy lại. Sau đó lưới về tốc độ thường.'),
-    jelly:t('A cube slides in, squashes as it lands, then the group pulses and flies into the cannon.','Khối trượt vào, bẹp lại khi dừng, rồi cả nhóm phồng lên và bay vào pháo.'),
-    cannonIn:t('Ammo flies in and the counter ticks up with a bounce. Then a shot: recoil, and a drop flies to the target grid.','Đạn bay vào, số đạn tăng kèm cú nảy. Sau đó pháo bắn: giật nhẹ, giọt màu bay lên lưới mục tiêu.'),
-    pop:t('A drop hits a target cube. It swells, pops and splashes paint in its color.','Giọt đạn trúng khối mục tiêu. Khối phồng lên, vỡ và bắn sơn cùng màu.'),
+    target:t('The blue cannon has 3 ammo. It only aims at blue front ants in view, lowest first: column 3, then the two in column 1. Blue ants behind other ants and the one above the view are not targets. At 0 ammo the cannon disappears.','Pháo xanh có 3 đạn. Pháo chỉ nhắm kiến xanh ở đầu hàng trong khung nhìn thấy, thấp nhất trước: cột 3, rồi 2 con ở cột 1. Kiến xanh nằm sau con khác và con ở trên khung không phải target. Hết đạn thì pháo biến mất.'),
+    boost:t('Only 3 ants are in view, so the grid speeds up (×5 in the demo) until the view is full again. Then it goes back to normal speed.','Khung nhìn thấy chỉ còn 3 con kiến, nên lưới đi xuống nhanh hơn (demo: ×5) cho đến khi khung đầy lại. Sau đó lưới về tốc độ thường.'),
+    jelly:t('A swap makes a blue line of 3. The cubes squash as they land, the line pulses and flies up, and a blue cannon with 3 ammo pops into the first slot.','Một lần swap tạo hàng 3 khối xanh. Khối bẹp lại khi dừng, hàng phồng lên rồi bay lên, và 1 pháo xanh 3 đạn bật vào slot đầu.'),
+    cannonIn:t('The red cannon fires 3 shots at a red ant with 3 HP. Each shot: recoil, ammo goes down 1, the ant flinches and loses 1 HP. At 0 HP it swells up and disappears.','Pháo đỏ bắn 3 phát vào kiến đỏ 3 HP. Mỗi phát: giật nhẹ, đạn giảm 1, kiến khựng lại và mất 1 HP. Về 0 HP, kiến mập lên rồi biến mất.'),
+    pop:t('A yellow ant with 2 HP takes 2 hits. At 0 HP it swells up, then disappears with a yellow paint splash.','Kiến vàng 2 HP trúng 2 phát. Về 0 HP, kiến mập lên, rồi biến mất kèm vệt sơn vàng.'),
     praise:t('Great, Amazing, Extreme and Epic pop over the board, with the ammo gained under each.','Great, Amazing, Extreme và Epic bật lên trên bàn, bên dưới là số đạn nhận được.'),
     result:t('The 3 stars fill in one by one, confetti falls and “Level Completed!” shows.','3 sao lần lượt sáng, pháo giấy rơi và hiện “Level Completed!”.'),
     lockedCannon:t('The blue cannon is locked (2 groups to go). A red group counts it down to 1. A blue group loads 10 ammo and counts it to 0: the lock breaks and the cannon starts firing.','Pháo xanh đang bị khóa (còn 2 nhóm). Một nhóm đỏ đếm xuống 1. Một nhóm xanh nạp 10 đạn và đếm về 0: khóa vỡ và pháo bắt đầu bắn.'),
-    spawn:t('The game scans the bottom row of the target grid: 3 red, 2 blue, 1 yellow, so 50%, 33% and 17%. A group of 5 clears, rings mark 5 random empty cells, and 5 new cubes fly in: 2 red, 2 blue, 1 yellow.','Game scan hàng dưới cùng của lưới mục tiêu: 3 đỏ, 2 xanh, 1 vàng, tức 50%, 33% và 17%. Một nhóm 5 khối bị xóa, vòng tròn đánh dấu 5 ô trống ngẫu nhiên, rồi 5 khối mới bay vào: 2 đỏ, 2 xanh, 1 vàng.'),
+    spawn:t('The game scans the bottom row of the ant grid: 3 red, 2 blue, 1 yellow, so 50%, 33% and 17%. A group of 5 clears, rings mark 5 random empty cells, and 5 new cubes fly in: 2 red, 2 blue, 1 yellow.','Game scan hàng dưới cùng của lưới kiến: 3 đỏ, 2 xanh, 1 vàng, tức 50%, 33% và 17%. Một nhóm 5 khối bị xóa, vòng tròn đánh dấu 5 ô trống ngẫu nhiên, rồi 5 khối mới bay vào: 2 đỏ, 2 xanh, 1 vàng.'),
     hiddenCube:t('A red line of 3 clears right next to the hidden cube. The hidden cube flips and shows its real color: blue.','Một hàng 3 khối đỏ được xóa ngay cạnh khối ẩn. Khối ẩn lật lại và hiện màu thật: xanh dương.'),
-    stacked:t('A stack of 3 blue cubes on the target grid. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên lưới mục tiêu. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
+    stacked:t('A stack of 3 blue cubes on the ant grid. Each shot pops the front cube, the rest drop into place and the number goes down. 3 ammo clear the stack.','Một chồng 3 khối xanh trên lưới kiến. Mỗi phát bắn phá khối trước, các khối còn lại tụt xuống và con số giảm. Cần 3 đạn để phá hết chồng.'),
     lockedBlock:t('A red cube slides next to the chained red jelly. The group of 4 matches, the chain breaks and the group flies into the red cannon.','Một khối đỏ trượt tới cạnh khối đỏ bị xích. Nhóm 4 khối được ghép, xích vỡ và cả nhóm bay vào pháo đỏ.'),
     jellyLayer:t('Four red layers line up and match. The layers fly into the red cannon, and the jellies inside become normal cubes.','4 lớp đỏ xếp thành hàng và được ghép. Các lớp bay vào pháo đỏ, thạch bên trong thành khối thường.'),
-    smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the target grid.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên lưới mục tiêu.'),
+    smash:t('Slide a cube to finish a group of 4. The group flies into the blue cannon as ammo, and the cannon shoots blue cubes off the ant grid.','Trượt một khối để hoàn thành nhóm 4. Nhóm bay vào pháo xanh thành đạn, rồi pháo bắn rơi các khối xanh trên lưới kiến.'),
     hidden:t('The box reaches the top of its queue and reveals its color.','Hộp lên tới đầu hàng chờ và hiện màu.'),
     locked:t('Two boxes are sent, the number hits 0 and the item can be picked.','Đưa 2 hộp lên, con số về 0 và vật phẩm được nhặt.'),
     linked:t('Both boxes reach the top, the link breaks and they can be sent.','Hai hộp cùng lên đầu hàng chờ, liên kết được gỡ và cả hai được đưa lên.'),
@@ -1594,8 +1620,8 @@ function view(l){
         `Người chơi đổi chỗ 2 khối thạch cạnh nhau trên bàn để tạo hàng từ 3 khối cùng màu trở lên (swap match-3).`),
       t(`Each match spawns one cannon of that color into a free slot in the cannon row. Ammo = 2n − 3, n = cubes matched.`,
         `Mỗi lần match sinh 1 pháo cùng màu vào một slot trống trong hàng slot pháo. Số đạn = 2n − 3, n = số khối vừa match.`),
-      t(`Cannons fire on their own at the front target cubes of their color. A cannon disappears when its ammo runs out. The target grid above slides down: clear it before it reaches the red line.`,
-        `Pháo tự bắn vào khối mục tiêu cùng màu ở đầu hàng. Hết đạn thì pháo biến mất. Lưới mục tiêu phía trên trượt dần xuống: phá hết trước khi chạm vạch đỏ.`)
+      t(`Cannons fire on their own at the front ants of their color. Each ant has HP; 1 shot = 1 HP. A cannon disappears when its ammo runs out. The ant grid above marches down: clear it before it reaches the red line.`,
+        `Pháo tự bắn vào kiến cùng màu ở đầu hàng. Mỗi con kiến có HP; 1 phát = 1 HP. Hết đạn thì pháo biến mất. Lưới kiến phía trên bò dần xuống: diệt hết trước khi chạm vạch đỏ.`)
     ]))+
     ent(t('At a glance','Tóm tắt'),params([
       [t('Genre','Thể loại'),t('Hyper/hybrid-casual puzzle: swap match-3 that feeds a row of auto-shooting cannons','Puzzle hyper/hybrid-casual: swap match-3, mỗi match sinh pháo tự bắn trong hàng slot')],
@@ -1603,8 +1629,8 @@ function view(l){
       [t('Session','Thời lượng'),t('TBD (demo: about 40 s–2 min per level)','TBD (demo: khoảng 40 giây–2 phút mỗi màn)')]
     ]))+
     ent(t('Win and lose','Thắng và thua'),params([
-      [t('Win','Thắng'),t(`Every target cube is destroyed.`,`Mọi khối mục tiêu đều bị phá.`)],
-      [t('Lose','Thua'),t(`A target cube slides down and touches the red line at the bottom of the target area. Shown before the revive offer.`,`Một khối mục tiêu trượt xuống chạm vạch đỏ ở đáy khu vực mục tiêu. Hiện trước lựa chọn hồi sinh.`)],
+      [t('Win','Thắng'),t(`Every ant is defeated.`,`Mọi con kiến đều bị diệt.`)],
+      [t('Lose','Thua'),t(`An ant reaches the red line at the bottom of the ant area. Shown before the revive offer.`,`Một con kiến bò tới vạch đỏ ở đáy khu vực kiến. Hiện trước lựa chọn hồi sinh.`)],
       [t('Stars','Sao'),t(`3 stars on every win. No star criteria seen.`,`Thắng luôn được 3 sao. Chưa thấy tiêu chí tính sao.`)]
     ]));
 
@@ -1627,7 +1653,7 @@ function view(l){
     ent(t('Refill','Refill'),
       params([
         [t('Amount','Số lượng'),t(`1 new cube per cleared cell.`,`Mỗi ô vừa xóa có 1 khối mới.`)],
-        [t('Colors','Màu'),t(`Weighted random: part by the bottom-row colors of the target grid, part even. At least 4 colors on the board. Demo: 40% / 60%.`,`Random có trọng số: một phần theo màu hàng dưới cùng của lưới mục tiêu, phần còn lại chia đều. Bàn luôn có ít nhất 4 màu. Demo: 40% / 60%.`)],
+        [t('Colors','Màu'),t(`Weighted random: part by the bottom-row colors of the ant grid, part even. At least 4 colors on the board. Demo: 40% / 60%.`,`Random có trọng số: một phần theo màu hàng dưới cùng của lưới kiến, phần còn lại chia đều. Bàn luôn có ít nhất 4 màu. Demo: 40% / 60%.`)],
         [t('Help','Hỗ trợ'),t(`After each match, the game reads the bottom-row colors. New cubes are colored so each of those colors gets a swap that makes a line of 3. Never a free match.`,`Sau mỗi match, game đọc các màu ở hàng dưới cùng. Khối mới được tô màu để mỗi màu đó có 1 nước swap ra hàng 3. Không tự tạo match.`)],
         [t('Fallback','Dự phòng'),t(`At least one of those colors always has such a swap. If new cubes can't give it, a few board cubes change color with a glow.`,`Luôn có ít nhất 1 màu như vậy có nước swap. Nếu khối mới không đủ, vài khối trên bàn đổi màu và lóe sáng.`)]
       ]),'',demo('refill'))+
@@ -1636,25 +1662,27 @@ function view(l){
       table('',[t('Group (n)','Nhóm (n)'),'3','4','5','6','7','8','9','10'],[[t('Ammo','Đạn'),'3','5','7','9','11','13','15','17']])+
       `<p>${t(`Praise: 5 Great, 6–7 Amazing, 8–9 Extreme, 10+ Epic. Groups of 3–4 show only the ammo.`,`Lời khen: 5 Great, 6–7 Amazing, 8–9 Extreme, từ 10 Epic. Nhóm 3–4 chỉ hiện số đạn.`)}</p>`,'',demo('praise'))+
     ent(nm('Cannon slots','Hàng slot pháo'),ul([
-      t(`5 slots between the target grid and the board. Empty at start.`,`5 slot giữa lưới mục tiêu và bàn chơi. Đầu màn trống.`),
+      t(`5 slots between the ant grid and the board. Empty at start.`,`5 slot giữa lưới kiến và bàn chơi. Đầu màn trống.`),
       t(`Each match puts a cannon of its color in the leftmost free slot.`,`Mỗi match đặt 1 pháo cùng màu vào slot trống bên trái nhất.`),
       t(`<b>Slots full:</b> the new cannon is lost. The match still clears.`,`<b>Đủ slot:</b> pháo mới bị mất. Match vẫn xóa khối.`),
       t(`<b>Merge:</b> 3 cannons of one color become 1, with their ammo added. 2 slots free up.`,`<b>Gộp:</b> 3 pháo cùng màu gộp thành 1, cộng dồn đạn. Trả lại 2 slot.`),
-      t(`A cannon leaves at 0 ammo, or when its color is gone from the target grid. It can't be removed by hand.`,`Pháo biến mất khi hết đạn, hoặc khi màu của nó hết trên lưới mục tiêu. Không bỏ tay được.`),
-      t(`A match of a color no longer on the target grid spawns no cannon.`,`Match màu không còn trên lưới mục tiêu thì không sinh pháo.`)
+      t(`A cannon leaves at 0 ammo, or when its color is gone from the ant grid. It can't be removed by hand.`,`Pháo biến mất khi hết đạn, hoặc khi màu của nó hết trên lưới kiến. Không bỏ tay được.`),
+      t(`A match of a color no longer on the ant grid spawns no cannon.`,`Match màu không còn trên lưới kiến thì không sinh pháo.`)
     ]),'',demo('slots'))+
     ent(nm('Cannons','Pháo'),ul([
-      t(`Fires on its own, only at cubes of its color. 1 ammo = 1 shot = 1 cube.`,`Tự bắn, chỉ bắn khối cùng màu. 1 đạn = 1 phát = 1 khối.`),
-      t(`<b>Targets:</b> front cubes only (lowest in each column), and only in view.`,`<b>Target:</b> chỉ khối đầu hàng (thấp nhất mỗi cột), và phải trong khung nhìn thấy.`),
-      t(`<b>Order:</b> lowest cube first, then left to right.`,`<b>Thứ tự:</b> khối thấp nhất trước, rồi trái sang phải.`),
+      t(`Fires on its own, only at ants of its color. 1 ammo = 1 shot = 1 HP.`,`Tự bắn, chỉ bắn kiến cùng màu. 1 đạn = 1 phát = 1 HP.`),
+      t(`<b>Targets:</b> front ants only (lowest in each column), and only in view.`,`<b>Target:</b> chỉ kiến đầu hàng (thấp nhất mỗi cột), và phải trong khung nhìn thấy.`),
+      t(`<b>Order:</b> lowest ant first, then left to right. It keeps hitting the same ant until its HP is 0.`,`<b>Thứ tự:</b> kiến thấp nhất trước, rồi trái sang phải. Bắn tiếp con đó tới khi hết HP.`),
       t(`No target: it waits. Cannons fire in parallel. Fire rate: TBD (demo: about 6–7 shots/s).`,`Không có target: pháo chờ. Các pháo bắn cùng lúc. Tốc độ bắn: TBD (demo: khoảng 6–7 phát/giây).`)
     ]),'',demo('target'))+
-    ent(nm('Target grid','Lưới cube mục tiêu'),ul([
-      t(`Target cubes at the top, wider than the board. Size per level: TBD (demo: 9×16, 10×20, 11×24, 12×28).`,`Khối mục tiêu ở phía trên, rộng hơn bàn chơi. Kích thước mỗi màn: TBD (demo: 9×16, 10×20, 11×24, 12×28).`),
-      t(`The whole grid moves down toward the red line, from the first swap. Speed: TBD.`,`Cả lưới đi xuống về phía vạch đỏ, từ lần swap đầu tiên. Tốc độ: TBD.`),
-      t(`<b>Speed-up:</b> under 8 cubes in view, or under 4 rows in view: it moves faster until the view fills. Not near the red line (2 rows) or once the top row shows. Rate: TBD (demo ×5).`,`<b>Tăng tốc:</b> dưới 8 khối hoặc dưới 4 hàng trong khung: lưới đi nhanh hơn cho tới khi khung đầy. Không áp dụng khi cách vạch đỏ 2 hàng, hoặc khi hàng trên cùng đã hiện. Hệ số: TBD (demo ×5).`),
-      t(`A cube touches the red line: lose (see 1.1).`,`Khối chạm vạch đỏ: thua (xem 1.1).`)
-    ]),'',demo('boost'));
+    ent(nm('Ant grid','Lưới kiến'),ul([
+      t(`Armored ants in a grid at the top, wider than the board. Size per level: TBD (demo: 9×16, 10×20, 11×24, 12×28).`,`Lưới kiến mặc giáp ở phía trên, rộng hơn bàn chơi. Kích thước mỗi màn: TBD (demo: 9×16, 10×20, 11×24, 12×28).`),
+      t(`<b>HP:</b> the number on each ant. Each hit takes 1. At 0 the ant swells up and disappears. HP per ant: set per level, TBD.`,`<b>HP:</b> con số trên mỗi con kiến. Mỗi phát trúng trừ 1. Về 0 thì kiến mập lên rồi biến mất. HP mỗi con: đặt theo màn, TBD.`),
+      t(`The armor color is the ant's color. Only cannons of that color can hurt it.`,`Màu giáp là màu của kiến. Chỉ pháo cùng màu mới bắn được.`),
+      t(`The whole grid marches down toward the red line, from the first swap. Speed: TBD.`,`Cả lưới bò xuống về phía vạch đỏ, từ lần swap đầu tiên. Tốc độ: TBD.`),
+      t(`<b>Speed-up:</b> under 8 ants in view, or under 4 rows in view: it moves faster until the view fills. Not near the red line (2 rows) or once the top row shows. Rate: TBD (demo ×5).`,`<b>Tăng tốc:</b> dưới 8 con kiến hoặc dưới 4 hàng trong khung: lưới đi nhanh hơn cho tới khi khung đầy. Không áp dụng khi cách vạch đỏ 2 hàng, hoặc khi hàng trên cùng đã hiện. Hệ số: TBD (demo ×5).`),
+      t(`An ant touches the red line: lose (see 1.1).`,`Kiến chạm vạch đỏ: thua (xem 1.1).`)
+]),'',demo('boost'));
 
   /* FIXED: 1.3 is shared logic across projects. Keep it as it is and only change the numbers. */
 
@@ -1763,7 +1791,7 @@ function view(l){
         ],'compact'))+
       panel(t('On revive','Khi hồi sinh'),ul([
         t(`Continue from where it stopped. No restart, no life lost.`,`Chơi tiếp từ chỗ dừng. Không chơi lại, không mất tim.`),
-        t(`1. The target grid is pushed back up, away from the red line. Rows pushed: TBD.`,`1. Lưới mục tiêu bị đẩy lùi lên, xa vạch đỏ. Số hàng đẩy lùi: TBD.`),
+        t(`1. The ant grid is pushed back up, away from the red line. Rows pushed: TBD.`,`1. Lưới kiến bị đẩy lùi lên, xa vạch đỏ. Số hàng đẩy lùi: TBD.`),
         t(`2. The game uses Hand 3 times for free, one after another. The player's own Hands are not spent. Slots empty: the uses left are skipped.`,`2. Game dùng Hand miễn phí 3 lần liên tiếp. Không trừ Hand của người chơi. Slot trống: bỏ qua các lần còn lại.`),
         t(`3. Play goes on as normal.`,`3. Chơi tiếp như bình thường.`),
         t(`Revive count and price reset on a new attempt.`,`Số lần và giá hồi sinh tính lại khi bắt đầu lượt mới.`),
@@ -1778,12 +1806,6 @@ function view(l){
       t(`A match next to it (up, down, left, right) breaks it. The jelly under it becomes a normal cube.`,`Match cạnh nó (trên, dưới, trái, phải) làm nó vỡ. Khối thạch bên dưới thành khối thường.`),
       t(`It stays in its cell; cubes above don't fall through it.`,`Đứng yên tại ô; khối phía trên không rơi xuyên qua.`)
     ]),unlock('TBD'),demo('choco'))+
-    ent(N.el2,ul([
-      t(`Target grid. 2–3 cubes stacked in one cell, with a number for cubes left.`,`Trên lưới mục tiêu. 2–3 khối chồng ở 1 ô, có số ghi số khối còn lại.`),
-      t(`Each shot removes one cube. The cell clears with the last one.`,`Mỗi phát phá 1 khối. Ô trống khi phá khối cuối.`),
-      t(`Costs 2–3 ammo instead of 1, so the player plans bigger groups (2n − 3).`,`Tốn 2–3 đạn thay vì 1, nên người chơi phải tính nhóm lớn hơn (2n − 3).`),
-      t(`Mixed colors in one stack: TBD.`,`Chồng nhiều màu: TBD.`)
-    ]),unlock('TBD'),demo('stack3'))+
     ent(N.el3,ul([
       t(`Slot row. A slot with a padlock and a number.`,`Trên hàng slot. Slot có ổ khóa và 1 con số.`),
       t(`Each cannon that enters a slot counts every locked slot down by 1. Lost cannons don't count.`,`Mỗi pháo vào slot làm mọi slot khóa giảm 1. Pháo bị mất không tính.`),
@@ -1798,8 +1820,8 @@ function view(l){
     ]),unlock('TBD'),demo('fountain'))+
     ent(N.el5,ul([
       t(`Board. Ice cream locks a group of cubes in a set shape (2×2, L, line…). Locked cubes can't be swapped or matched.`,`Trên bàn. Kem khóa 1 nhóm khối theo hình định sẵn (2×2, chữ L, hàng…). Khối bị khóa không swap, không match được.`),
-      t(`The key is a spoon on one target-grid cube. Spoon and ice cream share a color.`,`Chìa là cái muỗng nằm trên 1 khối của lưới mục tiêu. Muỗng và kem cùng màu.`),
-      t(`Destroy that cube: the spoon flies down and removes the lock. The cubes become normal.`,`Phá khối đó: muỗng bay xuống gỡ khóa. Các khối thành khối thường.`),
+      t(`The key is a spoon carried by one ant. Spoon and ice cream share a color.`,`Chìa là cái muỗng do 1 con kiến mang. Muỗng và kem cùng màu.`),
+      t(`Defeat that ant: the spoon flies down and removes the lock. The cubes become normal.`,`Diệt con kiến đó: muỗng bay xuống gỡ khóa. Các khối thành khối thường.`),
       t(`Locked cubes stay in place; cubes above don't fall through. Shapes per level: TBD.`,`Khối bị khóa đứng yên; khối phía trên không rơi xuyên qua. Hình khóa mỗi màn: TBD.`)
     ]),unlock('TBD'),demo('iceLock'));
 
@@ -1807,24 +1829,23 @@ function view(l){
   B['booster-mechanics']=
     ent(N.bo1,ul([
       t(`The game picks the cannon in the slots with the most ammo. Tie: the leftmost.`,`Game chọn pháo trong slot có nhiều đạn nhất. Bằng nhau: pháo bên trái nhất.`),
-      t(`It fires all its ammo at once, at cubes of its color, nearest first.`,`Pháo xả hết đạn ngay, bắn khối cùng màu, gần nhất trước.`),
-      t(`It ignores the target rules: any cube of its color, front or not, in view or not.`,`Bỏ qua luật target: khối cùng màu nào cũng bắn, ở đầu hàng hay không, trong khung hay không.`),
-      t(`The cannon then leaves and its slot frees up. Its color runs out first: it leaves with the rest of its ammo.`,`Sau đó pháo biến mất, trả lại slot. Hết khối màu đó trước: pháo biến mất cùng số đạn còn lại.`),
+      t(`It fires all its ammo at once, at ants of its color, nearest first. 1 shot = 1 HP.`,`Pháo xả hết đạn ngay, bắn kiến cùng màu, gần nhất trước. 1 phát = 1 HP.`),
+      t(`It ignores the target rules: any ant of its color, front or not, in view or not.`,`Bỏ qua luật target: kiến cùng màu nào cũng bắn, ở đầu hàng hay không, trong khung hay không.`),
+      t(`The cannon then leaves and its slot frees up. Its color runs out first: it leaves with the rest of its ammo.`,`Sau đó pháo biến mất, trả lại slot. Hết kiến màu đó trước: pháo biến mất cùng số đạn còn lại.`),
       t(`No cannon in the slots: the booster can't be used and is not spent.`,`Không có pháo trong slot: không dùng được, không mất lượt.`),
-      withEl+':'+ul([t(`${P.el2}: each shot removes 1 cube of the stack.`,`${P.el2}: mỗi phát phá 1 khối của chồng.`),
-        t(`${P.el5}: hitting the spoon cube unlocks the ice cream.`,`${P.el5}: bắn trúng khối có muỗng thì mở khóa kem.`)])
+      withEl+':'+ul([t(`${P.el5}: defeating the spoon ant unlocks the ice cream.`,`${P.el5}: diệt con kiến mang muỗng thì mở khóa kem.`)])
     ]),unlockB('TBD'),demo('jHand'))+
     ent(N.bo2,ul([
       t(`Clears every cube on the board and fills it with a new board.`,`Xóa hết khối trên bàn và thay bằng bàn mới.`),
       t(`Cleared cubes give no cannon and no ammo.`,`Khối bị xóa không sinh pháo, không cho đạn.`),
-      t(`The new board has no ready match. Each color in the bottom row of the target grid gets a swap that makes a line of 3.`,`Bàn mới không có match sẵn. Mỗi màu ở hàng dưới cùng của lưới mục tiêu có 1 nước swap ra hàng 3.`),
+      t(`The new board has no ready match. Each color in the bottom row of the ant grid gets a swap that makes a line of 3.`,`Bàn mới không có match sẵn. Mỗi màu ở hàng dưới cùng của lưới kiến có 1 nước swap ra hàng 3.`),
       withEl+':'+ul([t(`${P.el1}, ${P.el4} and ${P.el5} stay where they are. Only normal cubes are replaced.`,`${P.el1}, ${P.el4} và ${P.el5} giữ nguyên chỗ. Chỉ thay khối thường.`)])
     ]),unlockB('TBD'),demo('jShuffle'))+
     ent(N.bo3,ul([
-      t(`The game takes 3 colors from the bottom row of the target grid. Fewer than 3 colors there: the rest come from the next rows up.`,`Game lấy 3 màu từ hàng dưới cùng của lưới mục tiêu. Hàng đó ít hơn 3 màu: lấy thêm từ các hàng phía trên.`),
+      t(`The game takes 3 colors from the bottom row of the ant grid. Fewer than 3 colors there: the rest come from the next rows up.`,`Game lấy 3 màu từ hàng dưới cùng của lưới kiến. Hàng đó ít hơn 3 màu: lấy thêm từ các hàng phía trên.`),
       t(`It spawns 3 cannons of those colors, 15 ammo each. They don't take a slot.`,`Sinh 3 pháo của 3 màu đó, mỗi pháo 15 đạn. Không chiếm slot.`),
-      t(`They fire like Hand: any cube of their color, nearest first, until the ammo runs out.`,`Bắn như Hand: khối cùng màu nào cũng bắn, gần nhất trước, cho tới khi hết đạn.`),
-      t(`A color runs out before its ammo: that cannon leaves, and the leftover ammo is lost.`,`Hết khối màu đó trước khi hết đạn: pháo biến mất, đạn dư bị mất.`),
+      t(`They fire like Hand: any ant of their color, nearest first, until the ammo runs out.`,`Bắn như Hand: kiến cùng màu nào cũng bắn, gần nhất trước, cho tới khi hết đạn.`),
+      t(`Its color runs out before its ammo: that cannon leaves, and the leftover ammo is lost.`,`Hết kiến màu đó trước khi hết đạn: pháo biến mất, đạn dư bị mất.`),
       withEl+':'+ul([t(`${P.el3}: Bomb cannons don't enter a slot, so they don't count the lock down.`,`${P.el3}: pháo của Bomb không vào slot nên không làm khóa giảm.`)])
     ]),unlockB('TBD'),demo('jBomb'));
 
@@ -1861,11 +1882,11 @@ function view(l){
        t('The player taps to agree to the Terms &amp; Conditions / Privacy Policy.','Người chơi chạm đồng ý với Điều khoản / Chính sách quyền riêng tư.'),dash,dash,dash],
       [t('First swap','Swap đầu tiên'),t('The player swaps the two shown cubes and makes a line of 3 blue cubes.','Người chơi đổi chỗ 2 khối được chỉ, tạo hàng 3 khối xanh.'),
        t('The two cubes to swap. The tutorial hand plays the swap.','2 khối cần đổi chỗ. Bàn tay hướng dẫn diễn cách swap.'),popup('Swap to match 3!','Đổi chỗ để ghép 3!'),dash],
-      [t('Cannon and shooting','Sinh pháo và bắn'),t('A blue cannon appears in the first slot and fires at the target grid. No input needed.','Pháo xanh xuất hiện ở slot đầu và bắn lên lưới mục tiêu. Không cần thao tác.'),
+      [t('Cannon and shooting','Sinh pháo và bắn'),t('A blue cannon appears in the first slot and fires at the ant grid. No input needed.','Pháo xanh xuất hiện ở slot đầu và bắn lên lưới kiến. Không cần thao tác.'),
        t('The slot row and the new cannon with its ammo','Hàng slot và pháo mới kèm số đạn'),popup('Each match makes a cannon!','Mỗi match sinh 1 pháo!'),dash],
       [t('Bigger group','Nhóm lớn hơn'),t('The player makes a group of 5 or 6 (Great or Amazing).','Người chơi ghép nhóm 5 hoặc 6 khối (Great hoặc Amazing).'),
        t('The cubes of the group to finish','Các khối của nhóm cần hoàn thành'),popup('Bigger groups, more ammo!','Nhóm càng lớn, đạn càng nhiều!'),dash],
-      [t('Level complete','Hoàn thành màn'),t('Every target cube is destroyed.','Mọi khối mục tiêu đều bị phá.'),dash,dash,t('Yes','Có')]
+      [t('Level complete','Hoàn thành màn'),t('Every ant is destroyed.','Mọi con kiến đều bị phá.'),dash,dash,t('Yes','Có')]
     ],'wide steps-tbl');
 
   /* PER GAME: one row per element, in unlock order. Jelly Smash has none yet. */
@@ -1873,10 +1894,9 @@ function view(l){
     [t('Element','Yếu tố'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn')],
     [
       [N.el1,popup('Match next to the chocolate<br>to break it.','Ghép cạnh chocolate<br>để phá vỡ.'),lvl('TBD')],
-      [N.el2,popup('Shoot the stack<br>to clear it cube by cube.','Bắn chồng khối<br>để phá từng khối.'),lvl('TBD')],
       [N.el3,popup('Send cannons to the slots<br>to unlock the locked one.','Đưa pháo lên các ô<br>để mở khóa ô bị khóa.'),lvl('TBD')],
       [N.el4,popup('Clear chocolate fast<br>before it spreads.','Phá chocolate thật nhanh<br>trước khi nó lan ra.'),lvl('TBD')],
-      [N.el5,popup('Destroy the cube with the spoon<br>to unlock the ice cream.','Phá khối có muỗng<br>để mở khóa kem.'),lvl('TBD')],
+      [N.el5,popup('Defeat the ant with the spoon<br>to unlock the ice cream.','Diệt kiến mang muỗng<br>để mở khóa kem.'),lvl('TBD')],
     ]);
 
   /* PER GAME: one row per booster */
@@ -1885,14 +1905,13 @@ function view(l){
     [
       [N.bo1,popup('Fire all ammo from one cannon','Xả hết đạn của một pháo'),lvl('TBD'),lvl(3)],
       [N.bo2,popup('Shuffle the whole board','Xáo lại toàn bộ bàn chơi'),lvl('TBD'),lvl(3)],
-      [N.bo3,popup('Call 3 cannons to clear cubes','Gọi 3 pháo dọn khối'),lvl('TBD'),lvl(3)]
+      [N.bo3,popup('Call 3 cannons to defeat ants','Gọi 3 pháo diệt kiến'),lvl('TBD'),lvl(3)]
     ]);
 
   /* PER GAME: every element and booster with its unlock level, sorted by level. Add rows when elements and boosters exist. */
   const stops=[
     [1,t('First tutorial','Hướng dẫn đầu tiên'),'ftue','ftue-steps','FTUE'],
     ['TBD',P.el1,'elem','elements-mechanics'],
-    ['TBD',P.el2,'elem','elements-mechanics'],
     ['TBD',P.el3,'elem','elements-mechanics'],
     ['TBD',P.el4,'elem','elements-mechanics'],
     ['TBD',P.el5,'elem','elements-mechanics'],
@@ -1908,25 +1927,27 @@ function view(l){
 
   /* ===== 3. Object set & animation ===== */
   /* PER GAME */
-  B['game-concept']=`<p>${t(`Glossy jelly cubes in bright colors on a deep purple arena. The player lines them up to load chunky cannons, which blast a grid of target jelly cubes with paint-drop shots. Reference: the level 2 screenshot (sketch at the top of this page).`,
-    `Các khối thạch bóng, màu tươi, trên nền khung đấu tím đậm. Người chơi xếp khối để nạp đạn cho những khẩu pháo to tròn, pháo bắn đạn giọt sơn vào lưới khối thạch mục tiêu phía trên. Tham khảo: ảnh chụp màn 2 (hình minh họa ở đầu trang).`)}</p>`;
+  B['game-concept']=`<p>${t(`Glossy jelly cubes in bright colors on a deep purple arena. The player lines them up to load chunky cannons, which shoot paint drops at a grid of armored ants. Each ant shows its HP; at 0 it swells up and disappears. Reference: the level 2 screenshot (sketch at the top of this page).`,
+    `Các khối thạch bóng, màu tươi, trên nền khung đấu tím đậm. Người chơi xếp khối để nạp đạn cho những khẩu pháo to tròn, pháo bắn giọt sơn vào lưới kiến mặc giáp phía trên. Mỗi kiến có số HP; về 0 thì kiến mập lên rồi biến mất. Tham khảo: ảnh chụp màn 2 (hình minh họa ở đầu trang).`)}</p>`;
 
   const colors=[t('Red','Đỏ'),t('Blue','Xanh dương'),t('Green','Xanh lá'),t('Yellow','Vàng'),t('Pink','Hồng'),t('Orange','Cam'),t('Purple','Tím'),t('Cyan','Xanh ngọc')];
   const anim=n=>t('Animation '+n,'Chuyển động '+n);
   B['core-game-object-concept']=
     ent(t('Color list','Bảng màu'),
-      `<p>${t('Board cubes, target cubes, cannons and shots share this color list.','Khối trên bàn, khối mục tiêu, pháo và đạn dùng chung bảng màu này.')}</p>
+      `<p>${t('Board cubes, ants, cannons and shots share this color list.','Khối trên bàn, kiến, pháo và đạn dùng chung bảng màu này.')}</p>
        <ol class="colors">${colors.map((c,i)=>`<li>${cap(i+1,i+1)}<span><span class="sr">${i+1}: </span>${c}</span></li>`).join('')}</ol>`)+
     ent(nm('Jelly cube','Khối thạch'),params([
-      [anim(1),t('Slide and land: the cube squashes and wobbles when it stops in a cell.','Trượt và dừng: khối bẹp lại rồi rung nhẹ khi dừng vào ô.')],
-      [anim(2),t('Match: the group pulses, then each cube flies up into the cannon of its color.','Ghép nhóm: nhóm phồng lên, rồi từng khối bay vào pháo cùng màu.')]
+      [anim(1),t('Swap: two cubes trade places, then squash and wobble as they land.','Swap: 2 khối đổi chỗ, bẹp lại rồi rung nhẹ khi dừng.')],
+      [anim(2),t('Match: the line pulses, then flies up and becomes a cannon in a free slot.','Match: hàng phồng lên, rồi bay lên thành pháo ở slot trống.')]
     ]),'',demo('jelly'))+
     ent(nm('Cannon','Pháo'),params([
-      [anim(1),t('Ammo in: the counter ticks up and the cannon bounces.','Nạp đạn: số đạn tăng và pháo nảy nhẹ.')],
-      [anim(2),t('Shot: small recoil, a colored drop flies to the target cube.','Bắn: giật nhẹ, một giọt màu bay tới khối mục tiêu.')]
+      [anim(1),t('Spawn: the cannon pops into its slot with its ammo count.','Xuất hiện: pháo bật vào slot, kèm số đạn.')],
+      [anim(2),t('Shot: small recoil, the counter goes down 1, a colored drop flies to the ant.','Bắn: giật nhẹ, số đạn giảm 1, một giọt màu bay tới kiến.')]
     ]),'',demo('cannonIn'))+
-    ent(nm('Target cube','Khối mục tiêu'),params([
-      [anim(1),t('Hit: the cube pops with a paint-splash particle in its color.','Trúng đạn: khối vỡ kèm hạt sơn bắn tung cùng màu.')]
+    ent(nm('Ant','Kiến'),params([
+      [t('Look','Hình ảnh'),t('An ant in armor of its color, facing the red line. Its HP number is on its back.','Kiến mặc giáp cùng màu, quay mặt về vạch đỏ. Số HP nằm trên lưng.')],
+      [anim(1),t('Hit: the ant flinches and its HP goes down 1.','Trúng đạn: kiến khựng lại, HP giảm 1.')],
+      [anim(2),t('HP 0: the ant swells up, then disappears with a paint splash in its color.','HP về 0: kiến mập lên, rồi biến mất kèm vệt sơn cùng màu.')]
     ]),'',demo('pop'))+
     ent(nm('Praise popup','Popup khen'),params([
       [anim(1),t('Great, Amazing, Extreme or Epic pops up over the board, with the ammo gained under it.','Great, Amazing, Extreme hoặc Epic bật lên trên bàn, bên dưới là số đạn nhận được.')]
@@ -1941,10 +1962,6 @@ function view(l){
       [look,t('A glossy chocolate tile with a grid of squares and a drip, over a cube.','Miếng chocolate bóng có rãnh ô vuông và giọt chảy, phủ lên khối.')],
       [an,t('Can\'t swap: it shakes. Break: it cracks into 4 bits that fly off, and the jelly under it pops up.','Không swap được: rung nhẹ. Vỡ: nứt thành 4 mảnh văng ra, khối thạch bên dưới bật lên.')]
     ]))+
-    ent(N.el2,params([
-      [look,t('A target cube with 1–2 cubes peeking out behind it and a number badge.','Khối mục tiêu, phía sau lộ 1–2 khối, kèm huy hiệu số.')],
-      [an,t('Hit: the front cube bounces, a back cube disappears and the number drops by 1.','Trúng đạn: khối trước nảy, 1 khối sau biến mất và con số giảm 1.')]
-    ]))+
     ent(N.el3,params([
       [look,t('A dark filled slot with a padlock and a number.','Slot tô tối, có ổ khóa và con số.')],
       [an,t('Count down: the slot bounces. Open: the padlock pops and the dashed slot shows.','Đếm ngược: slot nảy. Mở: ổ khóa vỡ, hiện slot viền nét đứt.')]
@@ -1954,7 +1971,7 @@ function view(l){
       [an,t('Each move: the badge counts down. At 0: the spout bubbles and chocolate grows over a cube.','Mỗi move: huy hiệu đếm xuống. Về 0: vòi sủi bọt, chocolate mọc phủ lên 1 khối.')]
     ]))+
     ent(N.el5,params([
-      [look,t('Scoops of ice cream in one color over the locked cubes. A spoon of the same color sits on a target cube.','Các viên kem một màu phủ trên khối bị khóa. Muỗng cùng màu nằm trên 1 khối mục tiêu.')],
+      [look,t('Scoops of ice cream in one color over the locked cubes. A spoon of the same color sits on an ant.','Các viên kem một màu phủ trên khối bị khóa. Muỗng cùng màu nằm trên 1 kiến.')],
       [an,t('Tap a locked cube: it shakes. Spoon cube destroyed: the spoon flies to the lock and the ice cream melts away.','Chạm khối bị khóa: rung. Khối có muỗng bị phá: muỗng bay tới khóa, kem tan đi.')]
     ]));
 
@@ -1971,7 +1988,7 @@ function view(l){
     ['BGM In Game','ui',t('Gameplay starts','Bắt đầu vào chơi'),0],
     ['BGM Home','ui',t('The home scene is open','Đang ở màn hình chính'),0],
     ['Win Level','ui',t('The player wins the level','Người chơi thắng màn'),3],
-    ['Lose Level','ui',t('A target cube reaches the bottom','Một khối mục tiêu chạm đáy'),3],
+    ['Lose Level','ui',t('An ant reaches the bottom','Một con kiến chạm đáy'),3],
     ['Tap','ui',t('The player taps the screen','Người chơi chạm vào màn hình'),1],
     ['Coin Reward','ui',t('The player earns coins','Người chơi nhận xu'),0],
     ['Booster Reward','ui',t('The player earns a booster','Người chơi nhận công cụ hỗ trợ'),0],
@@ -1980,9 +1997,9 @@ function view(l){
     ['Praise','core',t('Great, Amazing, Extreme or Epic shows','Hiện Great, Amazing, Extreme hoặc Epic'),2],
     ['Ammo Load','core',t('Cubes reach the cannon and its counter goes up','Khối bay tới pháo và số đạn tăng'),0],
     ['Cannon Shot','core',t('A cannon fires','Pháo bắn'),0],
-    ['Target Cube Pop','core',t('A target cube is destroyed','Một khối mục tiêu bị phá'),1],
+    ['Ant Hit','core',t('A shot hits an ant and its HP drops','Đạn trúng kiến và HP giảm'),0],
+    ['Ant Pop','core',t('An ant at 0 HP swells and disappears','Kiến hết HP mập lên rồi biến mất'),1],
     ['Chocolate Break','el',t('A Chocolate Layer breaks','Lớp chocolate vỡ'),0],
-    ['Stacked Cube Hit','el',t('A shot pops a cube of a stack','Một phát bắn phá 1 khối của chồng'),0],
     ['Slot Unlock','el',t('A locked slot counts down or opens','Slot khóa đếm ngược hoặc mở'),1],
     ['Chocolate Spread','el',t('The fountain makes new chocolate','Vòi tạo chocolate mới'),0],
     ['Ice Cream Unlock','el',t('A spoon removes an ice cream lock','Muỗng gỡ một khóa kem'),1],
@@ -2279,11 +2296,16 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
+      ent(t('Ant theme','Theme kiến'),ul([
+        t(`The target grid is now a grid of armored ants. The number on each ant is its HP; 1 shot = 1 HP. At 0 HP the ant swells up and disappears. HP per ant: TBD.`,`Lưới mục tiêu giờ là lưới kiến mặc giáp. Số trên kiến là HP; 1 phát = 1 HP. Về 0 HP, kiến mập lên rồi biến mất. HP mỗi kiến: TBD.`),
+        t(`Stacked Cube is removed: ant HP already covers it.`,`Bỏ Stacked Cube: HP của kiến đã thay cho element này.`),
+        t(`The hero sketch and all demos draw ants. The 3.2 demos are redrawn: swap to cannon, cannon shots lowering HP, and an ant swelling then disappearing. Added the Ant Hit SFX.`,`Hình đầu trang và mọi demo vẽ kiến. Vẽ lại demo mục 3.2: swap ra pháo, pháo bắn giảm HP, kiến mập lên rồi biến mất. Thêm SFX Ant Hit.`)
+      ]))+
       ent(t('Tutorial popups','Popup hướng dẫn'),ul([
         t(`Element and booster popups rewritten in the Caps Sorting style: elements say action, then result, split at “to”; boosters are one short line.`,`Viết lại popup element và booster theo kiểu Caps Sorting: element nói hành động rồi kết quả, xuống dòng ở “để”; booster là 1 dòng ngắn.`)
       ]))+
       ent(t('Revive','Hồi sinh'),ul([
-        t(`On revive: the target grid is pushed back up, then 3 free Hands fire, then play goes on. Rows pushed: TBD.`,`Khi hồi sinh: lưới mục tiêu bị đẩy lùi lên, rồi dùng 3 Hand miễn phí, rồi chơi tiếp. Số hàng đẩy lùi: TBD.`)
+        t(`On revive: the ant grid is pushed back up, then 3 free Hands fire, then play goes on. Rows pushed: TBD.`,`Khi hồi sinh: lưới mục tiêu bị đẩy lùi lên, rồi dùng 3 Hand miễn phí, rồi chơi tiếp. Số hàng đẩy lùi: TBD.`)
       ]))+
       ent(t('Boosters','Booster'),ul([
         t(`Added 3 boosters: Hand (the fullest cannon fires everything, at any cube of its color), Shuffle (new board with a swap for each bottom-row color), Bomb (3 off-slot cannons with 15 ammo each). Rules, tutorial, look, SFX and a demo for each. Unlock levels: TBD.`,`Thêm 3 booster: Hand (pháo nhiều đạn nhất xả hết, bắn mọi khối cùng màu), Shuffle (bàn mới có nước swap cho từng màu hàng dưới cùng), Bomb (3 pháo ngoài slot, mỗi pháo 15 đạn). Mỗi booster có luật, hướng dẫn, hình ảnh, SFX và minh họa. Màn mở khóa: TBD.`),
@@ -2404,24 +2426,24 @@ function view(l){
   /* PER GAME: one legend row per part of the play-screen sketch (A to E), matching the part-A … part-E groups in fieldSVG */
   const legend=[
     ['A',t('HUD','HUD'),t('Settings on the left, level badge in the middle, Restart on the right.','Cài đặt bên trái, số màn ở giữa, Chơi lại bên phải.')],
-    ['B',t('Target grid','Lưới cube mục tiêu'),t('Target cubes at the top. They slide down together from the first swap. Clear them all before they reach the red line.','Các khối mục tiêu ở phía trên. Cả lưới trượt xuống từ lần swap đầu tiên. Phá hết trước khi chạm vạch đỏ.')],
+    ['B',t('Ant grid','Lưới kiến'),t('Armored ants at the top. The number is HP. They march down together from the first swap. Defeat them all before they reach the red line.','Kiến mặc giáp ở phía trên. Số trên kiến là HP. Cả lưới đi xuống từ lần swap đầu tiên. Diệt hết trước khi chạm vạch đỏ.')],
     ['C',t('Cannon slots','Hàng slot pháo'),t('5 slots. Each match spawns a cannon of its color here, with its ammo count. It fires on its own and disappears when empty.','5 slot. Mỗi match sinh 1 pháo cùng màu vào đây, kèm số đạn. Pháo tự bắn và biến mất khi hết đạn.')],
     ['D',t('Board cubes','Khối trên bàn'),t('Swap two neighbors to make a line of 3 or more of one color.','Đổi chỗ 2 khối cạnh nhau để tạo hàng từ 3 khối cùng màu.')],
-    ['E',t('Red line','Vạch đỏ'),t('The bottom edge of the target area. If a target cube touches it, the level is lost.','Mép dưới khu vực mục tiêu. Khối mục tiêu chạm vạch là thua màn.')]
+    ['E',t('Red line','Vạch đỏ'),t('The bottom edge of the target area. If an ant touches it, the level is lost.','Mép dưới khu vực kiến. Kiến chạm vạch là thua màn.')]
   ];
   const hero=`<div class="hero" id="top" data-sec="top" data-spy="top">
     <div>
       <h1>${GAME}</h1>
       <p class="kind">${ui.sub}</p>
-      <p class="pitch">${t(`Swap jelly cubes to make lines of 3, spawn cannons into the slot row, and let them smash the target grid before it reaches the red line.`,
-                           `Đổi chỗ khối thạch để tạo hàng 3, sinh pháo vào hàng slot, rồi để pháo phá lưới mục tiêu trước khi nó chạm vạch đỏ.`)}</p>
+      <p class="pitch">${t(`Swap jelly cubes to make lines of 3, spawn cannons into the slot row, and let them shoot down the ant grid before it reaches the red line.`,
+                           `Đổi chỗ khối thạch để tạo hàng 3, sinh pháo vào hàng slot, rồi để pháo diệt lưới kiến trước khi nó chạm vạch đỏ.`)}</p>
       <ul class="legend">${legend.map(g=>`<li><button type="button" data-part="${g[0]}" aria-pressed="false"><span class="pinl" data-nosearch>${g[0]}</span><span><b>${g[1]}</b><span class="d">${g[2]}</span></span></button></li>`).join('')}</ul>
     </div>
     <figure class="field${paused?' paused':''}" id="field">
-      <div class="field-box">${fieldSVG(t('Sketch of level 2: a 9-column target grid moving down toward the red line, a row of 5 cannon slots, and a full 7 by 7 board. Two swaps make a red line of 3 and a yellow line of 4; each spawns a cannon that fires at the lowest front cube of its color.','Hình minh họa màn 2: lưới mục tiêu 9 cột đi xuống về phía vạch đỏ, hàng 5 slot pháo, và bàn 7×7 kín khối. Hai lần swap tạo hàng đỏ 3 khối và hàng vàng 4 khối; mỗi hàng sinh 1 pháo bắn khối thấp nhất cùng màu ở đầu hàng.'))}</div>
+      <div class="field-box">${fieldSVG(t('Sketch of level 2: a 9-column ant grid moving down toward the red line, a row of 5 cannon slots, and a full 7 by 7 board. Two swaps make a red line of 3 and a yellow line of 4; each spawns a cannon that fires at the lowest front ant of its color.','Hình minh họa màn 2: lưới kiến 9 cột đi xuống về phía vạch đỏ, hàng 5 slot pháo, và bàn 7×7 kín khối. Hai lần swap tạo hàng đỏ 3 khối và hàng vàng 4 khối; mỗi hàng sinh 1 pháo bắn kiến thấp nhất cùng màu ở đầu hàng.'))}</div>
       <div class="field-foot"><button type="button" class="pause" id="pauseBtn">${paused?ui.play:ui.pause}</button></div>
-      <figcaption>${t(`Level 2, played by the current rules. The blue cannon waits until a blue cube comes to the front. The red cannon (3 ammo) and the yellow one (5 ammo) take the leftmost free slot, hit the lowest front cube first and leave at 0 ammo.`,
-                       `Màn 2, chạy theo luật hiện tại. Pháo xanh chờ đến khi có khối xanh ở đầu hàng. Pháo đỏ (3 đạn) và pháo vàng (5 đạn) vào slot trống bên trái nhất, bắn khối thấp nhất ở đầu hàng trước và biến mất khi hết đạn.`)}</figcaption>
+      <figcaption>${t(`Level 2, played by the current rules. Ants here have 1 HP. The blue cannon waits until a blue ant comes to the front. The red cannon (3 ammo) and the yellow one (5 ammo) take the leftmost free slot, hit the lowest front ant first and leave at 0 ammo.`,
+                       `Màn 2, chạy theo luật hiện tại. Kiến ở đây có 1 HP. Pháo xanh chờ đến khi có kiến xanh ở đầu hàng. Pháo đỏ (3 đạn) và pháo vàng (5 đạn) vào slot trống bên trái nhất, bắn kiến thấp nhất ở đầu hàng trước và biến mất khi hết đạn.`)}</figcaption>
     </figure>
   </div>`;
 
