@@ -1872,20 +1872,20 @@ function view(l){
   B['element-tutorial']=table(t('Element tutorial','Hướng dẫn yếu tố đặc biệt'),
     [t('Element','Yếu tố'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn')],
     [
-      [N.el1,popup('Match beside it to break it!','Match cạnh nó để phá!'),lvl('TBD')],
-      [N.el2,popup('Stacks need more shots!','Khối chồng cần bắn nhiều lần!'),lvl('TBD')],
-      [N.el3,popup('Send cannons to unlock it!','Đưa pháo lên để mở slot!'),lvl('TBD')],
-      [N.el4,popup('It spreads chocolate!','Vòi làm lan chocolate!'),lvl('TBD')],
-      [N.el5,popup('Hit the spoon to unlock!','Bắn muỗng để mở khóa!'),lvl('TBD')],
+      [N.el1,popup('Match next to the chocolate<br>to break it.','Ghép cạnh chocolate<br>để phá vỡ.'),lvl('TBD')],
+      [N.el2,popup('Shoot the stack<br>to clear it cube by cube.','Bắn chồng khối<br>để phá từng khối.'),lvl('TBD')],
+      [N.el3,popup('Send cannons to the slots<br>to unlock the locked one.','Đưa pháo lên các ô<br>để mở khóa ô bị khóa.'),lvl('TBD')],
+      [N.el4,popup('Clear chocolate fast<br>before it spreads.','Phá chocolate thật nhanh<br>trước khi nó lan ra.'),lvl('TBD')],
+      [N.el5,popup('Destroy the cube with the spoon<br>to unlock the ice cream.','Phá khối có muỗng<br>để mở khóa kem.'),lvl('TBD')],
     ]);
 
   /* PER GAME: one row per booster */
   B['booster-tutorial']=table(t('Booster tutorial','Hướng dẫn công cụ hỗ trợ'),
     [t('Booster','Công cụ'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn'),t('Free boosters','Số lượt tặng')],
     [
-      [N.bo1,popup('Fire all ammo now!','Xả hết đạn ngay!'),lvl('TBD'),lvl(3)],
-      [N.bo2,popup('Get a fresh board!','Đổi bàn mới!'),lvl('TBD'),lvl(3)],
-      [N.bo3,popup('3 cannons clear the way!','3 pháo dọn đường!'),lvl('TBD'),lvl(3)]
+      [N.bo1,popup('Fire all ammo from one cannon','Xả hết đạn của một pháo'),lvl('TBD'),lvl(3)],
+      [N.bo2,popup('Shuffle the whole board','Xáo lại toàn bộ bàn chơi'),lvl('TBD'),lvl(3)],
+      [N.bo3,popup('Call 3 cannons to clear cubes','Gọi 3 pháo dọn khối'),lvl('TBD'),lvl(3)]
     ]);
 
   /* PER GAME: every element and booster with its unlock level, sorted by level. Add rows when elements and boosters exist. */
@@ -2280,7 +2280,7 @@ function view(l){
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 16, 2026','16/11/2026'),
       ent(t('Tutorial popups','Popup hướng dẫn'),ul([
-        t(`Element and booster popups shortened to one line each.`,`Rút gọn popup element và booster còn 1 dòng.`)
+        t(`Element and booster popups rewritten in the Caps Sorting style: elements say action, then result, split at “to”; boosters are one short line.`,`Viết lại popup element và booster theo kiểu Caps Sorting: element nói hành động rồi kết quả, xuống dòng ở “để”; booster là 1 dòng ngắn.`)
       ]))+
       ent(t('Revive','Hồi sinh'),ul([
         t(`On revive: the target grid is pushed back up, then 3 free Hands fire, then play goes on. Rows pushed: TBD.`,`Khi hồi sinh: lưới mục tiêu bị đẩy lùi lên, rồi dùng 3 Hand miễn phí, rồi chơi tiếp. Số hàng đẩy lùi: TBD.`)
