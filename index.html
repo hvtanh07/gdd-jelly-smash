@@ -1875,12 +1875,6 @@ function view(l){
       t(`At 0 it opens and works as a normal slot.`,`Về 0 thì slot mở, dùng như slot thường.`),
       t(`New cannons skip locked slots. Number per slot: set per level, TBD.`,`Pháo mới bỏ qua slot khóa. Con số mỗi slot: đặt theo màn, TBD.`)
     ]),unlock('TBD'),demo('lockSlot'))+
-    ent(N.el5,ul([
-      t(`Board. Ice cream locks a group of cubes in a set shape (2×2, L, line…). Locked cubes can't be swapped or matched.`,`Trên bàn. Kem khóa 1 nhóm khối theo hình định sẵn (2×2, chữ L, hàng…). Khối bị khóa không swap, không match được.`),
-      t(`The key is a spoon carried by one ant. Spoon and ice cream share a color.`,`Chìa là cái muỗng do 1 con kiến mang. Muỗng và kem cùng màu.`),
-      t(`Defeat that ant: the spoon flies down and removes the lock. The cubes become normal.`,`Diệt con kiến đó: muỗng bay xuống gỡ khóa. Các khối thành khối thường.`),
-      t(`Locked cubes stay in place; cubes above don't fall through. Shapes per level: TBD.`,`Khối bị khóa đứng yên; khối phía trên không rơi xuyên qua. Hình khóa mỗi màn: TBD.`)
-    ]),unlock('TBD'),demo('iceLock'))+
     ent(N.el6,ul([
       t(`Board. 1 tray takes 2×2 cells and holds 4 bottles, each a different color.`,`Trên bàn. 1 khay chiếm 2×2 ô, chứa 4 lọ, mỗi lọ 1 màu khác nhau.`),
       t(`Can't be swapped or matched. Cubes above don't fall through.`,`Không swap, không match được. Khối phía trên không rơi xuyên qua.`),
@@ -1903,14 +1897,13 @@ function view(l){
       t(`It fires all its ammo at once, at ants of its color, nearest first. 1 shot = 1 HP.`,`Pháo xả hết đạn ngay, bắn kiến cùng màu, gần nhất trước. 1 phát = 1 HP.`),
       t(`It ignores the target rules: any ant of its color, front or not, in view or not.`,`Bỏ qua luật target: kiến cùng màu nào cũng bắn, ở đầu hàng hay không, trong khung hay không.`),
       t(`The cannon then leaves and its slot frees up. Its color runs out first: it leaves with the rest of its ammo.`,`Sau đó pháo biến mất, trả lại slot. Hết kiến màu đó trước: pháo biến mất cùng số đạn còn lại.`),
-      t(`No cannon in the slots: the booster can't be used and is not spent.`,`Không có pháo trong slot: không dùng được, không mất lượt.`),
-      withEl+':'+ul([t(`${P.el5}: defeating the spoon ant unlocks the ice cream.`,`${P.el5}: diệt con kiến mang muỗng thì mở khóa kem.`)])
+      t(`No cannon in the slots: the booster can't be used and is not spent.`,`Không có pháo trong slot: không dùng được, không mất lượt.`)
     ]),unlockB('TBD'),demo('jHand'))+
     ent(N.bo2,ul([
       t(`Clears every cube on the board and fills it with a new board.`,`Xóa hết khối trên bàn và thay bằng bàn mới.`),
       t(`Cleared cubes give no cannon and no ammo.`,`Khối bị xóa không sinh pháo, không cho đạn.`),
       t(`The new board has no ready match. Each color in the bottom row of the ant grid gets a swap that makes a line of 3.`,`Bàn mới không có match sẵn. Mỗi màu ở hàng dưới cùng của lưới kiến có 1 nước swap ra hàng 3.`),
-      withEl+':'+ul([t(`${P.el1}, ${P.el5} and ${P.el6} stay where they are. Only normal cubes are replaced.`,`${P.el1}, ${P.el5} và ${P.el6} giữ nguyên chỗ. Chỉ thay khối thường.`)])
+      withEl+':'+ul([t(`${P.el1} and ${P.el6} stay where they are. Only normal cubes are replaced.`,`${P.el1} và ${P.el6} giữ nguyên chỗ. Chỉ thay khối thường.`)])
     ]),unlockB('TBD'),demo('jShuffle'))+
     ent(N.bo3,ul([
       t(`The game takes 3 colors from the bottom row of the ant grid. Fewer than 3 colors there: the rest come from the next rows up.`,`Game lấy 3 màu từ hàng dưới cùng của lưới kiến. Hàng đó ít hơn 3 màu: lấy thêm từ các hàng phía trên.`),
@@ -1966,7 +1959,6 @@ function view(l){
     [
       [N.el1,popup('Match next to the chocolate<br>to break it.','Ghép cạnh chocolate<br>để phá vỡ.'),lvl('TBD')],
       [N.el3,popup('Send cannons to the slots<br>to unlock the locked one.','Đưa pháo lên các ô<br>để mở khóa ô bị khóa.'),lvl('TBD')],
-      [N.el5,popup('Defeat the spoon ant<br>to unlock the ice cream.','Diệt kiến mang muỗng<br>để mở khóa kem.'),lvl('TBD')],
       [N.el6,popup('Match next to a bottle<br>to break it.','Ghép cạnh lọ<br>để làm vỡ lọ.'),lvl('TBD')],
       [N.el7,popup('Use any cannon<br>to defeat the queen.','Dùng pháo bất kỳ<br>để hạ kiến chúa.'),lvl('TBD')],
     ]);
@@ -1985,7 +1977,6 @@ function view(l){
     [1,t('First tutorial','Hướng dẫn đầu tiên'),'ftue','ftue-steps','FTUE'],
     ['TBD',P.el1,'elem','elements-mechanics'],
     ['TBD',P.el3,'elem','elements-mechanics'],
-    ['TBD',P.el5,'elem','elements-mechanics'],
     ['TBD',P.el6,'elem','elements-mechanics'],
     ['TBD',P.el7,'elem','elements-mechanics'],
     ['TBD',P.bo1,'boost','booster-mechanics'],
@@ -2039,10 +2030,6 @@ function view(l){
       [look,t('A dark filled slot with a padlock and a number.','Slot tô tối, có ổ khóa và con số.')],
       [an,t('Count down: the slot bounces. Open: the padlock pops and the dashed slot shows.','Đếm ngược: slot nảy. Mở: ổ khóa vỡ, hiện slot viền nét đứt.')]
     ]))+
-    ent(N.el5,params([
-      [look,t('Scoops of ice cream in one color over the locked cubes. A spoon of the same color sits on an ant.','Các viên kem một màu phủ trên khối bị khóa. Muỗng cùng màu nằm trên 1 kiến.')],
-      [an,t('Tap a locked cube: it shakes. Spoon ant defeated: the spoon flies to the lock and the ice cream melts away.','Chạm khối bị khóa: rung. Kiến mang muỗng bị diệt: muỗng bay tới khóa, kem tan đi.')]
-    ]))+
     ent(N.el6,params([
       [look,t('An orange tray over 2×2 cells with 4 round jelly bottles in different colors. Each has a cork and a gold ribbon.','Khay cam phủ 2×2 ô, chứa 4 lọ thạch tròn khác màu. Mỗi lọ có nút bần và dải ruy băng vàng.')],
       [an,t('Break: the bottle shakes, shatters into glass bits of its color, and +5 floats up. All 4 broken: the tray pops away.','Vỡ: lọ rung, vỡ thành mảnh thủy tinh cùng màu, chữ +5 bay lên. Vỡ hết 4 lọ: khay bật mất.')]
@@ -2078,7 +2065,6 @@ function view(l){
     ['Ant Pop','core',t('An ant at 0 HP swells and disappears','Kiến hết HP mập lên rồi biến mất'),1],
     ['Chocolate Break','el',t('A Chocolate Layer breaks','Lớp chocolate vỡ'),0],
     ['Slot Unlock','el',t('A locked slot counts down or opens','Slot khóa đếm ngược hoặc mở'),1],
-    ['Ice Cream Unlock','el',t('A spoon removes an ice cream lock','Muỗng gỡ một khóa kem'),1],
     ['Queen Pop','el',t('The Queen Ant reaches 0 HP and disappears','Kiến chúa hết HP và biến mất'),2],
     ['Bottle Break','el',t('A Jelly Bottle breaks and gives +5 ammo','Lọ thạch vỡ và cho +5 đạn'),1],
     ['Hand','bo',t('The chosen cannon fires all its ammo','Pháo được chọn xả hết đạn'),2],
@@ -2327,7 +2313,7 @@ function view(l){
       panel(t('Mission: collect jelly','Nhiệm vụ: thu thập thạch'),ul([
         t(`Each event has 1 target color. The color rotates between events: red → blue → purple → yellow.`,`Mỗi sự kiện có 1 màu mục tiêu. Màu đổi theo từng sự kiện: đỏ → xanh → tím → vàng.`),
         t(`Every cube of the target color the player matches on the board counts as 1 jelly.`,`Mỗi khối màu mục tiêu người chơi ghép trên bàn tính là 1 thạch.`),
-        t(`Cubes freed from a Chocolate Layer or an Ice Cream Lock count when they are matched.`,`Khối thoát khỏi Lớp chocolate hoặc Khóa kem được tính khi được match.`)+' '+inf,
+        t(`Cubes freed from a Chocolate Layer count when they are matched.`,`Khối thoát khỏi Lớp chocolate được tính khi được match.`)+' '+inf,
         t(`In the level, each matched target cube flies a small jelly icon to a counter under the HUD.`,`Trong màn, mỗi khối mục tiêu được ghép bay một biểu tượng thạch nhỏ tới bộ đếm dưới HUD.`),
         t(`Jelly is only added to the event when the level is won. Lose or quit: the jelly from that attempt is lost.`,`Thạch chỉ được cộng vào sự kiện khi thắng màn. Thua hoặc thoát: mất số thạch của lượt đó.`)
       ]))+
@@ -2374,6 +2360,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Ice Cream Lock','Khóa kem'),ul([
+        t(`Removed the element Ice Cream Lock: rules, tutorial, look, SFX and demo. Hand, Shuffle and the live-ops event no longer mention it.`,`Bỏ element Khóa kem: luật, hướng dẫn, hình ảnh, SFX và demo. Hand, Shuffle và sự kiện live ops không còn nhắc tới nó.`)
+      ]))+
       ent(t('Tutorial popups','Popup hướng dẫn'),ul([
         t(`Element popups for Ice Cream Lock, Jelly Bottle and Queen Ant cut to the Caps Sorting length: 3–5 words, then “to” + the result.`,`Rút gọn popup của Khóa kem, Lọ thạch và Kiến chúa theo độ dài Caps Sorting: 3–5 chữ, rồi “để” + kết quả.`)
       ]))
