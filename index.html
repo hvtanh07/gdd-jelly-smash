@@ -2168,7 +2168,7 @@ function view(l){
       ['leaderboard_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['leaderboard_group_size',t('Players per group','Số người mỗi nhóm'),'50',t('players','người')],
       ['leaderboard_reward_coins',t('Coins for rank 1, 2, 3, 4–10, 11–20, 21–50','Xu cho hạng 1, 2, 3, 4–10, 11–20, 21–50'),'1500, 1000, 600, 300, 150, 50',coins],
-      ['leaderboard_reward_boosters',t('Boosters for rank 1, 2, 3','Booster cho hạng 1, 2, 3'),'Shuffle+Hand+Bomb, Shuffle+Hand, Shuffle',t('list','danh sách')]
+      ['leaderboard_reward_boosters',t('Boosters of each type (Shuffle, Hand, Bomb) for rank 1, 2, 3','Số booster mỗi loại (Shuffle, Hand, Bomb) cho hạng 1, 2, 3'),'5, 3, 1',t('each','mỗi loại')]
     ]);
 
   /* ===== 6. IAP & offers ===== */
@@ -2326,9 +2326,9 @@ function view(l){
         ]))+
       panel(t('Rewards by rank at round end','Phần thưởng theo hạng khi hết vòng'),
         table(t('Leaderboard rewards','Phần thưởng Bảng xếp hạng'),[t('Rank','Hạng'),t('Coins','Xu'),t('Boosters','Booster')],[
-          ['1','1,500',t('1 Shuffle + 1 Hand + 1 Bomb','1 Shuffle + 1 Hand + 1 Bomb')],
-          ['2','1,000',t('1 Shuffle + 1 Hand','1 Shuffle + 1 Hand')],
-          ['3','600',t('1 Shuffle','1 Shuffle')],
+          ['1','1,500',t('5 Shuffle + 5 Hand + 5 Bomb','5 Shuffle + 5 Hand + 5 Bomb')],
+          ['2','1,000',t('3 Shuffle + 3 Hand + 3 Bomb','3 Shuffle + 3 Hand + 3 Bomb')],
+          ['3','600',t('1 Shuffle + 1 Hand + 1 Bomb','1 Shuffle + 1 Hand + 1 Bomb')],
           ['4–10','300',dash],
           ['11–20','150',dash],
           ['21–50','50',dash]
@@ -2337,7 +2337,7 @@ function view(l){
           t(`When the x-day timer ends, the ranking is locked. The next time the player opens the game, a result popup shows their final rank and gives the reward.`,`Khi hết x ngày, bảng xếp hạng được chốt. Lần mở game tiếp theo, popup kết quả hiện hạng cuối cùng và trao phần thưởng.`),
           t(`A player with 0 points in the round gets no reward.`,`Người chơi có 0 điểm trong vòng thì không nhận thưởng.`)+' '+inf,
           t(`Ties: the player who reached the score first ranks higher.`,`Bằng điểm: ai đạt số điểm đó trước thì xếp trên.`)+' '+inf,
-          t(`How the amounts were set: a level win gives 40 coins and one booster costs 300–500 coins (5). Ranks 21–50 get about 1 level win. Rank 1 gets coins for 1 revive (900) and more, plus one of each booster.`,`Cách đặt số: thắng 1 màn được 40 xu, 1 booster giá 300–500 xu (mục 5). Hạng 21–50 nhận khoảng bằng 1 màn thắng. Hạng 1 nhận đủ xu cho hơn 1 lần hồi sinh (900), kèm mỗi loại booster 1 cái.`)
+          t(`How the amounts were set: a level win gives 40 coins and one booster costs 300–500 coins (5). Ranks 21–50 get about 1 level win. Ranks 1–3 get every booster type: 5, 3 and 1 of each.`,`Cách đặt số: thắng 1 màn được 40 xu, 1 booster giá 300–500 xu (mục 5). Hạng 21–50 nhận khoảng bằng 1 màn thắng. Hạng 1–3 nhận đủ các loại booster: mỗi loại 5, 3 và 1 cái.`)
         ]))+
       panel(t('Screens','Màn hình'),ul([
         t(`<b>Home icon:</b> a podium with the round countdown, the current streak multiplier and a red badge. Tap to open the board.`,`<b>Biểu tượng ở màn hình chính:</b> bục xếp hạng kèm đồng hồ đếm ngược của vòng, hệ số streak hiện tại và chấm đỏ. Chạm để mở bảng.`),
@@ -2406,6 +2406,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Leaderboard boosters','Booster của Bảng xếp hạng'),ul([
+        t(`Bigger booster rewards for the top 3: rank 1 gets 5 of each booster, rank 2 gets 3 of each, rank 3 gets 1 of each.`,`Tăng thưởng booster cho top 3: hạng 1 nhận mỗi loại 5 cái, hạng 2 mỗi loại 3 cái, hạng 3 mỗi loại 1 cái.`)
+      ]))+
       ent(t('Leaderboard rewards','Phần thưởng Bảng xếp hạng'),ul([
         t(`Leaderboard (7.4): stars and leagues removed. The mechanic stays as in the brief.`,`Bảng xếp hạng (mục 7.4): bỏ phần sao và giải đấu. Cơ chế giữ đơn giản như brief.`),
         t(`Group size set to 50 players.`,`Chốt mỗi nhóm 50 người chơi.`),
