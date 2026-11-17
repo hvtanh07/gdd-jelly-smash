@@ -1079,6 +1079,38 @@ const DEMOS={
         ['.cn0,.cn1,.cn2','transform',[[3.2,T(0,-32),'ease-in'],[3.5,T(0,0)]]]];
       [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b],k)=>tr.push([`.cbit${k}`,'opacity',[[0,0],[2.5,0],[2.55,1],[2.95,0]]],[`.cbit${k}`,'transform',[[2.5,T(0,0)],[2.95,T(a*20,b*20+10)]]]));
       return tr;}},
+  chocoL:{D:5.6, /* a 3-layer Chocolate Layer: each match next to it removes 1 layer; the 3rd match breaks it and shows the jelly */
+    svg:()=>{
+      const ST='transform-box:fill-box;transform-origin:center',bx=i=>22+32*i,by=j=>44+32*j;
+      const G=[[2,4,3,1,2],[3,1,9,2,4],[1,3,2,4,3],[3,2,0,4,1]];
+      let o=arena()+dpanel(16,38,168,138);
+      G.forEach((row,j)=>row.forEach((c,i)=>{if(c===9||(j===0||j===2)&&i>=1&&i<=3)return;o+=dj(bx(i),by(j),30,c,true);}));
+      const L=[[0,0,[5,5,5],1],[1,2,[3,1,4],0],[2,0,[3,0,1],0]];
+      L.forEach(([k,j,nw,c])=>{[1,2,3].forEach(i=>{
+        if(k===0||k===1)o+=`<g class="l${k}${i}" style="${ST}">${dj(bx(i),by(j),30,c,true)}</g>`;
+        o+=`<g class="n${k}${i}" style="opacity:0;${ST}">${dj(bx(i),by(j),30,nw[i-1],true)}</g>`;});});
+      o+=`<g class="jv" style="opacity:0;${ST}">${dj(bx(2),by(1),30,4,true)}</g>`;
+      o+=`<g class="ch" style="${ST}">${dchoc(bx(2),by(1),30)}<circle cx="${bx(2)+28}" cy="${by(1)+2}" r="8" fill="#fff" stroke="#4a2616" stroke-width="1.5"/>`+
+        ['3','2','1'].map((v,i)=>`<text class="cv${i}" x="${bx(2)+28}" y="${by(1)+2}" dy=".35em" text-anchor="middle" fill="#4a2616" style="${DFONT};font-size:10px${i?';opacity:0':''}">${v}</text>`).join('')+`</g>`;
+      o+=[0,1,2].map(m=>[[-1,-1],[1,-1],[-1,1],[1,1]].map(([a,b],k)=>`<rect class="b${m}${k}" x="${bx(2)+11}" y="${by(1)+11}" width="7" height="7" rx="2" fill="#7a4428" style="opacity:0"/>`).join('')).join('');
+      return o+dpill('cp',100,20,104,'3 layers left','#3a2456','#fff');},
+    tracks:()=>{
+      const P=[.6,2.0,3.4],tr=[['.cp','opacity',[[0,0],[.1,0],[.2,1],[.5,1],[.6,0]]]],sh=[[0,T(0,0,1)]];
+      /* match k: the line pulses and pops, a layer cracks off, new cubes drop in */
+      [0,1,2].forEach(k=>{const p=P[k],src=k===2?0:k;
+        [1,2,3].forEach(i=>{
+          const old=k===2?`.n0${i}`:`.l${k}${i}`;
+          tr.push([old,'transform',(k===2?[[0,'scale(0)'],[P[0]+.6,'scale(0)'],[P[0]+.8,'scale(1)']]:[[0,'scale(1)']]).concat([[p,'scale(1)'],[p+.14,'scale(1.13)'],[p+.28,'scale(1)'],[p+.42,'scale(1.13)'],[p+.6,'scale(0)']])],
+            [old,'opacity',(k===2?[[0,0],[P[0]+.6,0],[P[0]+.62,1]]:[[0,1]]).concat([[p+.55,1],[p+.6,0]])]);
+          tr.push([`.n${k}${i}`,'opacity',[[0,0],[p+.6,0],[p+.62,1]].concat(k===0?[[P[2]+.55,1],[P[2]+.6,0]]:[])],
+            [`.n${k}${i}`,'transform',[[p+.6,T(0,-14,0)],[p+.8,T(0,0,1)]]]);});
+        sh.push([p+.6,T(0,0,1)],[p+.66,T(-3,0,1)],[p+.72,T(3,0,1)],[p+.78,T(0,0,1)]);
+        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b],q)=>tr.push([`.b${k}${q}`,'opacity',[[0,0],[p+.6,0],[p+.63,1],[p+1.05,0]]],[`.b${k}${q}`,'transform',[[p+.6,T(0,0)],[p+1.05,T(a*20,b*20+10)]]]));});
+      const keep=tr;
+      keep.push(['.cv0','opacity',[[0,1],[P[0]+.6,1],[P[0]+.62,0]]],['.cv1','opacity',[[0,0],[P[0]+.6,0],[P[0]+.62,1],[P[1]+.6,1],[P[1]+.62,0]]],['.cv2','opacity',[[0,0],[P[1]+.6,0],[P[1]+.62,1]]],
+        ['.ch','transform',sh],['.ch','opacity',[[0,1],[P[2]+.6,1],[P[2]+.65,0]]],
+        ['.jv','opacity',[[0,0],[P[2]+.62,0],[P[2]+.66,1]]],['.jv','transform',[[P[2]+.62,'scale(.8)'],[P[2]+.82,'scale(1.1)'],[P[2]+.97,'scale(1)']]]);
+      return keep;}},
   stack3:{D:5.0, /* a stack of 3 takes 3 shots; a group of 4 gives 5 ammo, so 2 are left for other cubes */
     svg:()=>{
       const x=i=>30+30*i,y=j=>28+26*j,S=24;
@@ -1633,6 +1665,7 @@ function view(l){
     jHand:t('Tap Hand: the blue cannon has the most ammo (5). It fires all 5 at once, nearest first, including ants behind others and one above the view. Then its slot frees up.','Chạm Hand: pháo xanh nhiều đạn nhất (5). Pháo xả cả 5 phát, gần nhất trước, kể cả kiến nằm sau và con ở trên khung. Rồi slot được trả lại.'),
     jShuffle:t('Tap Shuffle: the board clears and a new one drops in. It has a swap ready for red, blue and yellow, the bottom-row colors.','Chạm Shuffle: bàn được xóa và bàn mới rơi vào. Bàn mới có sẵn nước swap cho đỏ, xanh và vàng, các màu ở hàng dưới cùng.'),
     jBomb:t('Bomb: 3 cannons of the bottom-row colors appear outside the slots, 15 ammo each. Each color has only 4 ants with 1 HP, so they defeat them and leave with 11 ammo unused.','Bomb: 3 pháo màu hàng dưới cùng xuất hiện ngoài slot, mỗi pháo 15 đạn. Mỗi màu chỉ có 4 con kiến 1 HP, nên pháo diệt hết rồi biến mất, dư 11 đạn.'),
+    chocoL:t('This chocolate has 3 layers. An orange line above it removes 1 layer and a red line below removes 1 more. The purple line above makes the 3rd match: the chocolate breaks and shows a blue jelly.','Miếng chocolate này có 3 lớp. Hàng cam phía trên phá 1 lớp, hàng đỏ phía dưới phá thêm 1 lớp. Hàng tím phía trên là match thứ 3: chocolate vỡ hẳn, lộ khối thạch xanh.'),
     choco:t('Tap the chocolate: it shakes, it can\'t be swapped. A swap makes a red line next to it: the chocolate breaks and shows a blue jelly, then the column refills.','Chạm chocolate: nó rung, không swap được. Một swap tạo hàng đỏ cạnh nó: chocolate vỡ, lộ khối thạch xanh, rồi cột được refill.'),
     stack3:t('A group of 4 gave this cannon 5 ammo. The stack of 3 takes 3 shots, so only 2 are left for the other blue cubes.','Nhóm 4 khối cho pháo này 5 đạn. Chồng 3 khối tốn 3 phát, nên chỉ còn 2 đạn cho các khối xanh khác.'),
     lockSlot:t('Two slots are locked (2 and 3). Each cannon sent to a slot counts both down. The first opens after 2 cannons and gets the next one; the second opens after 3.','2 slot bị khóa (2 và 3). Mỗi pháo vào slot làm cả 2 giảm. Slot đầu mở sau 2 pháo và nhận pháo kế tiếp; slot sau mở sau 3 pháo.'),
@@ -1865,10 +1898,12 @@ function view(l){
   B['elements-mechanics']=
     ent(N.el1,ul([
       t(`Board. Covers one jelly cube and hides its color.`,`Trên bàn. Phủ 1 khối thạch và che màu của nó.`),
+      t(`Up to 3 layers. The number on it shows the layers left. Layers per cell: set per level, TBD.`,`Tối đa 3 lớp. Số trên miếng chocolate là số lớp còn lại. Số lớp mỗi ô: đặt theo màn, TBD.`),
       t(`Can't be swapped and has no color, so it can't match.`,`Không swap được, không có màu nên không match được.`),
-      t(`A match next to it (up, down, left, right) breaks it. The jelly under it becomes a normal cube.`,`Match cạnh nó (trên, dưới, trái, phải) làm nó vỡ. Khối thạch bên dưới thành khối thường.`),
+      t(`Each match next to it (up, down, left, right) removes 1 layer. 3 layers = 3 matches.`,`Mỗi match cạnh nó (trên, dưới, trái, phải) phá 1 lớp. 3 lớp = 3 lần match.`),
+      t(`Last layer gone: the cell opens. The jelly under it becomes a normal cube.`,`Hết lớp cuối: ô được mở. Khối thạch bên dưới thành khối thường.`),
       t(`It stays in its cell; cubes above don't fall through it.`,`Đứng yên tại ô; khối phía trên không rơi xuyên qua.`)
-    ]),unlock('TBD'),demo('choco'))+
+    ]),unlock('TBD'),demo('chocoL'))+
     ent(N.el3,ul([
       t(`Slot row. A slot with a padlock and a number.`,`Trên hàng slot. Slot có ổ khóa và 1 con số.`),
       t(`Each cannon that enters a slot counts every locked slot down by 1. Lost cannons don't count.`,`Mỗi pháo vào slot làm mọi slot khóa giảm 1. Pháo bị mất không tính.`),
@@ -2023,8 +2058,8 @@ function view(l){
   const an=t('Animation','Chuyển động'),look=t('Look','Hình ảnh');
   B['element-object-concept']=
     ent(N.el1,params([
-      [look,t('A glossy chocolate tile with a grid of squares and a drip, over a cube.','Miếng chocolate bóng có rãnh ô vuông và giọt chảy, phủ lên khối.')],
-      [an,t('Can\'t swap: it shakes. Break: it cracks into 4 bits that fly off, and the jelly under it pops up.','Không swap được: rung nhẹ. Vỡ: nứt thành 4 mảnh văng ra, khối thạch bên dưới bật lên.')]
+      [look,t('A glossy chocolate tile with a grid of squares and a drip, over a cube. A white badge shows the layers left (1–3).','Miếng chocolate bóng có rãnh ô vuông và giọt chảy, phủ lên khối. Huy hiệu trắng hiện số lớp còn lại (1–3).')],
+      [an,t('Can\'t swap: it shakes. Lose a layer: it shakes, bits fly off and the badge counts down. Last layer: it breaks and the jelly under it pops up.','Không swap được: rung nhẹ. Mất 1 lớp: rung, mảnh vụn văng ra, huy hiệu giảm 1. Lớp cuối: vỡ hẳn, khối thạch bên dưới bật lên.')]
     ]))+
     ent(N.el3,params([
       [look,t('A dark filled slot with a padlock and a number.','Slot tô tối, có ổ khóa và con số.')],
@@ -2360,6 +2395,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Chocolate Layer','Lớp chocolate'),ul([
+        t(`Chocolate Layer now has up to 3 layers. Each match next to it removes 1; the cell opens when the last one breaks. A badge shows the layers left. New demo. Layers per cell: TBD.`,`Lớp chocolate giờ có tối đa 3 lớp. Mỗi match cạnh nó phá 1 lớp; hết lớp cuối thì ô mở. Huy hiệu hiện số lớp còn lại. Có demo mới. Số lớp mỗi ô: TBD.`)
+      ]))+
       ent(t('Ice Cream Lock','Khóa kem'),ul([
         t(`Removed the element Ice Cream Lock: rules, tutorial, look, SFX and demo. Hand, Shuffle and the live-ops event no longer mention it.`,`Bỏ element Khóa kem: luật, hướng dẫn, hình ảnh, SFX và demo. Hand, Shuffle và sự kiện live ops không còn nhắc tới nó.`)
       ]))+
