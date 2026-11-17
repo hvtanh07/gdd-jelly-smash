@@ -1966,9 +1966,9 @@ function view(l){
     [
       [N.el1,popup('Match next to the chocolate<br>to break it.','Ghép cạnh chocolate<br>để phá vỡ.'),lvl('TBD')],
       [N.el3,popup('Send cannons to the slots<br>to unlock the locked one.','Đưa pháo lên các ô<br>để mở khóa ô bị khóa.'),lvl('TBD')],
-      [N.el5,popup('Defeat the ant with the spoon<br>to unlock the ice cream.','Diệt kiến mang muỗng<br>để mở khóa kem.'),lvl('TBD')],
-      [N.el6,popup('Match next to a same-color bottle<br>to break it for +5 ammo.','Ghép cạnh lọ cùng màu<br>để làm vỡ và được +5 đạn.'),lvl('TBD')],
-      [N.el7,popup('Hit the queen with any cannon<br>to defeat her.','Bắn kiến chúa bằng pháo bất kỳ<br>để hạ kiến chúa.'),lvl('TBD')],
+      [N.el5,popup('Defeat the spoon ant<br>to unlock the ice cream.','Diệt kiến mang muỗng<br>để mở khóa kem.'),lvl('TBD')],
+      [N.el6,popup('Match next to a bottle<br>to break it.','Ghép cạnh lọ<br>để làm vỡ lọ.'),lvl('TBD')],
+      [N.el7,popup('Use any cannon<br>to defeat the queen.','Dùng pháo bất kỳ<br>để hạ kiến chúa.'),lvl('TBD')],
     ]);
 
   /* PER GAME: one row per booster */
@@ -2373,6 +2373,11 @@ function view(l){
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
+    day(t('November 17, 2026','17/11/2026'),
+      ent(t('Tutorial popups','Popup hướng dẫn'),ul([
+        t(`Element popups for Ice Cream Lock, Jelly Bottle and Queen Ant cut to the Caps Sorting length: 3–5 words, then “to” + the result.`,`Rút gọn popup của Khóa kem, Lọ thạch và Kiến chúa theo độ dài Caps Sorting: 3–5 chữ, rồi “để” + kết quả.`)
+      ]))
+    )+
     day(t('November 16, 2026','16/11/2026'),
       ent(t('Chocolate Fountain','Vòi chocolate'),ul([
         t(`Removed the element Chocolate Fountain: rules, tutorial, look, SFX and demo.`,`Bỏ element Vòi chocolate: luật, hướng dẫn, hình ảnh, SFX và demo.`)
