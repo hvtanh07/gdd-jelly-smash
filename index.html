@@ -2214,8 +2214,9 @@ function view(l){
       ['jelly_machine_milestones',t('Jelly needed for each milestone','Số thạch cần cho từng mốc'),'10, 15, 20, 25, 30, 40, 45, 50, 50, 55, 65, 70, 70, 75, 80, 85, 90, 90, 90, 95',t('jelly','thạch')]
     ])+
     rc(t('Leaderboard','Bảng xếp hạng'),[
-      ['leaderboard_round_days',t('Length of one round (x)','Độ dài một vòng (x)'),'TBD',t('days','ngày')],
-      ['leaderboard_points_per_win',t('Base points for winning a level','Điểm cơ bản khi thắng 1 màn'),'1',t('points','điểm')],
+      ['leaderboard_unlock_level',t('Unlocks on Level Complete of this level','Mở ở Level Complete của màn này'),'10',t('level','màn')],
+      ['leaderboard_round_days',t('Length of one round','Độ dài một vòng'),'7',t('days','ngày')],
+      ['leaderboard_candies_per_level',t('Candies on the board per level','Số kẹo trên bàn mỗi màn'),'TBD',t('candies','kẹo')],
       ['leaderboard_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['leaderboard_group_size',t('Players per group','Số người mỗi nhóm'),'50',t('players','người')],
       ['leaderboard_reward_coins',t('Coins for rank 1, 2, 3, 4–10, 11–20, 21–50','Xu cho hạng 1, 2, 3, 4–10, 11–20, 21–50'),'1500, 1000, 600, 300, 150, 50',coins],
@@ -2354,26 +2355,36 @@ function view(l){
   const CE=nm('Jelly Machine','Jelly Machine');
   B['leaderboard']=
     sys(nm('Leaderboard','Bảng xếp hạng'),
-      lead(t(`A ranking against a group of 50 players, in rounds of x days. Win a level to score points. Win in a row to score more, up to ×5. When the round ends, the final ranks decide the rewards. Benchmark: Meowdoku.`,
-        `Bảng xếp hạng đấu trong nhóm 50 người chơi, theo vòng x ngày. Thắng 1 màn là được cộng điểm. Thắng liên tiếp được nhiều điểm hơn, tối đa ×5. Hết vòng, thứ hạng cuối cùng quyết định phần thưởng. Tham khảo: Meowdoku.`))+
-      tiles([[t('x days','x ngày'),t('One round (TBD)','Một vòng (TBD)')],['×5',t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['50',t('Players per group','Số người mỗi nhóm')],[t('TBD','TBD'),t('Unlocks','Mở khóa')]])+
-      panel(t('Scoring and the board','Tính điểm và bảng'),ul([
-        t(`Winning a main level adds points to the player's score this round: points = base points × streak multiplier. Base points per win: 1.`,`Thắng 1 màn chính được cộng điểm cho vòng này: điểm = điểm cơ bản × hệ số streak. Điểm cơ bản mỗi màn thắng: 1.`)+' '+inf,
-        t(`Losing or quitting a level gives no points and takes none away.`,`Thua hoặc thoát màn không được điểm và không bị trừ điểm.`),
+      lead(t(`A 7-day ranking against a group of 50 players. Candies appear on the board and are matched like jelly cubes. At the end of a level, candies matched × the streak multiplier are added to the score. When the 7 days end, the final ranks decide the rewards. Benchmark: Meowdoku.`,
+        `Bảng xếp hạng 7 ngày, đấu trong nhóm 50 người chơi. Kẹo xuất hiện trên bàn và được match như khối thạch thường. Cuối màn, số kẹo đã match × hệ số streak được cộng vào điểm. Hết 7 ngày, thứ hạng cuối cùng quyết định phần thưởng. Tham khảo: Meowdoku.`))+
+      tiles([[t('7 days','7 ngày'),t('One round','Một vòng')],['×5',t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['50',t('Players per group','Số người mỗi nhóm')],[t('Level 10','Màn 10'),t('Unlocks on Level Complete','Mở ở Level Complete')]])+
+      panel(t('Unlock','Mở khóa'),ul([
+        t(`The leaderboard unlocks on the Level Complete screen of level 10.`,`Bảng xếp hạng mở ở màn hình Level Complete của màn 10.`),
+        t(`Candies appear on the board only after the leaderboard is unlocked.`,`Kẹo chỉ xuất hiện trên bàn sau khi đã mở Bảng xếp hạng.`)
+      ]))+
+      panel(t('Candy and score','Kẹo và điểm'),ul([
+        t(`Some board cubes carry a candy. A candy is matched like a normal jelly cube of its color. Each candy matched counts as 1.`,`Một số khối trên bàn mang kẹo. Kẹo được match như khối thạch thường cùng màu. Mỗi viên kẹo được match tính là 1.`)+' '+inf,
+        t(`In the level, a counter under the HUD shows the candies matched.`,`Trong màn, bộ đếm dưới HUD hiện số kẹo đã match.`),
+        t(`At the end of the level: score added = candies matched × the leaderboard streak multiplier.`,`Cuối màn: điểm cộng thêm = số kẹo đã match × hệ số streak của Bảng xếp hạng.`),
+        t(`Example: 12 candies at ×3 = 36 points.`,`Ví dụ: 12 kẹo ở ×3 = 36 điểm.`),
+        t(`Candies count only on a win. Lose or quit: the candies of that attempt are lost.`,`Kẹo chỉ được tính khi thắng. Thua hoặc thoát: mất số kẹo của lượt đó.`)+' '+inf,
+        t(`Candies per level: TBD (remote config).`,`Số kẹo mỗi màn: TBD (cấu hình từ xa).`)
+      ]))+
+      panel(t('The board','Bảng xếp hạng'),ul([
         t(`Each group has 50 players. The board lists them by score, highest first.`,`Mỗi nhóm có 50 người chơi. Bảng xếp theo điểm, cao nhất ở trên.`),
         t(`Each row: rank, avatar, name, score, and the reward of that rank.`,`Mỗi dòng: hạng, avatar, tên, điểm, và phần thưởng của hạng đó.`),
-        t(`The player's own row is highlighted and stays in view.`,`Dòng của người chơi được làm nổi bật và luôn hiện trên màn hình.`)+' '+inf
+        t(`The player's own row is highlighted and stays in view.`,`Dòng của người chơi được làm nổi bật và luôn hiện trên màn hình.`),
+        t(`Ties: the player who reached the score first ranks higher.`,`Bằng điểm: ai đạt số điểm đó trước thì xếp trên.`)
       ]))+
       panel(t('Streak multiplier','Hệ số streak'),
-        table(t('Leaderboard streak multiplier','Hệ số streak của Bảng xếp hạng'),[t('Wins in a row','Số màn thắng liên tiếp'),t('Multiplier','Hệ số'),t('Points for that win','Điểm của màn thắng đó')],[
-          ['1','×1','1'],['2','×2','2'],['3','×3','3'],['4','×4','4'],[t('5 or more','Từ 5 trở lên'),'×5 (max)','5']
+        table(t('Leaderboard streak multiplier','Hệ số streak của Bảng xếp hạng'),[t('Wins in a row','Số màn thắng liên tiếp'),t('Multiplier','Hệ số')],[
+          ['1','×1'],['2','×2'],['3','×3'],['4','×4'],[t('5 or more','Từ 5 trở lên'),'×5 (max)']
         ],'compact')+
         ul([
-          t(`Example: 6 wins in a row give 1 + 2 + 3 + 4 + 5 + 5 = 20 points. 6 wins with a loss after each give 6 points.`,`Ví dụ: thắng 6 màn liên tiếp được 1 + 2 + 3 + 4 + 5 + 5 = 20 điểm. Thắng 6 màn nhưng xen kẽ thua thì chỉ được 6 điểm.`),
           t(`A loss or quitting the level resets the streak to ×1. A revive does not break it.`,`Thua hoặc thoát màn đưa streak về ×1. Hồi sinh không làm mất streak.`),
           t(`The current multiplier shows on the home icon and on the level start popup.`,`Hệ số hiện tại hiện trên biểu tượng ở màn hình chính và trên popup bắt đầu màn.`),
           t(`The streak resets when a new round starts.`,`Streak tính lại khi bắt đầu vòng mới.`),
-          t(`This streak is the same one the Jelly Machine event uses (7.3): one win streak, two events.`,`Streak này dùng chung với sự kiện Jelly Machine (mục 7.3): một chuỗi thắng, hai sự kiện.`)+' '+inf
+          t(`This streak is separate from the Jelly Machine streak (7.3). Each feature counts its own.`,`Streak này tách riêng với streak của Jelly Machine (mục 7.3). Mỗi tính năng tự đếm streak của mình.`)
         ]))+
       panel(t('Rewards by rank at round end','Phần thưởng theo hạng khi hết vòng'),
         table(t('Leaderboard rewards','Phần thưởng Bảng xếp hạng'),[t('Rank','Hạng'),t('Coins','Xu'),t('Boosters','Booster')],[
@@ -2385,38 +2396,37 @@ function view(l){
           ['21–50','50',dash]
         ],'compact')+
         ul([
-          t(`When the x-day timer ends, the ranking is locked. The next time the player opens the game, a result popup shows their final rank and gives the reward.`,`Khi hết x ngày, bảng xếp hạng được chốt. Lần mở game tiếp theo, popup kết quả hiện hạng cuối cùng và trao phần thưởng.`),
-          t(`A player with 0 points in the round gets no reward.`,`Người chơi có 0 điểm trong vòng thì không nhận thưởng.`)+' '+inf,
-          t(`Ties: the player who reached the score first ranks higher.`,`Bằng điểm: ai đạt số điểm đó trước thì xếp trên.`)+' '+inf,
+          t(`When the 7-day timer ends, the ranking is locked. The next time the player opens the game, a result popup shows their final rank and gives the reward.`,`Khi hết 7 ngày, bảng xếp hạng được chốt. Lần mở game tiếp theo, popup kết quả hiện hạng cuối cùng và trao phần thưởng.`),
+          t(`A player with 0 points in the round gets no reward.`,`Người chơi có 0 điểm trong vòng thì không nhận thưởng.`),
           t(`How the amounts were set: a level win gives 40 coins and one booster costs 300–500 coins (5). Ranks 21–50 get about 1 level win. Ranks 1–3 get every booster type: 5, 3 and 1 of each.`,`Cách đặt số: thắng 1 màn được 40 xu, 1 booster giá 300–500 xu (mục 5). Hạng 21–50 nhận khoảng bằng 1 màn thắng. Hạng 1–3 nhận đủ các loại booster: mỗi loại 5, 3 và 1 cái.`)
         ]))+
       panel(t('Screens','Màn hình'),ul([
         t(`<b>Home icon:</b> a podium with the round countdown, the current streak multiplier and a red badge. Tap to open the board.`,`<b>Biểu tượng ở màn hình chính:</b> bục xếp hạng kèm đồng hồ đếm ngược của vòng, hệ số streak hiện tại và chấm đỏ. Chạm để mở bảng.`),
         t(`<b>Board:</b> title, round countdown, ranking list of 50, and a “Play” button that starts the next level.`,`<b>Bảng:</b> tiêu đề, đồng hồ đếm ngược, danh sách xếp hạng 50 người, và nút “Chơi” để vào màn tiếp theo.`),
-        t(`<b>Info (i):</b> how it works in 3 pictures: win levels to score → win in a row for up to ×5 → top the board for coins and boosters.`,`<b>Thông tin (i):</b> cách chơi bằng 3 hình: thắng màn để ghi điểm → thắng liên tiếp để nhân tới ×5 → lên top để nhận xu và booster.`),
+        t(`<b>Info (i):</b> how it works in 3 pictures: match candies → win in a row for up to ×5 → top the board for coins and boosters.`,`<b>Thông tin (i):</b> cách chơi bằng 3 hình: match kẹo → thắng liên tiếp để nhân tới ×5 → lên top để nhận xu và booster.`),
         t(`<b>Result popup:</b> final rank and the reward, with a “Claim” button.`,`<b>Popup kết quả:</b> hạng cuối cùng và phần thưởng, kèm nút “Nhận”.`)
       ]))+
       kv([
-        [t('Round reset','Bắt đầu vòng mới'),t(`Every x days (x: TBD, remote config; Meowdoku uses 24 h). Rewards are given when the round ends, then scores and the streak reset and a new group of 50 is formed. Reset time and group matching: TBD.`,`Mỗi x ngày (x: TBD, cấu hình từ xa; Meowdoku dùng 24 giờ). Thưởng được trao khi hết vòng, sau đó điểm và streak về 0 và ghép nhóm 50 người mới. Giờ reset và cách ghép nhóm: TBD.`)+' '+inf],
-        [t('Numbers','Con số'),t(`Round length, group size, base points, max multiplier and rewards per rank are remote config (5).`,`Độ dài vòng, số người mỗi nhóm, điểm cơ bản, hệ số tối đa và thưởng mỗi hạng nằm trong cấu hình từ xa (mục 5).`)]
+        [t('Round reset','Bắt đầu vòng mới'),t(`Every 7 days. Rewards are given when the round ends, then scores and the streak reset and the game starts a new leaderboard with a new group of 50 players for the next 7 days. Reset time and group matching: TBD.`,`Mỗi 7 ngày. Thưởng được trao khi hết vòng, sau đó điểm và streak về 0, game mở bảng xếp hạng mới và ghép nhóm 50 người chơi mới cho 7 ngày tiếp theo. Giờ reset và cách ghép nhóm: TBD.`)],
+        [t('Numbers','Con số'),t(`Unlock level, round length, group size, candies per level, max multiplier and rewards per rank are remote config (5).`,`Màn mở khóa, độ dài vòng, số người mỗi nhóm, số kẹo mỗi màn, hệ số tối đa và thưởng mỗi hạng nằm trong cấu hình từ xa (mục 5).`)]
       ]));
 
   B['collection-event']=
     sys(CE,
-      lead(t(`A timed event, started remotely for all players. It has a track of 20 milestones. Each milestone asks for an amount of jelly of one color and holds one reward. Fill it, claim the reward, then move on to the next milestone with a different color. Win in a row to multiply the jelly, up to ×5.`,
-        `Sự kiện có thời hạn, được bật từ xa cho mọi người chơi. Gồm 20 mốc. Mỗi mốc yêu cầu thu một số thạch của một màu và có một phần thưởng. Làm đầy mốc, nhận thưởng, rồi sang mốc tiếp theo với màu khác. Thắng liên tiếp để nhân số thạch, tối đa ×5.`))+
+      lead(t(`A timed event, started remotely for all players. It has a track of 20 milestones. Each milestone asks for an amount of jelly of one color and holds one reward. Fill it, claim the reward, then move on to the next milestone with a different color. Win in a row to multiply the jelly, up to ×5. This streak is separate from the leaderboard streak.`,
+        `Sự kiện có thời hạn, được bật từ xa cho mọi người chơi. Gồm 20 mốc. Mỗi mốc yêu cầu thu một số thạch của một màu và có một phần thưởng. Làm đầy mốc, nhận thưởng, rồi sang mốc tiếp theo với màu khác. Thắng liên tiếp để nhân số thạch, tối đa ×5. Streak này tách riêng với streak của Bảng xếp hạng.`))+
       tiles([[t('Level 18','Màn 18'),t('Must be completed','Cần hoàn thành')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('×5','×5'),t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['20',t('Milestones','Số mốc')]])+
       panel(t('Start: remote trigger','Bắt đầu: bật từ xa'),ul([
         t(`The team starts the event remotely, for all players at once (start time in remote config).`,`Đội vận hành bật sự kiện từ xa, cho mọi người chơi cùng lúc (giờ bắt đầu trong cấu hình từ xa).`),
-        t(`A player joins only after completing level 18 or higher. A player who reaches level 18 while the event is live joins at once, with the time left.`,`Người chơi chỉ tham gia khi đã hoàn thành màn 18 trở lên. Ai qua màn 18 khi sự kiện đang chạy thì vào luôn, với thời gian còn lại.`)+' '+inf
+        t(`A player joins only after completing level 18 or higher. A player who reaches level 18 while the event is live joins at once, with the time left.`,`Người chơi chỉ tham gia khi đã hoàn thành màn 18 trở lên. Ai qua màn 18 khi sự kiện đang chạy thì vào luôn, với thời gian còn lại.`)
       ]))+
       panel(t('Milestones: collect jelly','Các mốc: thu thập thạch'),ul([
         t(`The track has 20 milestones. Only 1 milestone is active at a time. Each one has 1 jelly color, a jelly count and 1 reward.`,`Thanh tiến độ có 20 mốc. Mỗi lúc chỉ có 1 mốc đang chạy. Mỗi mốc có 1 màu thạch, số thạch cần thu và 1 phần thưởng.`),
         t(`Every cube of the active milestone's color the player matches on the board counts as 1 jelly.`,`Mỗi khối cùng màu với mốc đang chạy mà người chơi match trên bàn tính là 1 thạch.`),
-        t(`Cubes freed from a Chocolate Layer count when they are matched.`,`Khối thoát khỏi Lớp chocolate được tính khi được match.`)+' '+inf,
+        t(`Cubes freed from a Chocolate Layer count when they are matched.`,`Khối thoát khỏi Lớp chocolate được tính khi được match.`),
         t(`In the level, each matched cube of that color flies a small jelly icon to a counter under the HUD.`,`Trong màn, mỗi khối màu đó được match bay một biểu tượng thạch nhỏ tới bộ đếm dưới HUD.`),
         t(`Jelly is only added when the level is won. Lose or quit: the jelly from that attempt is lost.`,`Thạch chỉ được cộng khi thắng màn. Thua hoặc thoát: mất số thạch của lượt đó.`),
-        t(`Two milestones in a row never have the same color. Jelly over the milestone's count is lost.`,`Hai mốc liền nhau không bao giờ cùng màu. Thạch dư so với yêu cầu bị mất.`)+' '+inf
+        t(`Two milestones in a row never have the same color. Jelly over the milestone's count is lost.`,`Hai mốc liền nhau không bao giờ cùng màu. Thạch dư so với yêu cầu bị mất.`)
       ]))+
       panel(t('Streak multiplier','Hệ số streak'),
         table(t('Streak multiplier','Hệ số streak'),[t('Wins in a row','Số màn thắng liên tiếp'),t('Multiplier','Hệ số')],[
@@ -2471,10 +2481,10 @@ function view(l){
           t(`Total value: about 4,850 coins + 10 Shuffle, 8 Hand, 7 Bomb and 3.5 h of unlimited lives. A casual player who reaches milestone 10 gets about 1,050 coins and 7 boosters, about 25 level wins' worth of coins.`,`Tổng giá trị: khoảng 4.850 xu + 10 Shuffle, 8 Hand, 7 Bomb và 3,5 giờ tim vô hạn. Người chơi thường tới mốc 10 nhận khoảng 1.050 xu và 7 booster, tương đương xu của khoảng 25 màn thắng.`)
         ]))+
       panel(t('Claim and next milestone','Nhận thưởng và sang mốc tiếp theo'),ul([
-        t(`When a milestone is full, its reward shows a “Claim” button. The player taps it to get the reward.`,`Khi mốc đầy, phần thưởng của mốc hiện nút “Nhận”. Người chơi chạm để nhận thưởng.`),
-        t(`After the claim, the milestone shows a check and the next milestone starts, with a new color.`,`Sau khi nhận, mốc hiện dấu tích và mốc tiếp theo bắt đầu, với màu mới.`),
-        t(`Until the player claims, no jelly is collected. The event popup opens by itself on the Home screen after the win, so the claim is one tap away.`,`Chưa nhận thưởng thì chưa thu thêm thạch. Popup sự kiện tự mở ở màn hình chính sau màn thắng, nên chỉ cần một chạm để nhận.`)+' '+inf,
-        t(`A reward not claimed when the event ends is given in the end popup.`,`Phần thưởng chưa nhận khi sự kiện kết thúc sẽ được trao trong popup kết thúc.`)+' '+inf,
+        t(`When a milestone is full, the game moves on to the next milestone at once, with a new color.`,`Khi mốc đầy, game tự chuyển ngay sang mốc tiếp theo, với màu mới.`),
+        t(`The full milestone's reward shows a “Claim” button on the event screen. The player can claim it any time while the event runs.`,`Phần thưởng của mốc đã đầy hiện nút “Nhận” ở màn hình sự kiện. Người chơi có thể nhận bất cứ lúc nào trong thời gian sự kiện.`),
+        t(`Several rewards can wait to be claimed at the same time. Claimed ones show a check.`,`Nhiều phần thưởng có thể cùng chờ nhận. Mốc đã nhận hiện dấu tích.`),
+        t(`A reward not claimed when the event ends is given in the end popup.`,`Phần thưởng chưa nhận khi sự kiện kết thúc sẽ được trao trong popup kết thúc.`),
         t(`After milestone 20 the event is done. The icon shows a check until the event ends.`,`Sau mốc 20, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi sự kiện kết thúc.`)
       ]))+
       panel(t('Event popup (Jelly Machine)','Popup sự kiện (Jelly Machine)'),ul([
@@ -2487,13 +2497,12 @@ function view(l){
         table(t('Jelly Machine cycle','Chu kỳ Jelly Machine'),[t('State','Trạng thái'),t('Player sees','Người chơi thấy'),t('Next','Tiếp theo')],[
           [t('Locked','Chưa mở'),t('Nothing','Không có gì'),t('Event started remotely and level 18 completed → Start','Sự kiện được bật từ xa và đã qua màn 18 → Bắt đầu')],
           [t('Start','Bắt đầu'),t('Event popup with milestone 1, the 72 h timer and the rewards. 1st time: a short how-to.','Popup sự kiện với mốc 1, timer 72 giờ và các phần thưởng. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
-          [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win → add jelly · Milestone full → Claim','Thắng → cộng thạch · Mốc đầy → Nhận thưởng')],
-          [t('Claim','Nhận thưởng'),t('Event popup with the “Claim” button on the full milestone','Popup sự kiện với nút “Nhận” ở mốc đã đầy'),t('Tap → reward, next milestone → Live · Milestone 20 → Done','Chạm → nhận thưởng, sang mốc tiếp → Đang chạy · Mốc 20 → Hoàn thành')],
+          [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win → add jelly · Milestone full → next milestone, reward ready to claim · Milestone 20 → Done','Thắng → cộng thạch · Mốc đầy → sang mốc tiếp, quà chờ nhận · Mốc 20 → Hoàn thành')],
           [t('Done','Hoàn thành'),t('Icon with a check','Biểu tượng có dấu tích'),t('Timer over → End','Hết giờ → Kết thúc')],
           [t('End','Kết thúc'),t('Event end popup with the result','Popup kết thúc kèm kết quả'),t('Next remote start → Start','Lần bật từ xa tiếp theo → Bắt đầu')]
         ],'compact'))+
       kv([
-        [t('Popup priority','Ưu tiên popup'),t(`Event popups show after the offer popups (7.2). If an offer popup shows, the event popup waits for the next screen.`,`Popup sự kiện hiện sau popup ưu đãi (mục 7.2). Nếu có popup ưu đãi, popup sự kiện chờ sang màn hình tiếp theo.`)+' '+inf],
+        [t('Popup timing','Thời điểm popup'),t(`The event popup shows after the player completes a level and returns Home, so it never overlaps other popups.`,`Popup sự kiện hiện sau khi người chơi hoàn thành màn và về màn hình chính, nên không trùng với các popup khác.`)],
         [t('Offline','Offline'),t(`The 72 h timer runs on server time, also offline.`,`Timer 72 giờ chạy theo giờ server, kể cả khi offline.`)],
         [t('Numbers','Con số'),t(`Start time, required level, length, max multiplier, milestones and rewards are remote config (5).`,`Giờ bắt đầu, màn yêu cầu, thời gian, hệ số tối đa, các mốc và phần thưởng nằm trong cấu hình từ xa (mục 5).`)]
       ]));
@@ -2503,6 +2512,12 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Leaderboard and Jelly Machine rules confirmed','Chốt luật Bảng xếp hạng và Jelly Machine'),ul([
+        t(`Leaderboard (7.4): score now comes from candies matched on the board × the streak multiplier, counted at the end of the level. Candies appear only after the leaderboard unlocks (Level Complete of level 10). Rounds last 7 days, then a new group of 50 starts.`,`Bảng xếp hạng (mục 7.4): điểm giờ tính từ số kẹo match trên bàn × hệ số streak, tổng kết cuối màn. Kẹo chỉ xuất hiện sau khi mở Bảng xếp hạng (Level Complete màn 10). Mỗi vòng 7 ngày, sau đó ghép nhóm 50 người mới.`),
+        t(`The leaderboard streak and the Jelly Machine streak are separate.`,`Streak của Bảng xếp hạng và của Jelly Machine tách riêng.`),
+        t(`Jelly Machine (7.3): a full milestone moves on to the next one at once; rewards can be claimed any time during the event. The popup shows after Level Complete when back Home.`,`Jelly Machine (mục 7.3): mốc đầy thì tự sang mốc tiếp; quà nhận được bất cứ lúc nào trong thời gian sự kiện. Popup hiện sau Level Complete khi về màn hình chính.`),
+        t(`Confirmed and untagged: late join after level 18, Chocolate Layer cubes count, no same color twice, overflow lost, 0 points = no reward, ties, own row in view.`,`Đã chốt, bỏ nhãn cần xác nhận: vào muộn sau màn 18, khối từ Lớp chocolate được tính, không 2 mốc liền cùng màu, thạch dư bị mất, 0 điểm không thưởng, bằng điểm, dòng của người chơi luôn hiện.`)
+      ]))+
       ent(t('Element order','Thứ tự element'),ul([
         t(`New element order and unlock levels: Chocolate Layer 7, Locked Slot 12, Armored Ant 17, Jelly Bottle 22, Queen Ant 27.`,`Thứ tự và màn mở khóa mới của element: Lớp chocolate 7, Slot khóa 12, Kiến giáp 17, Lọ thạch 22, Kiến chúa 27.`),
         t(`Rules (1.4), tutorials (2), unlock map, look (3) and SFX (4) follow this order.`,`Luật (1.4), hướng dẫn (2), bản đồ mở khóa, hình ảnh (3) và SFX (4) theo thứ tự này.`)
