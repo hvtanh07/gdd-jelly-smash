@@ -523,7 +523,7 @@ const SECTIONS=[
   {id:'live-ops',n:'7',c:6,en:'Live ops',vi:'Tính năng Live Ops',subs:[
     {id:'popup-list',n:'7.1',en:'Popup list',vi:'Danh sách popup'},
     {id:'popup-priority',n:'7.2',en:'Popup priority',vi:'Thứ tự ưu tiên popup'},
-    {id:'collection-event',n:'7.3',en:'Collection Event',vi:'Sự kiện thu thập'},
+    {id:'collection-event',n:'7.3',en:'Jelly Machine',vi:'Jelly Machine'},
     {id:'leaderboard',n:'7.4',en:'Leaderboard',vi:'Bảng xếp hạng'}]},
   {id:'change-note',n:'8',c:7,en:'Change note',vi:'Ghi chú thay đổi'}
 ];
@@ -2155,12 +2155,14 @@ function view(l){
       ['starter_pack_unlock_level',t('Starter Pack (IAP) — level from which the offer popup can show','Gói Khởi đầu (IAP) — màn bắt đầu có thể hiện popup ưu đãi'),'12',t('level','màn')],
       ['remove_ads_unlock_level',t('Remove Ads (IAP) — level from which the offer popup can show','Gỡ quảng cáo (IAP) — màn bắt đầu có thể hiện popup ưu đãi'),'15',t('level','màn')]
     ])+
-    rc(t('Collection Event','Sự kiện thu thập'),[
-      ['collection_event_unlock_level',t('Level from which the event can start','Màn bắt đầu có sự kiện'),'20',t('level','màn')],
-      ['collection_event_duration_hours',t('Length of one event','Thời gian một sự kiện'),'72',t('h','giờ')],
-      ['collection_event_colors',t('Mission colors, in order (mission 5: any of the 4)','Màu của các nhiệm vụ, theo thứ tự (nhiệm vụ 5: màu nào cũng được)'),'red, blue, purple, yellow, any',t('list','danh sách')],
-      ['collection_event_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
-      ['collection_event_missions',t('Jelly needed for each mission','Số thạch cần cho từng nhiệm vụ'),'50, 100, 150, 200, 300',t('jelly','thạch')]
+    rc(t('Jelly Machine','Jelly Machine'),[
+      ['jelly_machine_start_time',t('Start time for all players (remote trigger)','Giờ bắt đầu cho mọi người chơi (bật từ xa)'),'TBD',t('date','ngày giờ')],
+      ['jelly_machine_unlock_level',t('Level the player must have completed','Màn người chơi phải hoàn thành'),'18',t('level','màn')],
+      ['jelly_machine_duration_hours',t('Length of one event','Thời gian một sự kiện'),'72',t('h','giờ')],
+      ['jelly_machine_colors',t('Color order of the milestones (repeats)','Thứ tự màu của các mốc (lặp lại)'),'yellow, red, blue, purple',t('list','danh sách')],
+      ['jelly_machine_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
+      ['jelly_machine_milestone_count',t('Number of milestones','Số mốc'),'20',t('count','mốc')],
+      ['jelly_machine_milestones',t('Jelly needed for each milestone','Số thạch cần cho từng mốc'),'10, 15, 15, 20, 25, 30, 35, 40, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100',t('jelly','thạch')]
     ])+
     rc(t('Leaderboard','Bảng xếp hạng'),[
       ['leaderboard_round_days',t('Length of one round (x)','Độ dài một vòng (x)'),'TBD',t('days','ngày')],
@@ -2298,9 +2300,9 @@ function view(l){
 
   /* ===== 7. Live ops ===== */
   /* FIXED: keep the logic. Only change the numbers if the new game differs. */
-  B['live-ops']=`<p class="sec-intro">${t(`The rules for every offer popup (7.1, 7.2) the Collection Event (7.3) and the Leaderboard (7.4). Jelly Smash has no Limited Time Reward, Skip Level or Retry with Booster.`,
-    `Quy tắc cho mọi popup ưu đãi (7.1, 7.2) Sự kiện thu thập (7.3) và Bảng xếp hạng (7.4). Jelly Smash không có Quà giới hạn thời gian, Bỏ qua màn hay Chơi lại kèm công cụ.`)}</p>`;
-  const CE=nm('Collection Event','Sự kiện thu thập');
+  B['live-ops']=`<p class="sec-intro">${t(`The rules for every offer popup (7.1, 7.2) the Jelly Machine event (7.3) and the Leaderboard (7.4). Jelly Smash has no Limited Time Reward, Skip Level or Retry with Booster.`,
+    `Quy tắc cho mọi popup ưu đãi (7.1, 7.2) sự kiện Jelly Machine (7.3) và Bảng xếp hạng (7.4). Jelly Smash không có Quà giới hạn thời gian, Bỏ qua màn hay Chơi lại kèm công cụ.`)}</p>`;
+  const CE=nm('Jelly Machine','Jelly Machine');
   B['leaderboard']=
     sys(nm('Leaderboard','Bảng xếp hạng'),
       lead(t(`A ranking against a group of 50 players, in rounds of x days. Win a level to score points. Win in a row to score more, up to ×5. When the round ends, the final ranks decide the rewards. Benchmark: Meowdoku.`,
@@ -2322,7 +2324,7 @@ function view(l){
           t(`A loss or quitting the level resets the streak to ×1. A revive does not break it.`,`Thua hoặc thoát màn đưa streak về ×1. Hồi sinh không làm mất streak.`),
           t(`The current multiplier shows on the home icon and on the level start popup.`,`Hệ số hiện tại hiện trên biểu tượng ở màn hình chính và trên popup bắt đầu màn.`),
           t(`The streak resets when a new round starts.`,`Streak tính lại khi bắt đầu vòng mới.`),
-          t(`This streak is the same one the Collection Event uses (7.3): one win streak, two events.`,`Streak này dùng chung với Sự kiện thu thập (mục 7.3): một chuỗi thắng, hai sự kiện.`)+' '+inf
+          t(`This streak is the same one the Jelly Machine event uses (7.3): one win streak, two events.`,`Streak này dùng chung với sự kiện Jelly Machine (mục 7.3): một chuỗi thắng, hai sự kiện.`)+' '+inf
         ]))+
       panel(t('Rewards by rank at round end','Phần thưởng theo hạng khi hết vòng'),
         table(t('Leaderboard rewards','Phần thưởng Bảng xếp hạng'),[t('Rank','Hạng'),t('Coins','Xu'),t('Boosters','Booster')],[
@@ -2352,16 +2354,20 @@ function view(l){
 
   B['collection-event']=
     sys(CE,
-      lead(t(`A timed event made of missions. Each mission asks the player to collect jelly of one color: red, blue, purple or yellow. Finishing a mission fills one step of the progress track and gives a gift. Win in a row to multiply what you collect, up to ×5. Benchmark: Royal Match (Royal Pass style steps).`,
-        `Sự kiện có thời hạn, gồm nhiều nhiệm vụ. Mỗi nhiệm vụ yêu cầu thu thập thạch của một màu: đỏ, xanh, tím hoặc vàng. Xong 1 nhiệm vụ là đầy 1 nấc tiến độ và nhận quà. Thắng liên tiếp để nhân số thu được, tối đa ×5. Tham khảo: Royal Match (các nấc kiểu Royal Pass).`))+
-      tiles([[t('Level 20','Màn 20'),t('Unlocks','Mở khóa')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('×5','×5'),t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['5',t('Missions','Số nhiệm vụ')]])+
-      panel(t('Missions: collect jelly','Nhiệm vụ: thu thập thạch'),ul([
-        t(`The event is a chain of 5 missions. Only 1 mission is active at a time. Each mission has 1 target color and a jelly count.`,`Sự kiện là chuỗi 5 nhiệm vụ. Mỗi lúc chỉ có 1 nhiệm vụ đang chạy. Mỗi nhiệm vụ có 1 màu mục tiêu và số thạch cần thu.`),
-        t(`Every cube of the active mission's color the player matches on the board counts as 1 jelly.`,`Mỗi khối cùng màu với nhiệm vụ đang chạy mà người chơi match trên bàn tính là 1 thạch.`),
+      lead(t(`A timed event, started remotely for all players. It has a track of 20 milestones. Each milestone asks for an amount of jelly of one color and holds one reward. Fill it, claim the reward, then move on to the next milestone with a different color. Win in a row to multiply the jelly, up to ×5.`,
+        `Sự kiện có thời hạn, được bật từ xa cho mọi người chơi. Gồm 20 mốc. Mỗi mốc yêu cầu thu một số thạch của một màu và có một phần thưởng. Làm đầy mốc, nhận thưởng, rồi sang mốc tiếp theo với màu khác. Thắng liên tiếp để nhân số thạch, tối đa ×5.`))+
+      tiles([[t('Level 18','Màn 18'),t('Must be completed','Cần hoàn thành')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('×5','×5'),t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['20',t('Milestones','Số mốc')]])+
+      panel(t('Start: remote trigger','Bắt đầu: bật từ xa'),ul([
+        t(`The team starts the event remotely, for all players at once (start time in remote config).`,`Đội vận hành bật sự kiện từ xa, cho mọi người chơi cùng lúc (giờ bắt đầu trong cấu hình từ xa).`),
+        t(`A player joins only after completing level 18 or higher. A player who reaches level 18 while the event is live joins at once, with the time left.`,`Người chơi chỉ tham gia khi đã hoàn thành màn 18 trở lên. Ai qua màn 18 khi sự kiện đang chạy thì vào luôn, với thời gian còn lại.`)+' '+inf
+      ]))+
+      panel(t('Milestones: collect jelly','Các mốc: thu thập thạch'),ul([
+        t(`The track has 20 milestones. Only 1 milestone is active at a time. Each one has 1 jelly color, a jelly count and 1 reward.`,`Thanh tiến độ có 20 mốc. Mỗi lúc chỉ có 1 mốc đang chạy. Mỗi mốc có 1 màu thạch, số thạch cần thu và 1 phần thưởng.`),
+        t(`Every cube of the active milestone's color the player matches on the board counts as 1 jelly.`,`Mỗi khối cùng màu với mốc đang chạy mà người chơi match trên bàn tính là 1 thạch.`),
         t(`Cubes freed from a Chocolate Layer count when they are matched.`,`Khối thoát khỏi Lớp chocolate được tính khi được match.`)+' '+inf,
-        t(`In the level, each matched target cube flies a small jelly icon to a counter under the HUD.`,`Trong màn, mỗi khối mục tiêu được match bay một biểu tượng thạch nhỏ tới bộ đếm dưới HUD.`),
-        t(`Jelly is only added to the mission when the level is won. Lose or quit: the jelly from that attempt is lost.`,`Thạch chỉ được cộng vào nhiệm vụ khi thắng màn. Thua hoặc thoát: mất số thạch của lượt đó.`),
-        t(`Jelly over the mission's count carries over to the next mission only if it is the same color. Otherwise it is lost.`,`Thạch dư so với yêu cầu chỉ chuyển sang nhiệm vụ sau nếu cùng màu. Khác màu thì mất.`)+' '+inf
+        t(`In the level, each matched cube of that color flies a small jelly icon to a counter under the HUD.`,`Trong màn, mỗi khối màu đó được match bay một biểu tượng thạch nhỏ tới bộ đếm dưới HUD.`),
+        t(`Jelly is only added when the level is won. Lose or quit: the jelly from that attempt is lost.`,`Thạch chỉ được cộng khi thắng màn. Thua hoặc thoát: mất số thạch của lượt đó.`),
+        t(`Two milestones in a row never have the same color. Jelly over the milestone's count is lost.`,`Hai mốc liền nhau không bao giờ cùng màu. Thạch dư so với yêu cầu bị mất.`)+' '+inf
       ]))+
       panel(t('Streak multiplier','Hệ số streak'),
         table(t('Streak multiplier','Hệ số streak'),[t('Wins in a row','Số màn thắng liên tiếp'),t('Multiplier','Hệ số')],[
@@ -2369,36 +2375,64 @@ function view(l){
         ],'compact')+
         ul([
           t(`Jelly added on a win = jelly collected in the level × the multiplier.`,`Thạch cộng khi thắng = số thạch thu trong màn × hệ số.`),
+          t(`Example: the player collects 15 jelly in a level with a ×2 win streak. They get 15 × 2 = 30 jelly.`,`Ví dụ: người chơi thu 15 thạch trong màn, đang có streak ×2. Người chơi nhận 15 × 2 = 30 thạch.`),
           t(`A loss or quitting the level resets the streak to ×1. A revive does not break it.`,`Thua hoặc thoát màn đưa streak về ×1. Hồi sinh không làm mất streak.`),
           t(`The current multiplier shows on the event icon and on the level start popup.`,`Hệ số hiện tại hiện trên biểu tượng sự kiện và trên popup bắt đầu màn.`),
           t(`The streak resets when a new event starts.`,`Streak tính lại khi bắt đầu sự kiện mới.`)
         ]))+
-      panel(t('Progress & rewards','Tiến độ & phần thưởng'),
-        table(t('Collection Event missions','Các nhiệm vụ của Sự kiện thu thập'),[t('Mission','Nhiệm vụ'),t('Collect','Thu thập'),t('Gift','Quà')],[
-          ['1',t('50 red jelly','50 thạch đỏ'),t('100 coins','100 xu')],
-          ['2',t('100 blue jelly','100 thạch xanh'),t('1 Shuffle','1 Shuffle')],
-          ['3',t('150 purple jelly','150 thạch tím'),t('200 coins + 1 Hand','200 xu + 1 Hand')],
-          ['4',t('200 yellow jelly','200 thạch vàng'),t('30 min unlimited lives + 1 Bomb','30 phút tim vô hạn + 1 Bomb')],
-          ['5',t('300 jelly of any of the 4 colors (final)','300 thạch thuộc 4 màu trên (cuối)'),t('Big chest: 500 coins + 1 of each booster','Rương lớn: 500 xu + mỗi loại booster 1 cái')]
+      panel(t('Milestones & rewards','Các mốc & phần thưởng'),
+        table(t('Jelly Machine milestones','Các mốc của Jelly Machine'),[t('Milestone','Mốc'),t('Collect','Thu thập'),t('Reward','Phần thưởng')],[
+          ['1',t('10 yellow jelly','10 thạch vàng'),t('100 coins','100 xu')],
+          ['2',t('15 red jelly','15 thạch đỏ'),t('1 Shuffle','1 Shuffle')],
+          ['3',t('15 blue jelly','15 thạch xanh'),t('200 coins','200 xu')],
+          ['4',t('20 purple jelly','20 thạch tím'),t('1 Hand','1 Hand')],
+          ['5',t('25 yellow jelly','25 thạch vàng'),t('2 Shuffle','2 Shuffle')+' '+t('(seen)','(thấy trong ảnh)')],
+          ['6',t('30 red jelly','30 thạch đỏ'),t('2 Hand','2 Hand')+' '+t('(seen)','(thấy trong ảnh)')],
+          ['7',t('35 blue jelly','35 thạch xanh'),t('5,000 coins','5.000 xu')+' '+t('(seen)','(thấy trong ảnh)')],
+          ['8',t('40 purple jelly','40 thạch tím'),t('500 coins','500 xu')+' '+t('(seen)','(thấy trong ảnh)')],
+          ['9',t('40 yellow jelly','40 thạch vàng'),t('1 Bomb','1 Bomb')],
+          ['10',t('45 red jelly','45 thạch đỏ'),t('30 min unlimited lives','30 phút tim vô hạn')],
+          ['11',t('50 blue jelly','50 thạch xanh'),t('2 Shuffle','2 Shuffle')],
+          ['12',t('55 purple jelly','55 thạch tím'),t('600 coins','600 xu')],
+          ['13',t('60 yellow jelly','60 thạch vàng'),t('2 Hand','2 Hand')],
+          ['14',t('65 red jelly','65 thạch đỏ'),t('2 Bomb','2 Bomb')],
+          ['15',t('70 blue jelly','70 thạch xanh'),t('1 h unlimited lives','1 giờ tim vô hạn')],
+          ['16',t('75 purple jelly','75 thạch tím'),t('800 coins','800 xu')],
+          ['17',t('80 yellow jelly','80 thạch vàng'),t('3 Shuffle','3 Shuffle')],
+          ['18',t('85 red jelly','85 thạch đỏ'),t('3 Hand','3 Hand')],
+          ['19',t('90 blue jelly','90 thạch xanh'),t('3 Bomb','3 Bomb')],
+          ['20',t('100 purple jelly','100 thạch tím'),t('Big chest: 5,000 coins + 3 of each booster','Rương lớn: 5.000 xu + mỗi loại booster 3 cái')]
         ],'compact')+
         ul([
-          t(`The progress track has 1 step per mission. Finishing a mission fills its step and gives its gift right away, with a reward popup on the win screen. No extra tap or ad needed.`,`Thanh tiến độ có 1 nấc cho mỗi nhiệm vụ. Xong nhiệm vụ là đầy nấc và nhận quà ngay, kèm popup phần thưởng ở màn hình thắng. Không cần chạm thêm hay xem quảng cáo.`),
-          t(`The next mission starts at once. One win can finish only 1 mission, unless the next mission has the same color.`,`Nhiệm vụ tiếp theo bắt đầu ngay. Một lần thắng chỉ xong được 1 nhiệm vụ, trừ khi nhiệm vụ sau cùng màu.`)+' '+inf,
-          t(`After the final mission the event is done. The icon shows a check until the event ends.`,`Sau nhiệm vụ cuối, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi sự kiện kết thúc.`),
-          t(`The event ends when the 72 h timer runs out. Progress resets for the next event.`,`Sự kiện kết thúc khi hết 72 giờ. Tiến độ tính lại cho sự kiện sau.`)
+          t(`Rows marked “seen” match the Jelly Machine screenshot: milestone 5 needs 25 yellow jelly for 2 Shuffle, 6 gives 2 Hand, 7 gives 5,000 coins, 8 gives coins. The other numbers are a proposal.`,`Các dòng “thấy trong ảnh” khớp ảnh Jelly Machine: mốc 5 cần 25 thạch vàng để nhận 2 Shuffle, mốc 6 cho 2 Hand, mốc 7 cho 5.000 xu, mốc 8 cho xu. Các số còn lại là đề xuất.`),
+          t(`Colors follow the order yellow → red → blue → purple, then repeat. Total: 1,005 jelly.`,`Màu theo thứ tự vàng → đỏ → xanh → tím, rồi lặp lại. Tổng: 1.005 thạch.`)
         ]))+
+      panel(t('Claim and next milestone','Nhận thưởng và sang mốc tiếp theo'),ul([
+        t(`When a milestone is full, its reward shows a “Claim” button. The player taps it to get the reward.`,`Khi mốc đầy, phần thưởng của mốc hiện nút “Nhận”. Người chơi chạm để nhận thưởng.`),
+        t(`After the claim, the milestone shows a check and the next milestone starts, with a new color.`,`Sau khi nhận, mốc hiện dấu tích và mốc tiếp theo bắt đầu, với màu mới.`),
+        t(`Until the player claims, no jelly is collected. The event popup opens by itself on the Home screen after the win, so the claim is one tap away.`,`Chưa nhận thưởng thì chưa thu thêm thạch. Popup sự kiện tự mở ở màn hình chính sau màn thắng, nên chỉ cần một chạm để nhận.`)+' '+inf,
+        t(`A reward not claimed when the event ends is given in the end popup.`,`Phần thưởng chưa nhận khi sự kiện kết thúc sẽ được trao trong popup kết thúc.`)+' '+inf,
+        t(`After milestone 20 the event is done. The icon shows a check until the event ends.`,`Sau mốc 20, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi sự kiện kết thúc.`)
+      ]))+
+      panel(t('Event popup (Jelly Machine)','Popup sự kiện (Jelly Machine)'),ul([
+        t(`<b>Top bar:</b> info (i) and close (X) buttons.`,`<b>Thanh trên:</b> nút thông tin (i) và nút đóng (X).`),
+        t(`<b>Progress bar:</b> the jelly icon in the active color, the count (for example 6/25) and the milestone's reward at the end.`,`<b>Thanh tiến độ:</b> biểu tượng thạch màu đang cần, số đếm (ví dụ 6/25) và phần thưởng của mốc ở cuối thanh.`),
+        t(`<b>Streak bar:</b> ×1 to ×5. The current multiplier is highlighted.`,`<b>Thanh streak:</b> ×1 tới ×5. Hệ số hiện tại được làm nổi bật.`),
+        t(`<b>Milestone list:</b> numbered milestones on a vertical track, each with its reward card. Claimed ones show a check. The active one glows. The list scrolls to the active milestone.`,`<b>Danh sách mốc:</b> các mốc đánh số trên một đường dọc, mỗi mốc có thẻ phần thưởng. Mốc đã nhận hiện dấu tích. Mốc đang chạy phát sáng. Danh sách tự cuộn tới mốc đang chạy.`)
+      ]))+
       panel(t('Event flow','Luồng sự kiện'),
-        table(t('Collection Event cycle','Chu kỳ Sự kiện thu thập'),[t('State','Trạng thái'),t('Player sees','Người chơi thấy'),t('Next','Tiếp theo')],[
-          [t('Locked','Chưa mở'),t('Nothing','Không có gì'),t('Level Complete of level 20 → Start','Level Complete màn 20 → Bắt đầu')],
-          [t('Start','Bắt đầu'),t('Event popup with the first mission, the 72 h timer and the gifts. 1st time: a short how-to.','Popup sự kiện với nhiệm vụ đầu tiên, timer 72 giờ và các phần quà. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
-          [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win → add jelly · Mission done → gift, next mission · Final mission → Done · Timer over → End','Thắng → cộng thạch · Mốc cuối → Hoàn thành · Hết giờ → Kết thúc')],
+        table(t('Jelly Machine cycle','Chu kỳ Jelly Machine'),[t('State','Trạng thái'),t('Player sees','Người chơi thấy'),t('Next','Tiếp theo')],[
+          [t('Locked','Chưa mở'),t('Nothing','Không có gì'),t('Event started remotely and level 18 completed → Start','Sự kiện được bật từ xa và đã qua màn 18 → Bắt đầu')],
+          [t('Start','Bắt đầu'),t('Event popup with milestone 1, the 72 h timer and the rewards. 1st time: a short how-to.','Popup sự kiện với mốc 1, timer 72 giờ và các phần thưởng. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
+          [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win → add jelly · Milestone full → Claim','Thắng → cộng thạch · Mốc đầy → Nhận thưởng')],
+          [t('Claim','Nhận thưởng'),t('Event popup with the “Claim” button on the full milestone','Popup sự kiện với nút “Nhận” ở mốc đã đầy'),t('Tap → reward, next milestone → Live · Milestone 20 → Done','Chạm → nhận thưởng, sang mốc tiếp → Đang chạy · Mốc 20 → Hoàn thành')],
           [t('Done','Hoàn thành'),t('Icon with a check','Biểu tượng có dấu tích'),t('Timer over → End','Hết giờ → Kết thúc')],
-          [t('End','Kết thúc'),t('Event end popup with the result','Popup kết thúc kèm kết quả'),t('Next event starts at the next session → Start','Sự kiện mới bắt đầu ở phiên chơi tiếp theo → Bắt đầu')]
+          [t('End','Kết thúc'),t('Event end popup with the result','Popup kết thúc kèm kết quả'),t('Next remote start → Start','Lần bật từ xa tiếp theo → Bắt đầu')]
         ],'compact'))+
       kv([
         [t('Popup priority','Ưu tiên popup'),t(`Event popups show after the offer popups (7.2). If an offer popup shows, the event popup waits for the next screen.`,`Popup sự kiện hiện sau popup ưu đãi (mục 7.2). Nếu có popup ưu đãi, popup sự kiện chờ sang màn hình tiếp theo.`)+' '+inf],
         [t('Offline','Offline'),t(`The 72 h timer runs on server time, also offline.`,`Timer 72 giờ chạy theo giờ server, kể cả khi offline.`)],
-        [t('Numbers','Con số'),t(`Unlock level, length, max multiplier, missions and gifts are remote config (5).`,`Màn mở khóa, thời gian, hệ số tối đa, các nhiệm vụ và quà nằm trong cấu hình từ xa (mục 5).`)]
+        [t('Numbers','Con số'),t(`Start time, required level, length, max multiplier, milestones and rewards are remote config (5).`,`Giờ bắt đầu, màn yêu cầu, thời gian, hệ số tối đa, các mốc và phần thưởng nằm trong cấu hình từ xa (mục 5).`)]
       ]));
 
   /* ===== 8. Change note ===== */
@@ -2406,6 +2440,11 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Jelly Machine','Jelly Machine'),ul([
+        t(`Collection Event (7.3) renamed to Jelly Machine. It is started remotely for all players; a player joins after completing level 18.`,`Sự kiện thu thập (mục 7.3) đổi tên thành Jelly Machine. Sự kiện được bật từ xa cho mọi người chơi; người chơi tham gia sau khi hoàn thành màn 18.`),
+        t(`20 milestones, each with a jelly color, a jelly count and a reward. The player claims the reward, then moves to the next milestone with a different color.`,`20 mốc, mỗi mốc có màu thạch, số thạch và phần thưởng. Người chơi nhận thưởng rồi sang mốc tiếp với màu khác.`),
+        t(`Event popup described from the Jelly Machine screenshot. Jelly is multiplied by the win streak (15 jelly at ×2 = 30). Remote config (5) updated, keys renamed to jelly_machine_*.`,`Mô tả popup sự kiện theo ảnh Jelly Machine. Thạch nhân theo streak (15 thạch ở ×2 = 30). Cập nhật cấu hình từ xa (mục 5), đổi key thành jelly_machine_*.`)
+      ]))+
       ent(t('Leaderboard boosters','Booster của Bảng xếp hạng'),ul([
         t(`Bigger booster rewards for the top 3: rank 1 gets 5 of each booster, rank 2 gets 3 of each, rank 3 gets 1 of each.`,`Tăng thưởng booster cho top 3: hạng 1 nhận mỗi loại 5 cái, hạng 2 mỗi loại 3 cái, hạng 3 mỗi loại 1 cái.`)
       ]))+
