@@ -2363,11 +2363,11 @@ function view(l){
         t(`Candies appear on the board only after the leaderboard is unlocked.`,`Kẹo chỉ xuất hiện trên bàn sau khi đã mở Bảng xếp hạng.`)
       ]))+
       panel(t('Candy and score','Kẹo và điểm'),ul([
-        t(`Some board cubes carry a candy. A candy is matched like a normal jelly cube of its color. Each candy matched counts as 1.`,`Một số khối trên bàn mang kẹo. Kẹo được match như khối thạch thường cùng màu. Mỗi viên kẹo được match tính là 1.`)+' '+inf,
+        t(`Some board cubes carry a candy. A candy is matched like a normal jelly cube of its color. Each candy matched counts as 1.`,`Một số khối trên bàn mang kẹo. Kẹo được match như khối thạch thường cùng màu. Mỗi viên kẹo được match tính là 1.`),
         t(`In the level, a counter under the HUD shows the candies matched.`,`Trong màn, bộ đếm dưới HUD hiện số kẹo đã match.`),
         t(`At the end of the level: score added = candies matched × the leaderboard streak multiplier.`,`Cuối màn: điểm cộng thêm = số kẹo đã match × hệ số streak của Bảng xếp hạng.`),
         t(`Example: 12 candies at ×3 = 36 points.`,`Ví dụ: 12 kẹo ở ×3 = 36 điểm.`),
-        t(`Candies count only on a win. Lose or quit: the candies of that attempt are lost.`,`Kẹo chỉ được tính khi thắng. Thua hoặc thoát: mất số kẹo của lượt đó.`)+' '+inf,
+        t(`Candies count only on a win. Lose or quit: the candies of that attempt are lost.`,`Kẹo chỉ được tính khi thắng. Thua hoặc thoát: mất số kẹo của lượt đó.`),
         t(`Candies per level: TBD (remote config).`,`Số kẹo mỗi màn: TBD (cấu hình từ xa).`)
       ]))+
       panel(t('The board','Bảng xếp hạng'),ul([
@@ -2512,6 +2512,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Leaderboard candy','Kẹo Bảng xếp hạng'),ul([
+        t(`Confirmed: a candy is matched like a normal jelly cube of its color, and candies count only on a win.`,`Đã chốt: kẹo được match như khối thạch thường cùng màu, và kẹo chỉ được tính khi thắng.`)
+      ]))+
       ent(t('Leaderboard and Jelly Machine rules confirmed','Chốt luật Bảng xếp hạng và Jelly Machine'),ul([
         t(`Leaderboard (7.4): score now comes from candies matched on the board × the streak multiplier, counted at the end of the level. Candies appear only after the leaderboard unlocks (Level Complete of level 10). Rounds last 7 days, then a new group of 50 starts.`,`Bảng xếp hạng (mục 7.4): điểm giờ tính từ số kẹo match trên bàn × hệ số streak, tổng kết cuối màn. Kẹo chỉ xuất hiện sau khi mở Bảng xếp hạng (Level Complete màn 10). Mỗi vòng 7 ngày, sau đó ghép nhóm 50 người mới.`),
         t(`The leaderboard streak and the Jelly Machine streak are separate.`,`Streak của Bảng xếp hạng và của Jelly Machine tách riêng.`),
