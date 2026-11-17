@@ -1938,27 +1938,13 @@ function view(l){
       t(`Each match next to it (up, down, left, right) removes 1 layer. 3 layers = 3 matches.`,`Mỗi match cạnh nó (trên, dưới, trái, phải) phá 1 lớp. 3 lớp = 3 lần match.`),
       t(`Last layer gone: the cell opens. The jelly under it becomes a normal cube.`,`Hết lớp cuối: ô được mở. Khối thạch bên dưới thành khối thường.`),
       t(`It stays in its cell; cubes above don't fall through it.`,`Đứng yên tại ô; khối phía trên không rơi xuyên qua.`)
-    ]),unlock('TBD'),demo('chocoL'))+
+    ]),unlock(7),demo('chocoL'))+
     ent(N.el3,ul([
       t(`Slot row. A slot with a padlock and a number.`,`Trên hàng slot. Slot có ổ khóa và 1 con số.`),
       t(`Each cannon that enters a slot counts every locked slot down by 1. Lost cannons don't count.`,`Mỗi pháo vào slot làm mọi slot khóa giảm 1. Pháo bị mất không tính.`),
       t(`At 0 it opens and works as a normal slot.`,`Về 0 thì slot mở, dùng như slot thường.`),
       t(`New cannons skip locked slots. Number per slot: set per level, TBD.`,`Pháo mới bỏ qua slot khóa. Con số mỗi slot: đặt theo màn, TBD.`)
-    ]),unlock('TBD'),demo('lockSlot'))+
-    ent(N.el6,ul([
-      t(`Board. 1 tray takes 2×2 cells and holds 4 bottles, each a different color.`,`Trên bàn. 1 khay chiếm 2×2 ô, chứa 4 lọ, mỗi lọ 1 màu khác nhau.`),
-      t(`Can't be swapped or matched. Cubes above don't fall through.`,`Không swap, không match được. Khối phía trên không rơi xuyên qua.`),
-      t(`A match next to the tray (up, down, left, right) breaks the bottle of the same color.`,`Match cạnh khay (trên, dưới, trái, phải) làm vỡ lọ cùng màu với match.`),
-      t(`That match gets +5 ammo: ammo = 2n − 3 + 5.`,`Match đó được +5 đạn: đạn = 2n − 3 + 5.`),
-      t(`No bottle of that color left: no bonus. All 4 broken: the tray disappears and cubes fall into its cells.`,`Không còn lọ màu đó: không có thưởng. Vỡ hết 4 lọ: khay biến mất, khối rơi vào 4 ô đó.`)
-    ]),unlock('TBD'),demo('bottle'))+
-    ent(N.el7,ul([
-      t(`Ant grid. A big ant that takes 2×2 cells and marches down with the grid.`,`Trên lưới kiến. Kiến lớn chiếm 2×2 ô, đi xuống cùng lưới.`),
-      t(`Rainbow armor: cannons of any color can hit her. 1 shot = 1 HP. HP: TBD.`,`Giáp cầu vồng: pháo màu nào cũng bắn được. 1 phát = 1 HP. HP: TBD.`),
-      t(`Target rules stay: she must be the front ant in her 2 columns and in view. Her bottom row sets how low she is.`,`Luật target giữ nguyên: kiến chúa phải ở đầu hàng ở cả 2 cột và trong khung nhìn thấy. Hàng dưới của kiến chúa quyết định độ thấp.`),
-      t(`Hand and Bomb cannons can hit her too.`,`Pháo của Hand và Bomb cũng bắn được kiến chúa.`),
-      t(`At 0 HP she swells up and disappears, and her 4 cells empty. She touches the red line: lose.`,`Về 0 HP, kiến chúa mập lên rồi biến mất, 4 ô trống ra. Chạm vạch đỏ: thua.`)
-    ]),unlock('TBD'),demo('queen'))+
+    ]),unlock(12),demo('lockSlot'))+
     ent(N.el8,ul([
       t(`Ant grid. An ant that wears armor of its color.`,`Trên lưới kiến. Con kiến mặc áo giáp cùng màu.`),
       t(`The number on the armor is how many shots it takes before it breaks. Number per ant: set per level, TBD.`,`Số trên giáp là số phát giáp chịu được trước khi vỡ. Số mỗi con: đặt theo màn, TBD.`),
@@ -1966,7 +1952,21 @@ function view(l){
       t(`At 0 the armor breaks and the ant becomes a normal ant. 1 more shot defeats it. So armor 3 = 4 shots.`,`Về 0 thì giáp vỡ, kiến thành kiến thường. Thêm 1 phát là diệt. Vậy giáp 3 = 4 phát.`),
       t(`Target rules stay: front ants only, in view. A cannon keeps hitting it until it is defeated.`,`Luật target giữ nguyên: chỉ kiến đầu hàng, trong khung nhìn thấy. Pháo bắn tiếp tới khi diệt được.`),
       t(`Hand and Bomb shots hit the armor the same way.`,`Đạn của Hand và Bomb trừ giáp như đạn thường.`)
-    ]),unlock('TBD'),demo('armored'));
+    ]),unlock(17),demo('armored'))+
+    ent(N.el6,ul([
+      t(`Board. 1 tray takes 2×2 cells and holds 4 bottles, each a different color.`,`Trên bàn. 1 khay chiếm 2×2 ô, chứa 4 lọ, mỗi lọ 1 màu khác nhau.`),
+      t(`Can't be swapped or matched. Cubes above don't fall through.`,`Không swap, không match được. Khối phía trên không rơi xuyên qua.`),
+      t(`A match next to the tray (up, down, left, right) breaks the bottle of the same color.`,`Match cạnh khay (trên, dưới, trái, phải) làm vỡ lọ cùng màu với match.`),
+      t(`That match gets +5 ammo: ammo = 2n − 3 + 5.`,`Match đó được +5 đạn: đạn = 2n − 3 + 5.`),
+      t(`No bottle of that color left: no bonus. All 4 broken: the tray disappears and cubes fall into its cells.`,`Không còn lọ màu đó: không có thưởng. Vỡ hết 4 lọ: khay biến mất, khối rơi vào 4 ô đó.`)
+    ]),unlock(22),demo('bottle'))+
+    ent(N.el7,ul([
+      t(`Ant grid. A big ant that takes 2×2 cells and marches down with the grid.`,`Trên lưới kiến. Kiến lớn chiếm 2×2 ô, đi xuống cùng lưới.`),
+      t(`Rainbow armor: cannons of any color can hit her. 1 shot = 1 HP. HP: TBD.`,`Giáp cầu vồng: pháo màu nào cũng bắn được. 1 phát = 1 HP. HP: TBD.`),
+      t(`Target rules stay: she must be the front ant in her 2 columns and in view. Her bottom row sets how low she is.`,`Luật target giữ nguyên: kiến chúa phải ở đầu hàng ở cả 2 cột và trong khung nhìn thấy. Hàng dưới của kiến chúa quyết định độ thấp.`),
+      t(`Hand and Bomb cannons can hit her too.`,`Pháo của Hand và Bomb cũng bắn được kiến chúa.`),
+      t(`At 0 HP she swells up and disappears, and her 4 cells empty. She touches the red line: lose.`,`Về 0 HP, kiến chúa mập lên rồi biến mất, 4 ô trống ra. Chạm vạch đỏ: thua.`)
+    ]),unlock(27),demo('queen'));
 
   /* PER GAME: one ent per booster: ent(N.key, ul([...]), unlockB(level), demo('key')). */
   B['booster-mechanics']=
@@ -2035,11 +2035,11 @@ function view(l){
   B['element-tutorial']=table(t('Element tutorial','Hướng dẫn yếu tố đặc biệt'),
     [t('Element','Yếu tố'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn')],
     [
-      [N.el1,popup('Match next to the chocolate<br>to break it.','Ghép cạnh chocolate<br>để phá vỡ.'),lvl('TBD')],
-      [N.el3,popup('Send cannons to the slots<br>to unlock the locked one.','Đưa pháo lên các ô<br>để mở khóa ô bị khóa.'),lvl('TBD')],
-      [N.el6,popup('Match next to a bottle<br>to break it.','Ghép cạnh lọ<br>để làm vỡ lọ.'),lvl('TBD')],
-      [N.el7,popup('Use any cannon<br>to defeat the queen.','Dùng pháo bất kỳ<br>để hạ kiến chúa.'),lvl('TBD')],
-      [N.el8,popup('Break the armor first<br>to defeat the ant.','Phá giáp trước<br>để hạ kiến.'),lvl('TBD')],
+      [N.el1,popup('Match next to the chocolate<br>to break it.','Ghép cạnh chocolate<br>để phá vỡ.'),lvl(7)],
+      [N.el3,popup('Send cannons to the slots<br>to unlock the locked one.','Đưa pháo lên các ô<br>để mở khóa ô bị khóa.'),lvl(12)],
+      [N.el8,popup('Break the armor first<br>to defeat the ant.','Phá giáp trước<br>để hạ kiến.'),lvl(17)],
+      [N.el6,popup('Match next to a bottle<br>to break it.','Ghép cạnh lọ<br>để làm vỡ lọ.'),lvl(22)],
+      [N.el7,popup('Use any cannon<br>to defeat the queen.','Dùng pháo bất kỳ<br>để hạ kiến chúa.'),lvl(27)],
     ]);
 
   /* PER GAME: one row per booster */
@@ -2054,11 +2054,11 @@ function view(l){
   /* PER GAME: every element and booster with its unlock level, sorted by level. Add rows when elements and boosters exist. */
   const stops=[
     [1,t('First tutorial','Hướng dẫn đầu tiên'),'ftue','ftue-steps','FTUE'],
-    ['TBD',P.el1,'elem','elements-mechanics'],
-    ['TBD',P.el3,'elem','elements-mechanics'],
-    ['TBD',P.el6,'elem','elements-mechanics'],
-    ['TBD',P.el7,'elem','elements-mechanics'],
-    ['TBD',P.el8,'elem','elements-mechanics'],
+    [7,P.el1,'elem','elements-mechanics'],
+    [12,P.el3,'elem','elements-mechanics'],
+    [17,P.el8,'elem','elements-mechanics'],
+    [22,P.el6,'elem','elements-mechanics'],
+    [27,P.el7,'elem','elements-mechanics'],
     ['TBD',P.bo1,'boost','booster-mechanics'],
     ['TBD',P.bo2,'boost','booster-mechanics'],
     ['TBD',P.bo3,'boost','booster-mechanics']
@@ -2109,6 +2109,10 @@ function view(l){
       [look,t('A dark filled slot with a padlock and a number.','Slot tô tối, có ổ khóa và con số.')],
       [an,t('Count down: the slot bounces. Open: the padlock pops and the dashed slot shows.','Đếm ngược: slot nảy. Mở: ổ khóa vỡ, hiện slot viền nét đứt.')]
     ]))+
+    ent(N.el8,params([
+      [look,t('A normal ant with a shell of its color on its back. The shell has a silver rim and a white number.','Kiến thường có lớp vỏ giáp cùng màu trên lưng. Vỏ có viền bạc và con số màu trắng.')],
+      [an,t('Hit: the shell jolts and the number goes down 1. At 0: the shell breaks into silver bits and the plain ant stays.','Trúng đạn: vỏ giật nhẹ, số giảm 1. Về 0: vỏ vỡ thành mảnh bạc, còn lại kiến thường.')]
+    ]),'',demo('armored'))+
     ent(N.el6,params([
       [look,t('An orange tray over 2×2 cells with 4 round jelly bottles in different colors. Each has a cork and a gold ribbon.','Khay cam phủ 2×2 ô, chứa 4 lọ thạch tròn khác màu. Mỗi lọ có nút bần và dải ruy băng vàng.')],
       [an,t('Break: the bottle shakes, shatters into glass bits of its color, and +5 floats up. All 4 broken: the tray pops away.','Vỡ: lọ rung, vỡ thành mảnh thủy tinh cùng màu, chữ +5 bay lên. Vỡ hết 4 lọ: khay bật mất.')]
@@ -2116,11 +2120,7 @@ function view(l){
     ent(N.el7,params([
       [look,t('A big armored ant over 2×2 cells. Rainbow armor, a gold crown and her HP on her back.','Kiến lớn mặc giáp phủ 2×2 ô. Giáp cầu vồng, vương miện vàng, số HP trên lưng.')],
       [an,t('Hit: she flinches and her HP goes down 1. At 0 HP: she swells up, then bursts in a rainbow splash.','Trúng đạn: khựng lại, HP giảm 1. Về 0 HP: mập lên, rồi nổ thành vệt sơn cầu vồng.')]
-    ]))+
-    ent(N.el8,params([
-      [look,t('A normal ant with a shell of its color on its back. The shell has a silver rim and a white number.','Kiến thường có lớp vỏ giáp cùng màu trên lưng. Vỏ có viền bạc và con số màu trắng.')],
-      [an,t('Hit: the shell jolts and the number goes down 1. At 0: the shell breaks into silver bits and the plain ant stays.','Trúng đạn: vỏ giật nhẹ, số giảm 1. Về 0: vỏ vỡ thành mảnh bạc, còn lại kiến thường.')]
-    ]),'',demo('armored'));
+    ]))
 
   B['booster-object-concept']=
     ent(N.bo1,params([[an,t('The chosen cannon glows, then fires a fast stream of shots across the grid and pops out of its slot.','Pháo được chọn sáng lên, bắn một loạt đạn nhanh khắp lưới rồi bật khỏi slot.')]]))+
@@ -2149,8 +2149,8 @@ function view(l){
     ['Slot Unlock','el',t('A locked slot counts down or opens','Slot khóa đếm ngược hoặc mở'),1],
     ['Armor Hit','el',t('A shot hits armor and its number drops','Đạn trúng giáp và số giảm'),0],
     ['Armor Break','el',t('An armor reaches 0 and breaks','Giáp về 0 và vỡ'),1],
-    ['Queen Pop','el',t('The Queen Ant reaches 0 HP and disappears','Kiến chúa hết HP và biến mất'),2],
     ['Bottle Break','el',t('A Jelly Bottle breaks and gives +5 ammo','Lọ thạch vỡ và cho +5 đạn'),1],
+    ['Queen Pop','el',t('The Queen Ant reaches 0 HP and disappears','Kiến chúa hết HP và biến mất'),2],
     ['Hand','bo',t('The chosen cannon fires all its ammo','Pháo được chọn xả hết đạn'),2],
     ['Shuffle','bo',t('The board clears and refills','Bàn được xóa và thay mới'),2],
     ['Bomb','bo',t('3 bomb cannons appear and fire','3 pháo Bomb xuất hiện và bắn'),3]
@@ -2503,6 +2503,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Element order','Thứ tự element'),ul([
+        t(`New element order and unlock levels: Chocolate Layer 7, Locked Slot 12, Armored Ant 17, Jelly Bottle 22, Queen Ant 27.`,`Thứ tự và màn mở khóa mới của element: Lớp chocolate 7, Slot khóa 12, Kiến giáp 17, Lọ thạch 22, Kiến chúa 27.`),
+        t(`Rules (1.4), tutorials (2), unlock map, look (3) and SFX (4) follow this order.`,`Luật (1.4), hướng dẫn (2), bản đồ mở khóa, hình ảnh (3) và SFX (4) theo thứ tự này.`)
+      ]))+
       ent(t('Armored Ant','Kiến giáp'),ul([
         t(`Normal ants have no armor and no number: 1 shot defeats them. Core rules (1.1, 1.2), ant look (3), SFX and demos updated.`,`Kiến thường không có giáp, không có số: 1 phát là diệt. Cập nhật luật chính (1.1, 1.2), hình kiến (mục 3), SFX và demo.`),
         t(`Added the element Armored Ant: the number on its armor is the shots it takes before it breaks; then 1 more shot defeats the ant. Rules, tutorial, look, SFX and a demo. Unlock level: TBD.`,`Thêm element Kiến giáp: số trên giáp là số phát giáp chịu được trước khi vỡ; sau đó thêm 1 phát là diệt kiến. Có luật, hướng dẫn, hình ảnh, SFX và demo. Màn mở khóa: TBD.`)
