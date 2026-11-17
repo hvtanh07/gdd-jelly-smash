@@ -2162,7 +2162,7 @@ function view(l){
       ['jelly_machine_colors',t('Color order of the milestones (repeats)','Thứ tự màu của các mốc (lặp lại)'),'yellow, red, blue, purple',t('list','danh sách')],
       ['jelly_machine_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['jelly_machine_milestone_count',t('Number of milestones','Số mốc'),'20',t('count','mốc')],
-      ['jelly_machine_milestones',t('Jelly needed for each milestone','Số thạch cần cho từng mốc'),'10, 15, 15, 20, 25, 30, 35, 40, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100',t('jelly','thạch')]
+      ['jelly_machine_milestones',t('Jelly needed for each milestone','Số thạch cần cho từng mốc'),'10, 15, 20, 25, 30, 40, 45, 50, 50, 55, 65, 70, 70, 75, 80, 85, 90, 90, 90, 95',t('jelly','thạch')]
     ])+
     rc(t('Leaderboard','Bảng xếp hạng'),[
       ['leaderboard_round_days',t('Length of one round (x)','Độ dài một vòng (x)'),'TBD',t('days','ngày')],
@@ -2380,32 +2380,46 @@ function view(l){
           t(`The current multiplier shows on the event icon and on the level start popup.`,`Hệ số hiện tại hiện trên biểu tượng sự kiện và trên popup bắt đầu màn.`),
           t(`The streak resets when a new event starts.`,`Streak tính lại khi bắt đầu sự kiện mới.`)
         ]))+
+      panel(t('Balance intention','Ý đồ cân bằng'),
+        ul([
+          t(`Goal: everyone who plays during the event gets a few rewards; only players who keep a win streak finish all 20.`,`Mục tiêu: ai chơi trong thời gian sự kiện cũng nhận được vài phần quà; chỉ người giữ được chuỗi thắng mới về đích cả 20 mốc.`),
+          t(`Assumption: about 15 jelly of one color per won level at ×1 (1 color out of 4 on the board).`,`Giả định: khoảng 15 thạch của một màu mỗi màn thắng ở ×1 (1 trong 4 màu trên bàn).`)+' '+inf,
+          t(`4 phases of 5 milestones. Every 5th milestone (★) is a peak reward, worth about as much as the 4 before it, so the player always sees a big goal close by.`,`4 giai đoạn, mỗi giai đoạn 5 mốc. Mỗi mốc thứ 5 (★) là phần thưởng đỉnh, giá trị gần bằng 4 mốc trước cộng lại, để người chơi luôn thấy một mục tiêu lớn ở gần.`),
+          t(`Coin values used: 1 win = 40 coins; Shuffle ≈ 300, Hand ≈ 400, Bomb ≈ 500 coins each (3 for 900 / 1,200 / 1,500 in the shop, see 5).`,`Giá trị quy đổi: 1 màn thắng = 40 xu; Shuffle ≈ 300, Hand ≈ 400, Bomb ≈ 500 xu mỗi cái (cửa hàng bán 3 cái giá 900 / 1.200 / 1.500, xem mục 5).`)
+        ])+
+        table(t('Jelly Machine phases','Các giai đoạn Jelly Machine'),[t('Phase','Giai đoạn'),t('Milestones','Mốc'),t('Total jelly','Tổng thạch'),t('Who gets there','Ai tới được'),t('Intention','Ý đồ')],[
+          [t('Hook','Mồi'),'1–5','100',t('Everyone, day 1 (about 7 wins at ×1)','Mọi người, ngày 1 (khoảng 7 màn thắng ở ×1)'),t('Fast first claims. Teach claim and streak. Peak: unlimited lives.','Nhận thưởng nhanh. Dạy cách nhận thưởng và streak. Đỉnh: tim vô hạn.')],
+          [t('Habit','Thói quen'),'6–10','340',t('Casual player, about 5 wins a day for 3 days','Người chơi thường, khoảng 5 màn thắng mỗi ngày trong 3 ngày'),t('Bring the player back each day. Peak: one of each booster.','Kéo người chơi quay lại mỗi ngày. Đỉnh: mỗi loại booster 1 cái.')],
+          [t('Push','Bứt tốc'),'11–15','700',t('Active player who keeps ×2–×3','Người chơi tích cực, giữ được ×2–×3'),t('Make the streak matter. Bigger boosters and longer lives.','Làm streak có giá trị. Booster nhiều hơn, tim vô hạn lâu hơn.')],
+          [t('Chase','Về đích'),'16–20','1,150',t('Engaged player, about 10 wins a day at ×3–×4','Người chơi chăm, khoảng 10 màn thắng mỗi ngày ở ×3–×4'),t('Long goal for the top players. Peak: grand chest.','Mục tiêu dài cho người chơi giỏi. Đỉnh: rương lớn.')]
+        ],'compact'))+
       panel(t('Milestones & rewards','Các mốc & phần thưởng'),
-        table(t('Jelly Machine milestones','Các mốc của Jelly Machine'),[t('Milestone','Mốc'),t('Collect','Thu thập'),t('Reward','Phần thưởng')],[
-          ['1',t('10 yellow jelly','10 thạch vàng'),t('100 coins','100 xu')],
-          ['2',t('15 red jelly','15 thạch đỏ'),t('1 Shuffle','1 Shuffle')],
-          ['3',t('15 blue jelly','15 thạch xanh'),t('200 coins','200 xu')],
-          ['4',t('20 purple jelly','20 thạch tím'),t('1 Hand','1 Hand')],
-          ['5',t('25 yellow jelly','25 thạch vàng'),t('2 Shuffle','2 Shuffle')+' '+t('(seen)','(thấy trong ảnh)')],
-          ['6',t('30 red jelly','30 thạch đỏ'),t('2 Hand','2 Hand')+' '+t('(seen)','(thấy trong ảnh)')],
-          ['7',t('35 blue jelly','35 thạch xanh'),t('5,000 coins','5.000 xu')+' '+t('(seen)','(thấy trong ảnh)')],
-          ['8',t('40 purple jelly','40 thạch tím'),t('500 coins','500 xu')+' '+t('(seen)','(thấy trong ảnh)')],
-          ['9',t('40 yellow jelly','40 thạch vàng'),t('1 Bomb','1 Bomb')],
-          ['10',t('45 red jelly','45 thạch đỏ'),t('30 min unlimited lives','30 phút tim vô hạn')],
-          ['11',t('50 blue jelly','50 thạch xanh'),t('2 Shuffle','2 Shuffle')],
-          ['12',t('55 purple jelly','55 thạch tím'),t('600 coins','600 xu')],
-          ['13',t('60 yellow jelly','60 thạch vàng'),t('2 Hand','2 Hand')],
-          ['14',t('65 red jelly','65 thạch đỏ'),t('2 Bomb','2 Bomb')],
-          ['15',t('70 blue jelly','70 thạch xanh'),t('1 h unlimited lives','1 giờ tim vô hạn')],
-          ['16',t('75 purple jelly','75 thạch tím'),t('800 coins','800 xu')],
-          ['17',t('80 yellow jelly','80 thạch vàng'),t('3 Shuffle','3 Shuffle')],
-          ['18',t('85 red jelly','85 thạch đỏ'),t('3 Hand','3 Hand')],
-          ['19',t('90 blue jelly','90 thạch xanh'),t('3 Bomb','3 Bomb')],
-          ['20',t('100 purple jelly','100 thạch tím'),t('Big chest: 5,000 coins + 3 of each booster','Rương lớn: 5.000 xu + mỗi loại booster 3 cái')]
+        table(t('Jelly Machine milestones','Các mốc của Jelly Machine'),[t('Milestone','Mốc'),t('Jelly needed','Thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
+          ['1',t('10 yellow','10 vàng'),'10',t('50 coins','50 xu')],
+          ['2',t('15 red','15 đỏ'),'25',t('1 Shuffle','1 Shuffle')],
+          ['3',t('20 blue','20 xanh'),'45',t('100 coins','100 xu')],
+          ['4',t('25 purple','25 tím'),'70',t('1 Hand','1 Hand')],
+          ['5',t('30 yellow','30 vàng'),'100',t('★ 30 min unlimited lives + 200 coins','★ 30 phút tim vô hạn + 200 xu')],
+          ['6',t('40 red','40 đỏ'),'140',t('150 coins','150 xu')],
+          ['7',t('45 blue','45 xanh'),'185',t('1 Shuffle','1 Shuffle')],
+          ['8',t('50 purple','50 tím'),'235',t('1 Bomb','1 Bomb')],
+          ['9',t('50 yellow','50 vàng'),'285',t('250 coins','250 xu')],
+          ['10',t('55 red','55 đỏ'),'340',t('★ 1 Shuffle + 1 Hand + 1 Bomb + 300 coins','★ 1 Shuffle + 1 Hand + 1 Bomb + 300 xu')],
+          ['11',t('65 blue','65 xanh'),'405',t('300 coins','300 xu')],
+          ['12',t('70 purple','70 tím'),'475',t('2 Shuffle','2 Shuffle')],
+          ['13',t('70 yellow','70 vàng'),'545',t('1 h unlimited lives','1 giờ tim vô hạn')],
+          ['14',t('75 red','75 đỏ'),'620',t('2 Hand','2 Hand')],
+          ['15',t('80 blue','80 xanh'),'700',t('★ 2 Bomb + 500 coins','★ 2 Bomb + 500 xu')],
+          ['16',t('85 purple','85 tím'),'785',t('400 coins','400 xu')],
+          ['17',t('90 yellow','90 vàng'),'875',t('2 Shuffle + 1 Hand','2 Shuffle + 1 Hand')],
+          ['18',t('90 red','90 đỏ'),'965',t('2 h unlimited lives','2 giờ tim vô hạn')],
+          ['19',t('90 blue','90 xanh'),'1,055',t('600 coins','600 xu')],
+          ['20',t('95 purple','95 tím'),'1,150',t('★ Grand chest: 2,000 coins + 3 of each booster','★ Rương lớn: 2.000 xu + mỗi loại booster 3 cái')]
         ],'compact')+
         ul([
-          t(`Rows marked “seen” match the Jelly Machine screenshot: milestone 5 needs 25 yellow jelly for 2 Shuffle, 6 gives 2 Hand, 7 gives 5,000 coins, 8 gives coins. The other numbers are a proposal.`,`Các dòng “thấy trong ảnh” khớp ảnh Jelly Machine: mốc 5 cần 25 thạch vàng để nhận 2 Shuffle, mốc 6 cho 2 Hand, mốc 7 cho 5.000 xu, mốc 8 cho xu. Các số còn lại là đề xuất.`),
-          t(`Colors follow the order yellow → red → blue → purple, then repeat. Total: 1,005 jelly.`,`Màu theo thứ tự vàng → đỏ → xanh → tím, rồi lặp lại. Tổng: 1.005 thạch.`)
+          t(`Colors follow the order yellow → red → blue → purple, then repeat.`,`Màu theo thứ tự vàng → đỏ → xanh → tím, rồi lặp lại.`),
+          t(`Jelly needed grows fast in the Hook phase, then slowly. The last 5 milestones stay near 90 so the end does not feel like a wall.`,`Số thạch cần tăng nhanh ở giai đoạn Mồi, sau đó tăng chậm. 5 mốc cuối giữ quanh 90 để đoạn cuối không thành bức tường.`),
+          t(`Total value: about 4,850 coins + 10 Shuffle, 8 Hand, 7 Bomb and 3.5 h of unlimited lives. A casual player who reaches milestone 10 gets about 1,050 coins and 7 boosters, about 25 level wins' worth of coins.`,`Tổng giá trị: khoảng 4.850 xu + 10 Shuffle, 8 Hand, 7 Bomb và 3,5 giờ tim vô hạn. Người chơi thường tới mốc 10 nhận khoảng 1.050 xu và 7 booster, tương đương xu của khoảng 25 màn thắng.`)
         ]))+
       panel(t('Claim and next milestone','Nhận thưởng và sang mốc tiếp theo'),ul([
         t(`When a milestone is full, its reward shows a “Claim” button. The player taps it to get the reward.`,`Khi mốc đầy, phần thưởng của mốc hiện nút “Nhận”. Người chơi chạm để nhận thưởng.`),
@@ -2440,6 +2454,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Jelly Machine balance','Cân bằng Jelly Machine'),ul([
+        t(`Milestone and reward table rebuilt with a clear intention: 4 phases (Hook, Habit, Push, Chase), a peak reward every 5th milestone, 1,150 jelly in total.`,`Dựng lại bảng mốc và phần thưởng theo ý đồ rõ ràng: 4 giai đoạn (Mồi, Thói quen, Bứt tốc, Về đích), phần thưởng đỉnh ở mỗi mốc thứ 5, tổng 1.150 thạch.`),
+        t(`Milestones 5–8 no longer follow the screenshot.`,`Mốc 5–8 không còn theo ảnh chụp.`)
+      ]))+
       ent(t('Jelly Machine','Jelly Machine'),ul([
         t(`Collection Event (7.3) renamed to Jelly Machine. It is started remotely for all players; a player joins after completing level 18.`,`Sự kiện thu thập (mục 7.3) đổi tên thành Jelly Machine. Sự kiện được bật từ xa cho mọi người chơi; người chơi tham gia sau khi hoàn thành màn 18.`),
         t(`20 milestones, each with a jelly color, a jelly count and a reward. The player claims the reward, then moves to the next milestone with a different color.`,`20 mốc, mỗi mốc có màu thạch, số thạch và phần thưởng. Người chơi nhận thưởng rồi sang mốc tiếp với màu khác.`),
