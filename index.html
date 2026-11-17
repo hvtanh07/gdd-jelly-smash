@@ -2158,12 +2158,14 @@ function view(l){
     rc(t('Collection Event','Sự kiện thu thập'),[
       ['collection_event_unlock_level',t('Level from which the event can start','Màn bắt đầu có sự kiện'),'20',t('level','màn')],
       ['collection_event_duration_hours',t('Length of one event','Thời gian một sự kiện'),'72',t('h','giờ')],
-      ['collection_event_colors',t('Target color order, one per event','Thứ tự màu mục tiêu, mỗi sự kiện một màu'),'red, blue, purple, yellow',t('list','danh sách')],
+      ['collection_event_colors',t('Mission colors, in order (mission 5: any of the 4)','Màu của các nhiệm vụ, theo thứ tự (nhiệm vụ 5: màu nào cũng được)'),'red, blue, purple, yellow, any',t('list','danh sách')],
       ['collection_event_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
-      ['collection_event_milestones',t('Total jelly for each milestone','Tổng thạch cho từng mốc'),'50, 150, 300, 500, 800',t('jelly','thạch')]
+      ['collection_event_missions',t('Jelly needed for each mission','Số thạch cần cho từng nhiệm vụ'),'50, 100, 150, 200, 300',t('jelly','thạch')]
     ])+
     rc(t('Leaderboard','Bảng xếp hạng'),[
-      ['leaderboard_round_hours',t('Length of one round','Độ dài một vòng'),'24',t('h','giờ')],
+      ['leaderboard_round_days',t('Length of one round (x)','Độ dài một vòng (x)'),'TBD',t('days','ngày')],
+      ['leaderboard_points_per_win',t('Base points for winning a level','Điểm cơ bản khi thắng 1 màn'),'1',t('points','điểm')],
+      ['leaderboard_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['leaderboard_rank_stars',t('Stars for rank 1, 2, 3, 4–10, 11+','Sao cho hạng 1, 2, 3, 4–10, 11+'),'20, 15, 10, 5, 3','★'],
       ['leaderboard_league_stars',t('Stars needed for each league','Số sao cần cho từng giải'),'0, 10, 50, 150, 300, 1200, 1700, 2500','★']
     ]);
@@ -2300,15 +2302,34 @@ function view(l){
   const CE=nm('Collection Event','Sự kiện thu thập');
   B['leaderboard']=
     sys(nm('Leaderboard','Bảng xếp hạng'),
-      lead(t(`A daily ranking against a small group of players. Win main levels to score points and climb the board. When the round ends, each rank gives stars, and stars move the player up through the leagues. Benchmark: Meowdoku.`,
-        `Bảng xếp hạng theo ngày, đấu với một nhóm nhỏ người chơi. Thắng màn chính để ghi điểm và leo hạng. Hết vòng, mỗi hạng nhận sao, và sao giúp người chơi lên các giải đấu cao hơn. Tham khảo: Meowdoku.`))+
-      tiles([[t('24 h','24 giờ'),t('One round','Một vòng')],['+20 ★',t('Rank 1 reward','Thưởng hạng 1'),'hot'],['8',t('Leagues seen','Số giải đấu thấy được')],[t('TBD','TBD'),t('Unlocks','Mở khóa')]])+
+      lead(t(`A ranking against a small group of players, in rounds of x days. Win a level to score points. Win in a row to score more, up to ×5. When the round ends, the final ranks decide who wins and who loses. Benchmark: Meowdoku.`,
+        `Bảng xếp hạng đấu với một nhóm nhỏ người chơi, theo vòng x ngày. Thắng 1 màn là được cộng điểm. Thắng liên tiếp được nhiều điểm hơn, tối đa ×5. Hết vòng, thứ hạng cuối cùng phân thắng thua. Tham khảo: Meowdoku.`))+
+      tiles([[t('x days','x ngày'),t('One round (TBD)','Một vòng (TBD)')],['×5',t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['+20 ★',t('Rank 1 reward','Thưởng hạng 1')],[t('TBD','TBD'),t('Unlocks','Mở khóa')]])+
       panel(t('Scoring and the board','Tính điểm và bảng'),ul([
-        t(`Each main level the player wins adds points to their score this round. Points per level: TBD (1 per win seen).`,`Mỗi màn chính người chơi thắng được cộng điểm cho vòng này. Điểm mỗi màn: TBD (thấy 1 điểm mỗi màn thắng).`)+' '+inf,
+        t(`Winning a main level adds points to the player's score this round: points = base points × streak multiplier. Base points per win: 1.`,`Thắng 1 màn chính được cộng điểm cho vòng này: điểm = điểm cơ bản × hệ số streak. Điểm cơ bản mỗi màn thắng: 1.`)+' '+inf,
+        t(`Losing or quitting a level gives no points and takes none away.`,`Thua hoặc thoát màn không được điểm và không bị trừ điểm.`),
         t(`The board lists the group by score, highest first. Group size: TBD (at least 12 seen).`,`Bảng xếp người trong nhóm theo điểm, cao nhất ở trên. Số người mỗi nhóm: TBD (thấy ít nhất 12).`),
         t(`Each row: rank, avatar, name, status (Online, Playing, or “x min ago”), score, and the stars that rank gives.`,`Mỗi dòng: hạng, avatar, tên, trạng thái (Đang online, Đang chơi, hoặc “x phút trước”), điểm, và số sao của hạng đó.`),
         t(`Ranks 1–3 also show a gift box: red, blue and green. Box contents: TBD.`,`Hạng 1–3 có thêm hộp quà: đỏ, xanh dương và xanh lá. Nội dung hộp: TBD.`),
         t(`The player's own row is highlighted and stays in view.`,`Dòng của người chơi được làm nổi bật và luôn hiện trên màn hình.`)+' '+inf
+      ]))+
+      panel(t('Streak multiplier','Hệ số streak'),
+        table(t('Leaderboard streak multiplier','Hệ số streak của Bảng xếp hạng'),[t('Wins in a row','Số màn thắng liên tiếp'),t('Multiplier','Hệ số'),t('Points for that win','Điểm của màn thắng đó')],[
+          ['1','×1','1'],['2','×2','2'],['3','×3','3'],['4','×4','4'],[t('5 or more','Từ 5 trở lên'),'×5 (max)','5']
+        ],'compact')+
+        ul([
+          t(`Example: 6 wins in a row give 1 + 2 + 3 + 4 + 5 + 5 = 20 points. 6 wins with a loss after each give 6 points.`,`Ví dụ: thắng 6 màn liên tiếp được 1 + 2 + 3 + 4 + 5 + 5 = 20 điểm. Thắng 6 màn nhưng xen kẽ thua thì chỉ được 6 điểm.`),
+          t(`A loss or quitting the level resets the streak to ×1. A revive does not break it.`,`Thua hoặc thoát màn đưa streak về ×1. Hồi sinh không làm mất streak.`),
+          t(`The current multiplier shows on the home icon and on the level start popup.`,`Hệ số hiện tại hiện trên biểu tượng ở màn hình chính và trên popup bắt đầu màn.`),
+          t(`The streak resets when a new round starts.`,`Streak tính lại khi bắt đầu vòng mới.`),
+          t(`This streak is the same one the Collection Event uses (7.3): one win streak, two events.`,`Streak này dùng chung với Sự kiện thu thập (mục 7.3): một chuỗi thắng, hai sự kiện.`)+' '+inf
+        ]))+
+      panel(t('Round end: winners and losers','Hết vòng: phân thắng thua'),ul([
+        t(`When the x-day timer ends, the ranking is locked. A result popup shows the player's final rank and reward the next time they open the game.`,`Khi hết x ngày, bảng xếp hạng được chốt. Lần mở game tiếp theo, popup kết quả hiện hạng cuối cùng và phần thưởng của người chơi.`),
+        t(`<b>Winners:</b> ranks 1–3. They get a gift box and the most stars. Rank 1 also gets the exclusive avatar frame.`,`<b>Thắng:</b> hạng 1–3. Nhận hộp quà và nhiều sao nhất. Hạng 1 nhận thêm khung avatar độc quyền.`),
+        t(`<b>Losers:</b> rank 4 and below. No gift box, only the small star reward of their rank.`,`<b>Thua:</b> từ hạng 4 trở xuống. Không có hộp quà, chỉ nhận số sao nhỏ theo hạng.`),
+        t(`A player with 0 points in the round gets no stars.`,`Người chơi có 0 điểm trong vòng thì không nhận sao.`)+' '+inf,
+        t(`Ties: the player who reached the score first ranks higher.`,`Bằng điểm: ai đạt số điểm đó trước thì xếp trên.`)+' '+inf
       ]))+
       panel(t('Stars by rank at round end','Sao theo hạng khi hết vòng'),
         table(t('Stars by rank','Sao theo hạng'),[t('Rank','Hạng'),t('Stars','Sao'),t('Extra','Thêm')],[
@@ -2330,27 +2351,28 @@ function view(l){
           t(`Not playing for a long time can drop the player to a lower league. How long and how far: TBD.`,`Không chơi trong thời gian dài có thể bị hạ xuống giải thấp hơn. Bao lâu và hạ mấy bậc: TBD.`)
         ]))+
       panel(t('Screens','Màn hình'),ul([
-        t(`<b>Home icon:</b> a podium with the round countdown (for example 23:57:09) and a red badge. Tap to open the board.`,`<b>Biểu tượng ở màn hình chính:</b> bục xếp hạng kèm đồng hồ đếm ngược của vòng (ví dụ 23:57:09) và chấm đỏ. Chạm để mở bảng.`),
+        t(`<b>Home icon:</b> a podium with the round countdown, the current streak multiplier and a red badge. Tap to open the board.`,`<b>Biểu tượng ở màn hình chính:</b> bục xếp hạng kèm đồng hồ đếm ngược của vòng, hệ số streak hiện tại và chấm đỏ. Chạm để mở bảng.`),
         t(`<b>Board:</b> title, round countdown, league carousel, ranking list, and a “Go Get Rewards” button that starts the next level.`,`<b>Bảng:</b> tiêu đề, đồng hồ đếm ngược, băng chuyền giải đấu, danh sách xếp hạng, và nút “Đi Nhận Thưởng” để vào màn tiếp theo.`),
         t(`<b>Info (i):</b> how it works in 4 pictures: win main levels → top the board → get an exclusive frame and gift → earn ★ to move up a league. Note: “Not playing for a long time can drop you a league.” Tap to continue.`,`<b>Thông tin (i):</b> cách chơi bằng 4 hình: hoàn thành các màn chính → dẫn đầu bảng xếp hạng → nhận khung và quà độc quyền → nhận ★ để thăng giải đấu cao hơn. Ghi chú: “Không chơi trong thời gian dài có thể khiến bạn bị hạ bậc.” Chạm để tiếp tục.`),
         t(`Rank 1 gets an exclusive avatar frame. Details: TBD.`,`Hạng 1 nhận khung avatar độc quyền. Chi tiết: TBD.`)
       ]))+
       kv([
-        [t('Round reset','Bắt đầu vòng mới'),t(`Every 24 h. Stars are given when the round ends, then scores reset and a new group is formed. Reset time and group matching: TBD.`,`Mỗi 24 giờ. Sao được trao khi hết vòng, sau đó điểm về 0 và ghép nhóm mới. Giờ reset và cách ghép nhóm: TBD.`)+' '+inf],
-        [t('Numbers','Con số'),t(`Round length, stars per rank and league thresholds are remote config (5).`,`Độ dài vòng, sao mỗi hạng và mốc giải đấu nằm trong cấu hình từ xa (mục 5).`)]
+        [t('Round reset','Bắt đầu vòng mới'),t(`Every x days (x: TBD, remote config; Meowdoku uses 24 h). Stars are given when the round ends, then scores and the streak reset and a new group is formed. Reset time and group matching: TBD.`,`Mỗi x ngày (x: TBD, cấu hình từ xa; Meowdoku dùng 24 giờ). Sao được trao khi hết vòng, sau đó điểm và streak về 0 và ghép nhóm mới. Giờ reset và cách ghép nhóm: TBD.`)+' '+inf],
+        [t('Numbers','Con số'),t(`Round length, base points, max multiplier, stars per rank and league thresholds are remote config (5).`,`Độ dài vòng, điểm cơ bản, hệ số tối đa, sao mỗi hạng và mốc giải đấu nằm trong cấu hình từ xa (mục 5).`)]
       ]));
 
   B['collection-event']=
     sys(CE,
-      lead(t(`A timed event. Each event asks the player to collect one jelly color: red, blue, purple or yellow. Win levels to fill the progress bar. Each milestone gives a gift. Win in a row to multiply what you collect, up to ×5. Benchmark: Royal Match collection events.`,
-        `Sự kiện có thời hạn. Mỗi sự kiện yêu cầu thu thập một màu thạch: đỏ, xanh, tím hoặc vàng. Thắng màn để làm đầy thanh tiến độ. Mỗi mốc cho một phần quà. Thắng liên tiếp để nhân số thu được, tối đa ×5. Tham khảo: sự kiện thu thập của Royal Match.`))+
-      tiles([[t('Level 20','Màn 20'),t('Unlocks','Mở khóa')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('×5','×5'),t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['5',t('Milestones','Số mốc quà')]])+
-      panel(t('Mission: collect jelly','Nhiệm vụ: thu thập thạch'),ul([
-        t(`Each event has 1 target color. The color rotates between events: red → blue → purple → yellow.`,`Mỗi sự kiện có 1 màu mục tiêu. Màu đổi theo từng sự kiện: đỏ → xanh → tím → vàng.`),
-        t(`Every cube of the target color the player matches on the board counts as 1 jelly.`,`Mỗi khối màu mục tiêu người chơi ghép trên bàn tính là 1 thạch.`),
+      lead(t(`A timed event made of missions. Each mission asks the player to collect jelly of one color: red, blue, purple or yellow. Finishing a mission fills one step of the progress track and gives a gift. Win in a row to multiply what you collect, up to ×5. Benchmark: Royal Match (Royal Pass style steps).`,
+        `Sự kiện có thời hạn, gồm nhiều nhiệm vụ. Mỗi nhiệm vụ yêu cầu thu thập thạch của một màu: đỏ, xanh, tím hoặc vàng. Xong 1 nhiệm vụ là đầy 1 nấc tiến độ và nhận quà. Thắng liên tiếp để nhân số thu được, tối đa ×5. Tham khảo: Royal Match (các nấc kiểu Royal Pass).`))+
+      tiles([[t('Level 20','Màn 20'),t('Unlocks','Mở khóa')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('×5','×5'),t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['5',t('Missions','Số nhiệm vụ')]])+
+      panel(t('Missions: collect jelly','Nhiệm vụ: thu thập thạch'),ul([
+        t(`The event is a chain of 5 missions. Only 1 mission is active at a time. Each mission has 1 target color and a jelly count.`,`Sự kiện là chuỗi 5 nhiệm vụ. Mỗi lúc chỉ có 1 nhiệm vụ đang chạy. Mỗi nhiệm vụ có 1 màu mục tiêu và số thạch cần thu.`),
+        t(`Every cube of the active mission's color the player matches on the board counts as 1 jelly.`,`Mỗi khối cùng màu với nhiệm vụ đang chạy mà người chơi match trên bàn tính là 1 thạch.`),
         t(`Cubes freed from a Chocolate Layer count when they are matched.`,`Khối thoát khỏi Lớp chocolate được tính khi được match.`)+' '+inf,
-        t(`In the level, each matched target cube flies a small jelly icon to a counter under the HUD.`,`Trong màn, mỗi khối mục tiêu được ghép bay một biểu tượng thạch nhỏ tới bộ đếm dưới HUD.`),
-        t(`Jelly is only added to the event when the level is won. Lose or quit: the jelly from that attempt is lost.`,`Thạch chỉ được cộng vào sự kiện khi thắng màn. Thua hoặc thoát: mất số thạch của lượt đó.`)
+        t(`In the level, each matched target cube flies a small jelly icon to a counter under the HUD.`,`Trong màn, mỗi khối mục tiêu được match bay một biểu tượng thạch nhỏ tới bộ đếm dưới HUD.`),
+        t(`Jelly is only added to the mission when the level is won. Lose or quit: the jelly from that attempt is lost.`,`Thạch chỉ được cộng vào nhiệm vụ khi thắng màn. Thua hoặc thoát: mất số thạch của lượt đó.`),
+        t(`Jelly over the mission's count carries over to the next mission only if it is the same color. Otherwise it is lost.`,`Thạch dư so với yêu cầu chỉ chuyển sang nhiệm vụ sau nếu cùng màu. Khác màu thì mất.`)+' '+inf
       ]))+
       panel(t('Streak multiplier','Hệ số streak'),
         table(t('Streak multiplier','Hệ số streak'),[t('Wins in a row','Số màn thắng liên tiếp'),t('Multiplier','Hệ số')],[
@@ -2363,31 +2385,31 @@ function view(l){
           t(`The streak resets when a new event starts.`,`Streak tính lại khi bắt đầu sự kiện mới.`)
         ]))+
       panel(t('Progress & rewards','Tiến độ & phần thưởng'),
-        table(t('Collection Event milestones','Các mốc của Sự kiện thu thập'),[t('Milestone','Mốc'),t('Total jelly','Tổng thạch'),t('Reward','Phần thưởng')],[
-          ['1','50',t('100 coins','100 xu')],
-          ['2','150',t('1 Shuffle','1 Shuffle')],
-          ['3','300',t('200 coins + 1 Hand','200 xu + 1 Hand')],
-          ['4','500',t('30 min unlimited lives + 1 Bomb','30 phút tim vô hạn + 1 Bomb')],
-          ['5',t('800 (final)','800 (cuối)'),t('Big chest: 500 coins + 1 of each booster','Rương lớn: 500 xu + mỗi loại booster 1 cái')]
+        table(t('Collection Event missions','Các nhiệm vụ của Sự kiện thu thập'),[t('Mission','Nhiệm vụ'),t('Collect','Thu thập'),t('Gift','Quà')],[
+          ['1',t('50 red jelly','50 thạch đỏ'),t('100 coins','100 xu')],
+          ['2',t('100 blue jelly','100 thạch xanh'),t('1 Shuffle','1 Shuffle')],
+          ['3',t('150 purple jelly','150 thạch tím'),t('200 coins + 1 Hand','200 xu + 1 Hand')],
+          ['4',t('200 yellow jelly','200 thạch vàng'),t('30 min unlimited lives + 1 Bomb','30 phút tim vô hạn + 1 Bomb')],
+          ['5',t('300 jelly of any of the 4 colors (final)','300 thạch thuộc 4 màu trên (cuối)'),t('Big chest: 500 coins + 1 of each booster','Rương lớn: 500 xu + mỗi loại booster 1 cái')]
         ],'compact')+
         ul([
-          t(`Reaching a milestone gives its gift right away, with a reward popup on the win screen. No extra tap or ad needed.`,`Đạt mốc là nhận quà ngay, kèm popup phần thưởng ở màn hình thắng. Không cần chạm thêm hay xem quảng cáo.`),
-          t(`One win can pass more than one milestone. Each gift shows one after another.`,`Một lần thắng có thể vượt nhiều mốc. Từng phần quà hiện lần lượt.`),
-          t(`After the final milestone the event is done. The icon shows a check until the event ends.`,`Sau mốc cuối, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi sự kiện kết thúc.`),
+          t(`The progress track has 1 step per mission. Finishing a mission fills its step and gives its gift right away, with a reward popup on the win screen. No extra tap or ad needed.`,`Thanh tiến độ có 1 nấc cho mỗi nhiệm vụ. Xong nhiệm vụ là đầy nấc và nhận quà ngay, kèm popup phần thưởng ở màn hình thắng. Không cần chạm thêm hay xem quảng cáo.`),
+          t(`The next mission starts at once. One win can finish only 1 mission, unless the next mission has the same color.`,`Nhiệm vụ tiếp theo bắt đầu ngay. Một lần thắng chỉ xong được 1 nhiệm vụ, trừ khi nhiệm vụ sau cùng màu.`)+' '+inf,
+          t(`After the final mission the event is done. The icon shows a check until the event ends.`,`Sau nhiệm vụ cuối, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi sự kiện kết thúc.`),
           t(`The event ends when the 72 h timer runs out. Progress resets for the next event.`,`Sự kiện kết thúc khi hết 72 giờ. Tiến độ tính lại cho sự kiện sau.`)
         ]))+
       panel(t('Event flow','Luồng sự kiện'),
         table(t('Collection Event cycle','Chu kỳ Sự kiện thu thập'),[t('State','Trạng thái'),t('Player sees','Người chơi thấy'),t('Next','Tiếp theo')],[
           [t('Locked','Chưa mở'),t('Nothing','Không có gì'),t('Level Complete of level 20 → Start','Level Complete màn 20 → Bắt đầu')],
-          [t('Start','Bắt đầu'),t('Event popup with the target color, the 72 h timer and the rewards. 1st time: a short how-to.','Popup sự kiện với màu mục tiêu, timer 72 giờ và phần thưởng. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
-          [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win → add jelly · Final milestone → Done · Timer over → End','Thắng → cộng thạch · Mốc cuối → Hoàn thành · Hết giờ → Kết thúc')],
+          [t('Start','Bắt đầu'),t('Event popup with the first mission, the 72 h timer and the gifts. 1st time: a short how-to.','Popup sự kiện với nhiệm vụ đầu tiên, timer 72 giờ và các phần quà. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
+          [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win → add jelly · Mission done → gift, next mission · Final mission → Done · Timer over → End','Thắng → cộng thạch · Mốc cuối → Hoàn thành · Hết giờ → Kết thúc')],
           [t('Done','Hoàn thành'),t('Icon with a check','Biểu tượng có dấu tích'),t('Timer over → End','Hết giờ → Kết thúc')],
           [t('End','Kết thúc'),t('Event end popup with the result','Popup kết thúc kèm kết quả'),t('Next event starts at the next session → Start','Sự kiện mới bắt đầu ở phiên chơi tiếp theo → Bắt đầu')]
         ],'compact'))+
       kv([
         [t('Popup priority','Ưu tiên popup'),t(`Event popups show after the offer popups (7.2). If an offer popup shows, the event popup waits for the next screen.`,`Popup sự kiện hiện sau popup ưu đãi (mục 7.2). Nếu có popup ưu đãi, popup sự kiện chờ sang màn hình tiếp theo.`)+' '+inf],
         [t('Offline','Offline'),t(`The 72 h timer runs on server time, also offline.`,`Timer 72 giờ chạy theo giờ server, kể cả khi offline.`)],
-        [t('Numbers','Con số'),t(`Unlock level, length, max multiplier, milestones and rewards are remote config (5).`,`Màn mở khóa, thời gian, hệ số tối đa, các mốc và phần thưởng nằm trong cấu hình từ xa (mục 5).`)]
+        [t('Numbers','Con số'),t(`Unlock level, length, max multiplier, missions and gifts are remote config (5).`,`Màn mở khóa, thời gian, hệ số tối đa, các nhiệm vụ và quà nằm trong cấu hình từ xa (mục 5).`)]
       ]));
 
   /* ===== 8. Change note ===== */
@@ -2395,6 +2417,11 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 17, 2026','17/11/2026'),
+      ent(t('Leaderboard and Collection Event','Bảng xếp hạng và Sự kiện thu thập'),ul([
+        t(`Leaderboard (7.4), per the new brief: a win gives points, a win streak multiplies them up to ×5, a round lasts x days (TBD), and the final ranks decide winners (top 3) and losers.`,`Bảng xếp hạng (mục 7.4), theo brief mới: thắng 1 màn được cộng điểm, chuỗi thắng nhân điểm tối đa ×5, mỗi vòng dài x ngày (TBD), và thứ hạng cuối phân thắng (top 3) thua.`),
+        t(`Collection Event (7.3): now a chain of 5 missions, one jelly color each (red, blue, purple, yellow). Finishing a mission fills one progress step and gives a gift.`,`Sự kiện thu thập (mục 7.3): giờ là chuỗi 5 nhiệm vụ, mỗi nhiệm vụ một màu thạch (đỏ, xanh, tím, vàng). Xong 1 nhiệm vụ là đầy 1 nấc tiến độ và nhận quà.`),
+        t(`Remote config (5) updated for both.`,`Cập nhật cấu hình từ xa (mục 5) cho cả hai.`)
+      ]))+
       ent(t('Chocolate Layer','Lớp chocolate'),ul([
         t(`Chocolate Layer now has up to 3 layers. Each match next to it removes 1; the cell opens when the last one breaks. A badge shows the layers left. New demo. Layers per cell: TBD.`,`Lớp chocolate giờ có tối đa 3 lớp. Mỗi match cạnh nó phá 1 lớp; hết lớp cuối thì ô mở. Huy hiệu hiện số lớp còn lại. Có demo mới. Số lớp mỗi ô: TBD.`)
       ]))+
