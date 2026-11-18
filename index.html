@@ -1000,7 +1000,7 @@ const DEMOS={
         ...dpopT('.ri12,.ri22,.ri33',1.5),
         ['.rc','opacity',[[0,0],[1.45,0],[1.55,1],[2.2,1],[2.35,0]]],
         ['.rc','transform',[[1.45,'scale(.4)'],[1.65,'scale(1.15)'],[1.8,'scale(1)']]]];}},
-  slots:{D:6.6, /* each match puts a cannon in the leftmost free slot; 3 of one color merge; with 5 full, the new cannon is lost */
+  slots:{D:6.6, /* each match puts a cannon in the leftmost free slot; a cannon of a color already in the slots merges into it, even when full; otherwise with 5 full, the new cannon is lost */
     svg:()=>{
       const sx=i=>7+38*i,cx=i=>sx(i)+17,CY=52;
       let o=arena();
@@ -1010,9 +1010,9 @@ const DEMOS={
       const grp=(k,c,n)=>{const x0=100-(28*n-2)/2;let g='';for(let m=0;m<n;m++)g+=dj(f1(x0+28*m),118,26,c,true);return `<g class="g${k}" style="opacity:0"><g class="g${k}i">${g}</g></g>`;};
       o+=grp(0,0,3)+grp(1,0,4)+grp(2,4,3)+grp(3,5,3)+grp(4,1,3);
       const hid=(k,i,c,v)=>`<g class="k${k}" style="opacity:0">${dcan(cx(i),CY,c,[v],'',.75)}</g>`;
-      o+=dcan(cx(0),CY,2,['5'],'k0',.75)+dcan(cx(1),CY,0,['3','11'],'k1',.75)+dcan(cx(2),CY,3,['7'],'k2',.75)+
-         hid(3,3,0,'3')+hid(4,4,0,'5')+hid(5,3,4,'3')+hid(6,4,5,'3');
-      return o+dpill('pm',100,13,104,'Merge ×3 = 11 ammo','#ffd93d','#3a2400')+dpill('pf',100,13,76,'Slots full','#ff5470','#fff');},
+      o+=dcan(cx(0),CY,2,['5'],'k0',.75)+dcan(cx(1),CY,0,['3','6','11'],'k1',.75)+dcan(cx(2),CY,3,['7'],'k2',.75)+
+         hid(5,3,4,'3')+hid(6,4,5,'3');
+      return o+dpill('pm',100,13,104,'Merge: 6 + 5 = 11 ammo','#ffd93d','#3a2400')+dpill('pf',100,13,76,'Slots full','#ff5470','#fff');},
     tracks:()=>{
       const cx=i=>24+38*i,tr=[];
       const fly=(k,s,slot)=>{tr.push(
@@ -1020,17 +1020,16 @@ const DEMOS={
         [`.g${k}i`,'transform',[[s,'scale(1)'],[s+.12,'scale(1.12)'],[s+.24,'scale(1)'],[s+.36,'scale(1.12)'],[s+.48,'scale(1)']]],
         [`.g${k}`,'transform',[[s+.45,T(0,0,1),'ease-in'],[s+.85,T(cx(slot)-100,-83,.3)]]]);};
       const popIn=(k,t)=>[[t,T(0,0,0)],[t+.15,T(0,0,1.15)],[t+.25,T(0,0,1)]];
-      fly(0,.4,3);fly(1,1.3,4);fly(2,3.3,3);fly(3,4.0,4);
-      tr.push(['.k3','opacity',[[0,0],[1.2,0],[1.25,1],[2.85,1],[2.95,0]]],['.k3','transform',popIn(3,1.2).concat([[2.6,T(0,0,1),'ease-in'],[2.95,T(-76,0,.5)]])],
-        ['.k4','opacity',[[0,0],[2.1,0],[2.15,1],[2.85,1],[2.95,0]]],['.k4','transform',popIn(4,2.1).concat([[2.6,T(0,0,1),'ease-in'],[2.95,T(-114,0,.5)]])],
-        ['.pm','opacity',[[0,0],[2.55,0],[2.65,1],[3.6,1],[3.75,0]]],
-        ['.k1','transform',[[2.95,'scale(1)'],[3.1,'scale(1.25)'],[3.3,'scale(1)']]],
-        ['.k1 .v0','opacity',[[0,1],[2.95,1],[3.0,0]]],['.k1 .v1','opacity',[[0,0],[2.95,0],[3.0,1]]],
-        ['.k5','opacity',[[0,0],[4.1,0],[4.15,1]]],['.k5','transform',popIn(5,4.1)],
-        ['.k6','opacity',[[0,0],[4.8,0],[4.85,1]]],['.k6','transform',popIn(6,4.8)],
-        ['.g4','opacity',[[0,0],[5.0,0],[5.1,1],[5.75,1],[5.85,0]]],
-        ['.g4i','transform',[[5.0,'scale(1)'],[5.12,'scale(1.12)'],[5.24,'scale(1)'],[5.5,'scale(1)'],[5.85,'scale(0)']]],
-        ['.pf','opacity',[[0,0],[5.3,0],[5.4,1],[6.0,1],[6.15,0]]]);
+      const bump=t=>[[t,'scale(1)'],[t+.15,'scale(1.25)'],[t+.35,'scale(1)']];
+      fly(0,.3,1);fly(2,1.2,3);fly(3,2.1,4);fly(1,4.3,1);
+      tr.push(['.k1','transform',bump(1.15).concat(bump(5.15))],
+        ['.k1 .v0','opacity',[[0,1],[1.15,1],[1.2,0]]],['.k1 .v1','opacity',[[0,0],[1.15,0],[1.2,1],[5.15,1],[5.2,0]]],['.k1 .v2','opacity',[[0,0],[5.15,0],[5.2,1]]],
+        ['.k5','opacity',[[0,0],[2.05,0],[2.1,1]]],['.k5','transform',popIn(5,2.05)],
+        ['.k6','opacity',[[0,0],[2.95,0],[3.0,1]]],['.k6','transform',popIn(6,2.95)],
+        ['.g4','opacity',[[0,0],[3.2,0],[3.3,1],[3.95,1],[4.05,0]]],
+        ['.g4i','transform',[[3.2,'scale(1)'],[3.32,'scale(1.12)'],[3.44,'scale(1)'],[3.7,'scale(1)'],[4.05,'scale(0)']]],
+        ['.pf','opacity',[[0,0],[3.5,0],[3.6,1],[4.2,1],[4.35,0]]],
+        ['.pm','opacity',[[0,0],[5.1,0],[5.2,1],[6.1,1],[6.25,0]]]);
       return tr;}},
   target:{D:5.4, /* the cannon picks blue front cubes in view, lowest first, and disappears at 0 ammo */
     svg:()=>{
@@ -1708,7 +1707,7 @@ function view(l){
     iceLock:t('The cubes under the green ice cream are locked. The blue cannon defeats the ant carrying the green spoon, and the spoon flies down to remove the lock.','Các khối dưới kem xanh lá bị khóa. Pháo xanh diệt con kiến mang muỗng xanh lá, muỗng bay xuống gỡ khóa.'),
     swap:t('A swap that makes no line slides back. The next swap makes a blue line of 3, so it stays: the line pops for 3 ammo, the cubes above fall and new cubes drop in.','Swap không tạo hàng thì 2 khối trượt về. Swap tiếp theo tạo hàng 3 khối xanh nên được giữ: hàng nổ cho 3 đạn, khối phía trên rơi xuống và khối mới rơi vào.'),
     refill:t('The red line clears. Cubes above fall, new cubes drop in from the top, and the fall makes a green line. That cascade matches on its own.','Hàng đỏ bị xóa. Khối phía trên rơi xuống, khối mới rơi từ trên vào, và cú rơi tạo ra hàng xanh lá. Combo dây chuyền đó tự match.'),
-    slots:t('Each match puts a cannon of its color in the leftmost free slot. The 3 red cannons merge into one with 3 + 3 + 5 = 11 ammo and free 2 slots. With all 5 slots full, the cannon from the orange match is lost.','Mỗi match đặt 1 pháo cùng màu vào slot trống bên trái nhất. 3 pháo đỏ gộp thành 1 pháo với 3 + 3 + 5 = 11 đạn và trả lại 2 slot. Khi đủ 5 slot, pháo của match cam bị mất.'),
+    slots:t('Each match puts a cannon of its color in the leftmost free slot. The first red match merges into the red cannon: 3 + 3 = 6 ammo. With all 5 slots full, the cannon from the orange match is lost. The last red match still merges: 6 + 5 = 11 ammo.','Mỗi match đặt 1 pháo cùng màu vào slot trống bên trái nhất. Match đỏ đầu tiên gộp vào pháo đỏ: 3 + 3 = 6 đạn. Khi đủ 5 slot, pháo của match cam bị mất. Match đỏ cuối vẫn gộp được: 6 + 5 = 11 đạn.'),
     target:t('The blue cannon has 3 ammo. It only aims at blue front ants in view, lowest first: column 3, then the two in column 1. Blue ants behind other ants and the one above the view are not targets. At 0 ammo the cannon disappears.','Pháo xanh có 3 đạn. Pháo chỉ nhắm kiến xanh ở đầu hàng trong khung nhìn thấy, thấp nhất trước: cột 3, rồi 2 con ở cột 1. Kiến xanh nằm sau con khác và con ở trên khung không phải target. Hết đạn thì pháo biến mất.'),
     boost:t('Only 3 ants are in view, so the grid speeds up (×5 in the demo) until the view is full again. Then it goes back to normal speed.','Khung nhìn thấy chỉ còn 3 con kiến, nên lưới đi xuống nhanh hơn (demo: ×5) cho đến khi khung đầy lại. Sau đó lưới về tốc độ thường.'),
     jelly:t('A swap makes a blue line of 3. The cubes squash as they land, the line pulses and flies up, and a blue cannon with 3 ammo pops into the first slot.','Một lần swap tạo hàng 3 khối xanh. Khối bẹp lại khi dừng, hàng phồng lên rồi bay lên, và 1 pháo xanh 3 đạn bật vào slot đầu.'),
@@ -1794,8 +1793,8 @@ function view(l){
     ent(nm('Cannon slots','Hàng slot pháo'),ul([
       t(`5 slots between the ant grid and the board. Empty at start.`,`5 slot giữa lưới kiến và bàn chơi. Đầu màn trống.`),
       t(`Each match puts a cannon of its color in the leftmost free slot.`,`Mỗi match đặt 1 pháo cùng màu vào slot trống bên trái nhất.`),
-      t(`<b>Slots full:</b> the new cannon is lost. The match still clears. Exception: if 2 cannons of its color are in the slots, the new cannon merges into them and 1 slot frees up.`,`<b>Đủ slot:</b> pháo mới bị mất. Match vẫn xóa khối. Ngoại lệ: nếu trong slot đã có 2 pháo cùng màu, pháo mới gộp vào chúng và trả lại 1 slot.`),
-      t(`<b>Merge:</b> 3 cannons of one color become 1, with their ammo added. 2 slots free up.`,`<b>Gộp:</b> 3 pháo cùng màu gộp thành 1, cộng dồn đạn. Trả lại 2 slot.`),
+      t(`<b>Merge:</b> if a cannon of the same color is in the slots, the new cannon merges into it at once, with ammo added. This works even when the slots are full.`,`<b>Gộp:</b> nếu slot đã có pháo cùng màu, pháo mới gộp ngay vào pháo đó, cộng dồn đạn. Đủ slot vẫn gộp được.`),
+      t(`<b>Slots full:</b> a cannon of a new color is lost. The match still clears.`,`<b>Đủ slot:</b> pháo màu mới bị mất. Match vẫn xóa khối.`),
       t(`A cannon leaves at 0 ammo, or when its color is gone from the ant grid. It can't be removed by hand.`,`Pháo biến mất khi hết đạn, hoặc khi màu của nó hết trên lưới kiến. Không bỏ tay được.`),
       t(`A match of a color no longer on the ant grid spawns no cannon.`,`Match màu không còn trên lưới kiến thì không sinh pháo.`)
     ]),'',demo('slots'))+
@@ -2513,7 +2512,7 @@ function view(l){
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 18, 2026','18/11/2026'),
       ent(t('Cannon slots','Hàng slot pháo'),ul([
-        t(`With all slots full, a third cannon of a color still merges with the 2 already in the slots and frees 1 slot. Before, it was lost, so slots full of cannons with no target in view could not be cleared.`,`Khi đủ slot, pháo thứ 3 cùng màu vẫn gộp với 2 pháo đang trong slot và trả lại 1 slot. Trước đây pháo này bị mất, nên slot đầy pháo không có mục tiêu thì không gỡ được.`)
+        t(`Merge: a new cannon merges at once into a cannon of the same color in the slots, even when the slots are full (was: 3 cannons of one color merge). So each color takes at most 1 slot; full slots only lose cannons of a new color. The slots demo is redrawn.`,`Gộp: pháo mới gộp ngay vào pháo cùng màu trong slot, kể cả khi đủ slot (trước: đủ 3 pháo cùng màu mới gộp). Vì vậy mỗi màu chiếm tối đa 1 slot; đủ slot chỉ mất pháo màu mới. Vẽ lại demo slot.`)
       ]))
     )+
     day(t('November 17, 2026','17/11/2026'),
