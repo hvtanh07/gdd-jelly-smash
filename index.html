@@ -1794,7 +1794,7 @@ function view(l){
     ent(nm('Cannon slots','Hàng slot pháo'),ul([
       t(`5 slots between the ant grid and the board. Empty at start.`,`5 slot giữa lưới kiến và bàn chơi. Đầu màn trống.`),
       t(`Each match puts a cannon of its color in the leftmost free slot.`,`Mỗi match đặt 1 pháo cùng màu vào slot trống bên trái nhất.`),
-      t(`<b>Slots full:</b> the new cannon is lost. The match still clears.`,`<b>Đủ slot:</b> pháo mới bị mất. Match vẫn xóa khối.`),
+      t(`<b>Slots full:</b> the new cannon is lost. The match still clears. Exception: if 2 cannons of its color are in the slots, the new cannon merges into them and 1 slot frees up.`,`<b>Đủ slot:</b> pháo mới bị mất. Match vẫn xóa khối. Ngoại lệ: nếu trong slot đã có 2 pháo cùng màu, pháo mới gộp vào chúng và trả lại 1 slot.`),
       t(`<b>Merge:</b> 3 cannons of one color become 1, with their ammo added. 2 slots free up.`,`<b>Gộp:</b> 3 pháo cùng màu gộp thành 1, cộng dồn đạn. Trả lại 2 slot.`),
       t(`A cannon leaves at 0 ammo, or when its color is gone from the ant grid. It can't be removed by hand.`,`Pháo biến mất khi hết đạn, hoặc khi màu của nó hết trên lưới kiến. Không bỏ tay được.`),
       t(`A match of a color no longer on the ant grid spawns no cannon.`,`Match màu không còn trên lưới kiến thì không sinh pháo.`)
@@ -2511,6 +2511,11 @@ function view(l){
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
+    day(t('November 18, 2026','18/11/2026'),
+      ent(t('Cannon slots','Hàng slot pháo'),ul([
+        t(`With all slots full, a third cannon of a color still merges with the 2 already in the slots and frees 1 slot. Before, it was lost, so slots full of cannons with no target in view could not be cleared.`,`Khi đủ slot, pháo thứ 3 cùng màu vẫn gộp với 2 pháo đang trong slot và trả lại 1 slot. Trước đây pháo này bị mất, nên slot đầy pháo không có mục tiêu thì không gỡ được.`)
+      ]))
+    )+
     day(t('November 17, 2026','17/11/2026'),
       ent(t('Leaderboard candy','Kẹo Bảng xếp hạng'),ul([
         t(`Confirmed: a candy is matched like a normal jelly cube of its color, and candies count only on a win.`,`Đã chốt: kẹo được match như khối thạch thường cùng màu, và kẹo chỉ được tính khi thắng.`)
