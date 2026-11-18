@@ -1781,7 +1781,8 @@ function view(l){
     ]))+
     ent(t('Refill','Refill'),
       params([
-        [t('Amount','Số lượng'),t(`1 new cube per cleared cell. Exception: no new cubes below a Chocolate Layer in its column.`,`Mỗi ô vừa xóa có 1 khối mới. Ngoại lệ: không có khối mới bên dưới Lớp chocolate trong cùng cột.`)],
+        [t('Amount','Số lượng'),t(`1 new cube per cleared cell, dropped in from the top.`,`Mỗi ô vừa xóa có 1 khối mới, rơi từ trên xuống.`)],
+        [t('Blocked cells','Ô bị chặn'),t(`A Chocolate Layer, a Jelly Bottle tray or a hole in the board (a missing cell with cells above it) blocks the column. No new cube falls through it. The empty cells under it fill from the side: a cube slides in diagonally from the upper-left or upper-right cell, then that column falls and refills. Repeats until nothing can move.`,`Lớp chocolate, khay Jelly Bottle hoặc lỗ trên bàn (ô trống có ô phía trên) chặn cột. Không khối mới nào rơi xuyên qua. Ô trống bên dưới được lấp từ bên cạnh: 1 khối trượt chéo vào từ ô trên-trái hoặc trên-phải, rồi cột đó rơi xuống và refill. Lặp lại tới khi không còn khối nào di chuyển được.`)],
         [t('Colors','Màu'),t(`Weighted random: part by the bottom-row colors of the ant grid, part even. At least 4 colors on the board. Demo: 40% / 60%.`,`Random có trọng số: một phần theo màu hàng dưới cùng của lưới kiến, phần còn lại chia đều. Bàn luôn có ít nhất 4 màu. Demo: 40% / 60%.`)],
         [t('Help','Hỗ trợ'),t(`After each match, the game reads the bottom-row colors. New cubes are colored so each of those colors gets a swap that makes a line of 3. Never a free match.`,`Sau mỗi match, game đọc các màu ở hàng dưới cùng. Khối mới được tô màu để mỗi màu đó có 1 nước swap ra hàng 3. Không tự tạo match.`)],
         [t('Fallback','Dự phòng'),t(`At least one of those colors always has such a swap. If new cubes can't give it, a few board cubes change color with a glow.`,`Luôn có ít nhất 1 màu như vậy có nước swap. Nếu khối mới không đủ, vài khối trên bàn đổi màu và lóe sáng.`)]
@@ -1937,7 +1938,7 @@ function view(l){
       t(`Each match next to it (up, down, left, right) removes 1 layer. 3 layers = 3 matches.`,`Mỗi match cạnh nó (trên, dưới, trái, phải) phá 1 lớp. 3 lớp = 3 lần match.`),
       t(`Last layer gone: the cell opens. The jelly under it becomes a normal cube.`,`Hết lớp cuối: ô được mở. Khối thạch bên dưới thành khối thường.`),
       t(`It stays in its cell; cubes above don't fall through it.`,`Đứng yên tại ô; khối phía trên không rơi xuyên qua.`),
-      t(`Blocks refill: cells below it in its column get no new cubes. A match there leaves the cells empty until the chocolate above breaks.`,`Chặn refill: các ô bên dưới nó trong cùng cột không có khối mới. Match ở đó để lại ô trống cho tới khi chocolate phía trên vỡ.`)
+      t(`Blocks refill: no new cube falls through it. Cells below it fill by cubes sliding in diagonally from the side (Refill, 1.2).`,`Chặn refill: không khối mới nào rơi xuyên qua. Ô bên dưới được lấp bằng khối trượt chéo từ bên cạnh (Refill, mục 1.2).`)
     ]),unlock(7),demo('chocoL'))+
     ent(N.el3,ul([
       t(`Slot row. A slot with a padlock and a number.`,`Trên hàng slot. Slot có ổ khóa và 1 con số.`),
@@ -1956,6 +1957,7 @@ function view(l){
     ent(N.el6,ul([
       t(`Board. 1 tray takes 2×2 cells and holds 4 bottles, each a different color.`,`Trên bàn. 1 khay chiếm 2×2 ô, chứa 4 lọ, mỗi lọ 1 màu khác nhau.`),
       t(`Can't be swapped or matched. Cubes above don't fall through.`,`Không swap, không match được. Khối phía trên không rơi xuyên qua.`),
+      t(`Blocks refill like chocolate: cells below it fill by cubes sliding in diagonally from the side.`,`Chặn refill như chocolate: ô bên dưới được lấp bằng khối trượt chéo từ bên cạnh.`),
       t(`A match next to the tray (up, down, left, right) breaks the bottle of the same color.`,`Match cạnh khay (trên, dưới, trái, phải) làm vỡ lọ cùng màu với match.`),
       t(`That match gets +5 ammo: ammo = 2n − 3 + 5.`,`Match đó được +5 đạn: đạn = 2n − 3 + 5.`),
       t(`No bottle of that color left: no bonus. All 4 broken: the tray disappears and cubes fall into its cells.`,`Không còn lọ màu đó: không có thưởng. Vỡ hết 4 lọ: khay biến mất, khối rơi vào 4 ô đó.`)
@@ -2512,6 +2514,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 18, 2026','18/11/2026'),
+      ent(t('Refill','Refill'),ul([
+        t(`Blocked cells (1.2): chocolate, Jelly Bottle trays and holes in the board block a column. Cells under them fill by cubes sliding in diagonally from the upper-left or upper-right cell (was: no new cubes until the chocolate breaks). Chocolate and Jelly Bottle (1.4) updated.`,`Ô bị chặn (mục 1.2): chocolate, khay Jelly Bottle và lỗ trên bàn chặn cột. Ô bên dưới được lấp bằng khối trượt chéo từ ô trên-trái hoặc trên-phải (trước: không có khối mới cho tới khi chocolate vỡ). Cập nhật Chocolate và Jelly Bottle (mục 1.4).`)
+      ]))+
       ent(t('Cannon slots','Hàng slot pháo'),ul([
         t(`Merge: a new cannon merges at once into a cannon of the same color in the slots, even when the slots are full (was: 3 cannons of one color merge). So each color takes at most 1 slot; full slots only lose cannons of a new color. The slots demo is redrawn.`,`Gộp: pháo mới gộp ngay vào pháo cùng màu trong slot, kể cả khi đủ slot (trước: đủ 3 pháo cùng màu mới gộp). Vì vậy mỗi màu chiếm tối đa 1 slot; đủ slot chỉ mất pháo màu mới. Vẽ lại demo slot.`)
       ]))+
