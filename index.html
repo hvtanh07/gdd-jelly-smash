@@ -2432,7 +2432,8 @@ function view(l){
         t(`<b>Board:</b> title, round countdown, ranking list of 50, and a “Play” button that starts the next level.`,`<b>Bảng:</b> tiêu đề, đồng hồ đếm ngược, danh sách xếp hạng 50 người, và nút “Chơi” để vào màn tiếp theo.`),
         t(`<b>Info (i):</b> how it works in 3 pictures: match candies → win in a row for up to ×5 → top the board for coins and boosters.`,`<b>Thông tin (i):</b> cách chơi bằng 3 hình: match kẹo → thắng liên tiếp để nhân tới ×5 → lên top để nhận xu và booster.`),
         t(`<b>Victory screen:</b> the candies collected in the level and the player's updated rank.`,`<b>Màn hình Victory:</b> số kẹo thu được trong màn và thứ hạng mới của người chơi.`),
-        t(`<b>Reward screen (Home):</b> final rank and the reward, with a “Claim” button. After the claim, the new round starts.`,`<b>Màn hình nhận thưởng (màn hình chính):</b> hạng cuối cùng và phần thưởng, kèm nút “Nhận”. Nhận xong thì vòng mới bắt đầu.`)
+        t(`<b>Reward screen (Home):</b> final rank and the reward, with a “Claim” button. After the claim, the new round starts.`,`<b>Màn hình nhận thưởng (màn hình chính):</b> hạng cuối cùng và phần thưởng, kèm nút “Nhận”. Nhận xong thì vòng mới bắt đầu.`),
+        t(`<b>Order at Home:</b> the Leaderboard shows first, then the Jelly Machine update (7.3).`,`<b>Thứ tự ở màn hình chính:</b> Bảng xếp hạng hiện trước, sau đó mới tới cập nhật Jelly Machine (mục 7.3).`)
       ]))+
       kv([
         [t('Round reset','Bắt đầu vòng mới'),t(`Every 7 days. Rewards are given when the round ends, then scores and the streak reset and the game starts a new leaderboard with a new group of 50 players for the next 7 days. Reset time and group matching: TBD.`,`Mỗi 7 ngày. Thưởng được trao khi hết vòng, sau đó điểm và streak về 0, game mở bảng xếp hạng mới và ghép nhóm 50 người chơi mới cho 7 ngày tiếp theo. Giờ reset và cách ghép nhóm: TBD.`)],
@@ -2531,7 +2532,7 @@ function view(l){
           [t('End','Kết thúc'),t('Event end popup with the result','Popup kết thúc kèm kết quả'),t('Next remote start → Start','Lần bật từ xa tiếp theo → Bắt đầu')]
         ],'compact'))+
       kv([
-        [t('Popup timing','Thời điểm popup'),t(`The event popup shows after the player completes a level and returns Home, so it never overlaps other popups.`,`Popup sự kiện hiện sau khi người chơi hoàn thành màn và về màn hình chính, nên không trùng với các popup khác.`)],
+        [t('Popup timing','Thời điểm popup'),t(`The event popup shows after the player completes a level and returns Home, so it never overlaps other popups. If the Leaderboard (7.4) has something to show at Home, it goes first; the Jelly Machine update comes after it.`,`Popup sự kiện hiện sau khi người chơi hoàn thành màn và về màn hình chính, nên không trùng với các popup khác. Nếu Bảng xếp hạng (mục 7.4) có nội dung cần hiện ở màn hình chính thì hiện trước; cập nhật Jelly Machine hiện sau.`)],
         [t('Offline','Offline'),t(`The 72 h timer runs on server time, also offline.`,`Timer 72 giờ chạy theo giờ server, kể cả khi offline.`)],
         [t('Numbers','Con số'),t(`Start time, required level, length, max multiplier, milestones and rewards are remote config (5).`,`Giờ bắt đầu, màn yêu cầu, thời gian, hệ số tối đa, các mốc và phần thưởng nằm trong cấu hình từ xa (mục 5).`)]
       ]));
@@ -2541,6 +2542,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Home popup order','Thứ tự popup ở màn hình chính'),ul([
+        t(`Back at Home, the Leaderboard (7.4) shows before the Jelly Machine update (7.3).`,`Khi về màn hình chính, Bảng xếp hạng (mục 7.4) hiện trước cập nhật Jelly Machine (mục 7.3).`)
+      ]))+
       ent(t('Player name & avatar','Tên & avatar người chơi'),ul([
         t(`Added player name & avatar to 1.3: red avatar by default, a random 6-character upper-case name (letters and numbers), free changes, name up to 20 characters.`,`Thêm tên & avatar người chơi vào mục 1.3: avatar đỏ mặc định, tên ngẫu nhiên 6 ký tự viết hoa (chữ và số), đổi tự do, tên tối đa 20 ký tự.`),
         t(`The Leaderboard (7.4) links to it.`,`Bảng xếp hạng (mục 7.4) có liên kết tới phần này.`)
