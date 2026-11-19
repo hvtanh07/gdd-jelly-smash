@@ -2392,7 +2392,7 @@ function view(l){
       ]))+
       panel(t('Score','Điểm'),ul([
         t(`Each ant the player defeats in the level counts as 1. An Armored Ant counts as 1 when it is defeated, not per shot.`,`Mỗi con kiến người chơi tiêu diệt trong màn tính là 1. Kiến giáp tính là 1 khi bị diệt, không tính theo từng phát.`),
-        t(`Queen Ant: TBD.`,`Kiến chúa: TBD.`),
+        t(`A Queen Ant counts as 10 when she is defeated, not per shot.`,`Kiến chúa tính là 10 khi bị diệt, không tính theo từng phát.`),
         t(`At the end of a won level: score added = ants defeated × the leaderboard streak multiplier.`,`Cuối màn thắng: điểm cộng thêm = số kiến đã diệt × hệ số streak của Bảng xếp hạng.`),
         t(`The Victory screen shows the score earned in the level and updates the player's rank.`,`Màn hình Victory hiện số điểm nhận được trong màn và cập nhật thứ hạng của người chơi.`),
         t(`Example: 120 ants at ×3 = 360 points.`,`Ví dụ: 120 kiến ở ×3 = 360 điểm.`),
@@ -2596,6 +2596,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Queen Ant points','Điểm kiến chúa'),ul([
+        t(`Leaderboard (7.4): a Queen Ant counts as 10 points when defeated (was TBD).`,`Bảng xếp hạng (7.4): kiến chúa tính 10 điểm khi bị diệt (trước là TBD).`)
+      ]))+
       ent(t('Leaderboard bots','Bot Bảng xếp hạng'),ul([
         t(`Added the bot score logic to 7.4: average level 184 ants (levels 11–20), hidden target 20 levels won per day, 6 bot groups from top rivals to inactive.`,`Thêm logic tăng điểm cho bot vào mục 7.4: màn trung bình 184 kiến (màn 11–20), target ẩn 20 màn thắng mỗi ngày, 6 nhóm bot từ đối thủ top tới không chơi.`),
         t(`Bots play in sessions on a daily curve, with a win rate, streak and lives, so scores rise level by level like real players.`,`Bot chơi theo phiên trên đường cong trong ngày, có tỉ lệ thắng, streak và tim, nên điểm tăng theo từng màn như người thật.`),
