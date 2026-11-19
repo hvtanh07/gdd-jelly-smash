@@ -1766,6 +1766,13 @@ function lbsUI(){
   if(LBS.play&&!LBS.raf)LBS.raf=requestAnimationFrame(lbsTick);
 }
 
+/* ---------- Collection Event: milestone set tabs ---------- */
+let ceSet='easy';
+function ceTabsUI(){
+  $$('[data-ce-set]').forEach(b=>{const on=b.dataset.ceSet===ceSet;b.classList.toggle('primary',on);b.setAttribute('aria-pressed',on?'true':'false');b.onclick=()=>{ceSet=b.dataset.ceSet;ceTabsUI();};});
+  $$('[data-ce-list]').forEach(d=>{d.hidden=d.dataset.ceList!==ceSet;});
+}
+
 /* ---------- page content (English, Vietnamese) ---------- */
 let paused=false;
 function view(l){
@@ -2693,8 +2700,9 @@ function view(l){
           [t('Hard','Khó'),'1,820','9,100','16 Shuffle, 14 Hand, 10 Bomb',t('6 h','6 giờ'),'≈ 24,500']
         ],'compact'))+
       panel(t('Milestones & rewards','Các mốc & phần thưởng'),
-        `<p>${t('Each set has its own milestones: its own color, jelly count and reward at every step.','Mỗi bộ có các mốc riêng: màu, số thạch và phần thưởng riêng ở từng mốc.')}</p>`+
-        `<p><b>${t('Easy','Dễ')}</b></p>`+
+        `<p>${t('Each set has its own milestones: its own color, jelly count and reward at every step. Pick a set to see its list.','Mỗi bộ có các mốc riêng: màu, số thạch và phần thưởng riêng ở từng mốc. Chọn một bộ để xem danh sách.')}</p>`+
+        `<div class="gctl" role="group" aria-label="${t('Milestone set','Bộ mốc')}" style="margin:0 0 12px">${[['easy',t('Easy','Dễ')],['medium',t('Medium','Trung bình')],['hard',t('Hard','Khó')]].map(([k,l])=>`<button type="button" class="gbtn" data-ce-set="${k}" aria-pressed="false">${l}</button>`).join('')}</div>`+
+        `<div data-ce-list="easy">`+
         table(t('Easy set milestones','Các mốc bộ Dễ'),[t('Milestone','Mốc'),t('Easy: jelly needed','Dễ: thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
           ['1',t('yellow × 5','vàng × 5'),'5',t(`30 coins`,`30 xu`)],
           ['2',t('red × 10','đỏ × 10'),'15',t(`1 Shuffle`,`1 Shuffle`)],
@@ -2716,8 +2724,8 @@ function view(l){
           ['18',t('purple × 55','tím × 55'),'555',t(`1 h unlimited lives`,`1 giờ tim vô hạn`)],
           ['19',t('yellow × 60','vàng × 60'),'615',t(`300 coins`,`300 xu`)],
           ['20',t('purple × 60','tím × 60'),'675',t(`★ Chest: 1,000 coins + 1 of each booster`,`★ Rương: 1.000 xu + mỗi loại booster 1 cái`)]
-        ],'compact')+
-        `<p><b>${t('Medium','Trung bình')}</b></p>`+
+        ],'compact')+`</div>`+
+        `<div data-ce-list="medium">`+
         table(t('Medium set milestones','Các mốc bộ Trung bình'),[t('Milestone','Mốc'),t('Medium: jelly needed','Trung bình: thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
           ['1',t('red × 10','đỏ × 10'),'10',t(`50 coins`,`50 xu`)],
           ['2',t('yellow × 15','vàng × 15'),'25',t(`1 Shuffle`,`1 Shuffle`)],
@@ -2739,8 +2747,8 @@ function view(l){
           ['18',t('red × 90','đỏ × 90'),'965',t(`2 h unlimited lives`,`2 giờ tim vô hạn`)],
           ['19',t('blue × 90','xanh × 90'),'1,055',t(`600 coins`,`600 xu`)],
           ['20',t('red × 95','đỏ × 95'),'1,150',t(`★ Grand chest: 2,000 coins + 3 of each booster`,`★ Rương lớn: 2.000 xu + mỗi loại booster 3 cái`)]
-        ],'compact')+
-        `<p><b>${t('Hard','Khó')}</b></p>`+
+        ],'compact')+`</div>`+
+        `<div data-ce-list="hard">`+
         table(t('Hard set milestones','Các mốc bộ Khó'),[t('Milestone','Mốc'),t('Hard: jelly needed','Khó: thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
           ['1',t('blue × 15','xanh × 15'),'15',t(`100 coins`,`100 xu`)],
           ['2',t('purple × 25','tím × 25'),'40',t(`1 Shuffle`,`1 Shuffle`)],
@@ -2762,7 +2770,7 @@ function view(l){
           ['18',t('yellow × 150','vàng × 150'),'1,515',t(`3 h unlimited lives`,`3 giờ tim vô hạn`)],
           ['19',t('purple × 150','tím × 150'),'1,665',t(`1,000 coins`,`1.000 xu`)],
           ['20',t('blue × 155','xanh × 155'),'1,820',t(`★ Grand chest: 4,000 coins + 5 of each booster`,`★ Rương lớn: 4.000 xu + mỗi loại booster 5 cái`)]
-        ],'compact')+
+        ],'compact')+`</div>`+
         ul([
           t(`Each set has its own color order. Each color appears 5 times per set, never twice in a row. At the same milestone number, the 3 sets always ask for different colors.`,`Mỗi bộ có thứ tự màu riêng. Mỗi màu xuất hiện 5 lần trong một bộ, không bao giờ 2 lần liền nhau. Ở cùng một số mốc, 3 bộ luôn yêu cầu màu khác nhau.`),
           t(`Jelly needed grows fast in the Hook phase, then slowly. The last 5 milestones stay close together so the end does not feel like a wall.`,`Số thạch cần tăng nhanh ở giai đoạn Mồi, sau đó tăng chậm. 5 mốc cuối gần nhau để đoạn cuối không thành bức tường.`)
@@ -2800,6 +2808,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Collection Event set picker','Chọn bộ mốc Collection Event'),ul([
+        t(`7.3: the 3 milestone lists are now one block, with Easy / Medium / Hard buttons to switch between them.`,`Mục 7.3: 3 danh sách mốc gom thành một mục, có nút Dễ / Trung bình / Khó để chuyển qua lại.`)
+      ]))+
       ent(t('Collection Event set milestones','Mốc riêng cho từng bộ'),ul([
         t(`7.3: each set (Easy, Medium, Hard) now has its own milestone list: own color order, jelly count and reward. One table per set. Remote config (5): one color list per set.`,`Mục 7.3: mỗi bộ (Dễ, Trung bình, Khó) có danh sách mốc riêng: thứ tự màu, số thạch và phần thưởng riêng. Mỗi bộ một bảng. Cấu hình từ xa (mục 5): mỗi bộ một danh sách màu.`)
       ]))+
@@ -3319,6 +3330,7 @@ function render(){
   startHero();
   gaugeUI();
   lbsUI();
+  ceTabsUI();
   if(G.swing&&!G.raf)G.raf=requestAnimationFrame(gaugeTick);
 }
 function setLang(l){
