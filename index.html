@@ -1664,6 +1664,7 @@ const LBS_G=[['top',3,.85,.7,.85,4,6,0,'var(--c1)'],['va',7,.65,.4,.8,3,5,.05,'v
   ['ca',15,.18,.06,.7,1,3,.2,'var(--c3)'],['li',10,.05,.02,.65,1,1,.55,'var(--c8)'],['in',4,0,0,.6,0,0,1,'var(--hid)']];
 const LBS_GN={en:{top:'Top rivals',va:'Very active',ac:'Active',ca:'Casual',li:'Light',in:'Inactive',me:'You'},
   vi:{top:'Đối thủ top',va:'Rất chăm',ac:'Chăm',ca:'Bình thường',li:'Ít chơi',in:'Không chơi',me:'Bạn'}};
+const LBS_CW=220,LBS_CHT=170,LBS_CL=28,LBS_CR=4;
 const LBS={seed:1,W:20,t:LBS_H,play:false,raf:0,last:0,bots:null,bseed:0,me:null,mkey:''};
 function lbsRng(a){return()=>{a=a+0x6D2B79F5|0;let x=Math.imul(a^a>>>15,1|a);x=x+Math.imul(x^x>>>7,61|x)^x;return((x^x>>>14)>>>0)/4294967296;};}
 /* one player's 7 days: list of wins as [hour, score after the win] */
@@ -1707,37 +1708,38 @@ function lbsReward(rk,sc,vi){
   return vi?`${c.toLocaleString('en-US')} xu`+(bo?` + ${bo} mỗi loại booster`:''):`${c.toLocaleString('en-US')} coins`+(bo?` + ${bo} of each booster`:'');
 }
 function lbsChart(all,vi){
-  const W=640,H=250,L=46,R=10,T=10,Bm=26,max=Math.max(1000,...all.map(p=>p.ev.length?p.ev[p.ev.length-1][1]:0))*1.05;
+  const W=LBS_CW,H=LBS_CHT,L=LBS_CL,R=LBS_CR,T=6,Bm=16,max=Math.max(1000,...all.map(p=>p.ev.length?p.ev[p.ev.length-1][1]:0))*1.05;
   const X=h=>f1(L+h/LBS_H*(W-L-R)),Y=v=>f1(H-Bm-v/max*(H-T-Bm));
   let g='';
-  for(let i=0;i<=4;i++){const v=max/1.05*i/4,y=Y(v);g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${L-6}" y="${y}" dy=".35em" text-anchor="end" font-size="10" fill="var(--muted)">${v>=1000?Math.round(v/1000)+'k':Math.round(v)}</text>`;}
-  for(let d=0;d<=7;d++){const x=X(d*24);g+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${H-Bm}" stroke="var(--line)" stroke-dasharray="2 3"/>`+(d<7?`<text x="${X(d*24+12)}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${vi?'Ngày':'Day'} ${d+1}</text>`:'');}
+  for(let i=0;i<=4;i++){const v=max/1.05*i/4,y=Y(v);g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${L-6}" y="${y}" dy=".35em" text-anchor="end" font-size="9" fill="var(--muted)">${v>=1000?Math.round(v/1000)+'k':Math.round(v)}</text>`;}
+  for(let d=0;d<=7;d++){const x=X(d*24);g+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${H-Bm}" stroke="var(--line)" stroke-dasharray="2 3"/>`+(d<7?`<text x="${X(d*24+12)}" y="${H-8}" text-anchor="middle" font-size="9" fill="var(--muted)">${vi?'N':'D'}${d+1}</text>`:'');}
   const path=p=>{let d=`M${X(0)} ${Y(0)}`;p.ev.forEach(([h,v])=>{d+=`H${X(h)}V${Y(v)}`;});return d+`H${X(LBS_H)}`;};
-  const lines=all.filter(p=>!p.me).map(p=>`<path d="${path(p)}" fill="none" stroke="${p.col}" stroke-width="1.3" opacity=".7"/>`).join('')+
-    `<path d="${path(LBS.me)}" fill="none" stroke="var(--ink)" stroke-width="3"/>`;
+  const lines=all.filter(p=>!p.me).map(p=>`<path d="${path(p)}" fill="none" stroke="${p.col}" stroke-width=".8" opacity=".75"/>`).join('')+
+    `<path d="${path(LBS.me)}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
   return `<svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto" role="img" aria-label="${vi?'Điểm của 49 bot và người chơi trong 7 ngày':'Scores of 49 bots and the player over 7 days'}">${g}
     <clipPath id="lbsClip"><rect id="lbsClipR" x="0" y="0" width="${W}" height="${H}"/></clipPath><g clip-path="url(#lbsClip)">${lines}</g>
     <line id="lbsNow" x1="0" x2="0" y1="${T}" y2="${H-Bm}" stroke="var(--accent)" stroke-width="1.5"/></svg>`;
 }
 function lbsFrame(){
   const box=$('#lbSim');if(!box)return;
-  const vi=lang==='vi',all=lbsData(),N=LBS_GN[vi?'vi':'en'],t=LBS.t,W=640,L=46,R=10,x=f1(L+t/LBS_H*(W-L-R));
+  const vi=lang==='vi',all=lbsData(),N=LBS_GN[vi?'vi':'en'],t=LBS.t,W=LBS_CW,L=LBS_CL,R=LBS_CR,x=f1(L+t/LBS_H*(W-L-R));
   const cr=$('#lbsClipR');if(cr)cr.setAttribute('width',x);
   const nl=$('#lbsNow');if(nl){nl.setAttribute('x1',x);nl.setAttribute('x2',x);}
   const rows=all.map(p=>{const [s,w]=lbsAt(p.ev,t);return {p,s,w};}).sort((a,b)=>b.s-a.s||(a.s?a.w-b.w:0)||(a.p.me?-1:b.p.me?1:0));
   rows.forEach((r,i)=>r.rk=i+1);
   const mi=rows.findIndex(r=>r.p.me),me=rows[mi];
-  const show=rows.filter((r,i)=>i<10||Math.abs(i-mi)<=1);
+  const show=rows.filter((r,i)=>i<5||i===mi);
   const d=Math.min(7,Math.floor(t/24)+1),hh=t>=LBS_H?'24:00':String(Math.floor(t%24)).padStart(2,'0')+':'+String(Math.floor(t%1*60)).padStart(2,'0');
   $('#lbsT').textContent=(vi?'Ngày ':'Day ')+d+', '+hh;
   const ts=$('#lbsTime');if(ts&&+ts.value!==t)ts.value=t;
   $('#lbsRes').innerHTML=(vi?`<b>Bạn:</b> ${me.s.toLocaleString('en-US')} điểm, hạng <b>${me.rk}</b>/50. `:`<b>You:</b> ${me.s.toLocaleString('en-US')} points, rank <b>${me.rk}</b>/50. `)+
-    (t>=LBS_H?(vi?'Phần thưởng: ':'Reward: ')+lbsReward(me.rk,me.s,vi)+'.':(vi?'Phần thưởng nếu vòng kết thúc lúc này: ':'Reward if the round ended now: ')+lbsReward(me.rk,me.s,vi)+'.');
+    (t>=LBS_H?(vi?'Phần thưởng: ':'Reward: ')+lbsReward(me.rk,me.s,vi)+'.':(vi?'Nếu hết vòng lúc này: ':'If the round ended now: ')+lbsReward(me.rk,me.s,vi)+'.');
   let prev=0;
-  $('#lbsBoard').innerHTML=`<div class="tbl compact"><table><thead><tr><th scope="col">${vi?'Hạng':'Rank'}</th><th scope="col">${vi?'Tên':'Name'}</th><th scope="col">${vi?'Nhóm':'Group'}</th><th scope="col">${vi?'Điểm':'Score'}</th></tr></thead><tbody>`+
-    show.map(r=>{const gap=r.rk-prev>1?`<tr><td colspan="4" style="text-align:center;color:var(--muted)">…</td></tr>`:'';prev=r.rk;
-      const sty=r.p.me?' style="background:var(--wip);font-weight:700"':'';
-      return gap+`<tr${sty}><th scope="row">${r.rk}</th><td>${r.p.me?N.me:r.p.nm}</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.p.col};margin-right:6px"></span>${N[r.p.g]}</td><td>${r.s.toLocaleString('en-US')}</td></tr>`;}).join('')+`</tbody></table></div>`;
+  const cs='padding:4px 6px';
+  $('#lbsBoard').innerHTML=`<div class="tbl compact" style="border-radius:10px;margin:0"><table style="font-size:.78rem;line-height:1.3"><thead><tr><th scope="col" style="${cs}">#</th><th scope="col" style="${cs}">${vi?'Tên':'Name'}</th><th scope="col" style="${cs};text-align:right">${vi?'Điểm':'Score'}</th></tr></thead><tbody>`+
+    show.map(r=>{const gap=r.rk-prev>1?`<tr><td colspan="3" style="${cs};text-align:center;color:var(--muted)">…</td></tr>`:'';prev=r.rk;
+      const sty=r.p.me?';background:var(--wip);font-weight:700':'';
+      return gap+`<tr><th scope="row" style="${cs}${sty}">${r.rk}</th><td style="${cs}${sty};white-space:nowrap" title="${N[r.p.g]}"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.p.col};margin-right:5px"></span>${r.p.me?N.me:r.p.nm}</td><td style="${cs}${sty};text-align:right">${r.s.toLocaleString('en-US')}</td></tr>`;}).join('')+`</tbody></table></div>`;
   const pb=$('#lbsPlay');if(pb)pb.textContent=LBS.play?(vi?'Tạm dừng':'Pause'):(vi?'Chạy 7 ngày':'Play 7 days');
 }
 function lbsTick(ts){
@@ -1753,8 +1755,8 @@ function lbsUI(){
   const box=$('#lbSim');if(!box)return;
   const vi=lang==='vi';
   $('#lbsChart').innerHTML=lbsChart(lbsData(),vi);
-  $('#lbsLegend').innerHTML=LBS_G.map(g=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px"><span style="width:14px;height:3px;background:${g[8]}"></span>${LBS_GN[vi?'vi':'en'][g[0]]}</span>`).join('')+
-    `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:4px;background:var(--ink)"></span>${vi?'Bạn':'You'}</span>`;
+  $('#lbsLegend').innerHTML=LBS_G.map(g=>`<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px"><span style="width:10px;height:3px;background:${g[8]}"></span>${LBS_GN[vi?'vi':'en'][g[0]]}</span>`).join('')+
+    `<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:4px;background:var(--ink)"></span>${vi?'Bạn':'You'}</span>`;
   const w=$('#lbsWin');w.value=LBS.W;$('#lbsW').textContent=LBS.W;
   w.oninput=()=>{LBS.W=+w.value;$('#lbsW').textContent=LBS.W;$('#lbsChart').innerHTML=lbsChart(lbsData(),lang==='vi');lbsFrame();};
   const ts=$('#lbsTime');ts.oninput=()=>{LBS.play=false;LBS.t=+ts.value;lbsFrame();};
@@ -1927,7 +1929,7 @@ function view(l){
   /* FIXED: 1.3 is shared logic across projects. Keep it as it is and only change the numbers. */
 
   /* 1.3 uses panels, tiles and a small flow chart so each system and each of its parts stands apart */
-  const sys=(name,body,tags)=>ent(name,body,tags).replace('<div class="ent">','<div class="ent sys">');
+  const sys=(name,body,tags,dm)=>ent(name,body,tags,dm).replace('<div class="ent">','<div class="ent sys">');
   const panel=(title,body,sub)=>`<div class="gbox"><h5 class="gbox-h blk">${title}${sub?`<small>${sub}</small>`:''}</h5>${body}</div>`;
   const tiles=items=>`<ul class="tiles">${items.map(([v,k,cls])=>`<li${cls?` class="${cls}"`:''}><span class="tv">${v}</span><span class="tk">${k}</span></li>`).join('')}</ul>`;
   const kv=pairs=>`<dl class="kv">${pairs.map(([k,v])=>`<div class="blk"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
@@ -2557,25 +2559,6 @@ function view(l){
         table(t('Daily curve: chance a session starts in each hour','Đường cong trong ngày: khả năng một phiên bắt đầu ở mỗi giờ'),[t('Hours (local)','Giờ (địa phương)'),t('Weight','Trọng số')],[
           ['00–05','0.3–1'],['06–08','1–2'],['09–11','1.5–2.5'],['12–13',t('2–2.5 (lunch)','2–2,5 (giờ trưa)')],['14–18','1.5–2'],['19–22',t('2.5–3.5 (evening peak)','2,5–3,5 (cao điểm tối)')],['23','2']
         ],'compact'))+
-      panel(t('7-day simulator','Mô phỏng 7 ngày'),
-        `<p>${t(`Runs the logic above for one round: 49 bots in 6 groups and the player. Pick how many levels the player wins per day, then press Play. Each line is one score. A step = one won level.`,`Chạy logic ở trên cho một vòng: 49 bot trong 6 nhóm và người chơi. Chọn số màn người chơi thắng mỗi ngày, rồi bấm Chạy. Mỗi đường là điểm của một người. Mỗi bậc = một màn thắng.`)}</p>
-        <div id="lbSim">
-          <div class="gctl">
-            <label>${t('Player levels won per day','Số màn thắng mỗi ngày của người chơi')}: <b id="lbsW">20</b> <input type="range" id="lbsWin" min="0" max="30" step="1" value="20" style="vertical-align:middle;width:170px"></label>
-            <button type="button" class="gbtn primary" id="lbsPlay">${t('Play 7 days','Chạy 7 ngày')}</button>
-            <button type="button" class="gbtn" id="lbsNew">${t('New round','Vòng mới')}</button>
-          </div>
-          <div class="gctl"><label>${t('Time','Thời gian')}: <b id="lbsT"></b> <input type="range" id="lbsTime" min="0" max="168" step="0.25" value="168" style="vertical-align:middle;width:240px"></label></div>
-          <div id="lbsChart" style="margin-top:12px"></div>
-          <p id="lbsLegend" style="font-size:.86rem;color:var(--muted);margin:6px 0 10px"></p>
-          <p id="lbsRes" style="margin:0 0 10px"></p>
-          <div id="lbsBoard"></div>
-        </div>`+
-        ul([
-          t(`Bot names here are random samples. In the game they come from the Bot Data sheet.`,`Tên bot ở đây là mẫu ngẫu nhiên. Trong game, tên lấy từ sheet Bot Data.`),
-          t(`The player wins 80% of attempts and plays about 1 session per 4 levels (1–6 sessions per day).`,`Người chơi thắng 80% số lượt và chơi khoảng 1 phiên cho mỗi 4 màn (1–6 phiên mỗi ngày).`),
-          t(`New round = new seed: other bot results, same rules.`,`Vòng mới = seed mới: kết quả bot khác, luật giữ nguyên.`)
-        ]))+
       panel(t('What the player gets for how often they play','Người chơi nhận gì theo tần suất chơi'),
         table(t('Player levels won per day and rank','Số màn thắng mỗi ngày của người chơi và thứ hạng'),[t('Levels won per day','Số màn thắng mỗi ngày'),t('Usual rank','Hạng thường đạt'),t('Usual reward','Phần thưởng thường nhận')],[
           ['1','~34',t('50 coins','50 xu')],
@@ -2619,7 +2602,22 @@ function view(l){
       kv([
         [t('Round reset','Bắt đầu vòng mới'),t(`Every 7 days. Rewards are given when the round ends, then scores and the streak reset and the game starts a new leaderboard with a new group of 50 players for the next 7 days. Reset time and group matching: TBD.`,`Mỗi 7 ngày. Thưởng được trao khi hết vòng, sau đó điểm và streak về 0, game mở bảng xếp hạng mới và ghép nhóm 50 người chơi mới cho 7 ngày tiếp theo. Giờ reset và cách ghép nhóm: TBD.`)],
         [t('Numbers','Con số'),t(`Unlock level, round length, group size, max multiplier and rewards per rank are remote config (5).`,`Màn mở khóa, độ dài vòng, số người mỗi nhóm, hệ số tối đa và thưởng mỗi hạng nằm trong cấu hình từ xa (mục 5).`)]
-      ]));
+      ]),'',
+      `<div id="lbSim" style="position:sticky;top:calc(var(--bar-h) + 16px);margin-top:14px;font-size:.84rem;line-height:1.45">
+        <p style="margin:0 0 6px;font-weight:700">${t('7-day simulator','Mô phỏng 7 ngày')}</p>
+        <p style="margin:0 0 8px;color:var(--muted)">${t('49 bots and the player, using the bot logic. A step = one won level.','49 bot và người chơi, theo logic bot. Mỗi bậc = một màn thắng.')}</p>
+        <label style="display:block">${t('Player wins per day','Số màn thắng/ngày')}: <b id="lbsW">20</b><input type="range" id="lbsWin" min="0" max="30" step="1" value="20" style="display:block;width:100%"></label>
+        <label style="display:block;margin-top:4px">${t('Time','Thời gian')}: <b id="lbsT"></b><input type="range" id="lbsTime" min="0" max="168" step="0.25" value="168" style="display:block;width:100%"></label>
+        <div style="display:flex;gap:6px;margin:8px 0">
+          <button type="button" class="gbtn primary" id="lbsPlay" style="flex:1;padding:6px 8px;min-height:34px;font-size:.84rem">${t('Play 7 days','Chạy 7 ngày')}</button>
+          <button type="button" class="gbtn" id="lbsNew" style="flex:1;padding:6px 8px;min-height:34px;font-size:.84rem">${t('New round','Vòng mới')}</button>
+        </div>
+        <div id="lbsChart"></div>
+        <p id="lbsLegend" style="font-size:.74rem;color:var(--muted);margin:4px 0 8px"></p>
+        <p id="lbsRes" style="margin:0 0 8px"></p>
+        <div id="lbsBoard"></div>
+        <p style="margin:8px 0 0;font-size:.74rem;color:var(--muted)">${t('Sample names. The player wins 80% of attempts.','Tên bot là mẫu. Người chơi thắng 80% số lượt.')}</p>
+      </div>`);
 
   B['collection-event']=
     sys(CE,
@@ -2723,6 +2721,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Simulator moved left','Chuyển bộ mô phỏng sang trái'),ul([
+        t(`7.4: the 7-day simulator now sits in the left column under the Leaderboard title, in a compact size, and stays in view while scrolling the logic.`,`Mục 7.4: bộ mô phỏng 7 ngày chuyển sang cột trái, dưới tên Bảng xếp hạng, ở cỡ gọn, và luôn hiện khi cuộn phần logic.`)
+      ]))+
       ent(t('Leaderboard bot simulator','Mô phỏng bot Bảng xếp hạng'),ul([
         t(`Added a 7-day simulator to 7.4 under the bot score logic: a chart of all 50 scores, a live board and the player's reward.`,`Thêm bộ mô phỏng 7 ngày vào mục 7.4, dưới logic tăng điểm của bot: biểu đồ điểm của cả 50 người, bảng xếp hạng theo thời gian và phần thưởng của người chơi.`),
         t(`The player's levels won per day can be changed. A new round uses a new seed.`,`Có thể chỉnh số màn thắng mỗi ngày của người chơi. Vòng mới dùng seed mới.`)
