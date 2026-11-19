@@ -1927,6 +1927,26 @@ function view(l){
         t(`3. Play goes on as normal.`,`3. Chơi tiếp như bình thường.`),
         t(`Revive count and price reset on a new attempt.`,`Số lần và giá hồi sinh tính lại khi bắt đầu lượt mới.`),
         t(`Ad or purchase fails: back to the popup.`,`Quảng cáo hoặc giao dịch lỗi: quay lại popup.`)
+      ])))+
+    sys(nm('Player name & avatar','Tên & avatar người chơi'),
+      lead(t(`Every player has a name and an avatar. Both show on the Leaderboard.`,
+             `Mỗi người chơi có tên và avatar. Cả hai hiện trên Bảng xếp hạng.`))+
+      tiles([
+        [t('Red','Đỏ'),t('Default avatar','Avatar mặc định')],
+        ['6',t('Characters in the default name','Ký tự trong tên mặc định')],
+        ['20',t('Max name length','Độ dài tên tối đa'),'hot']
+      ])+
+      panel(t('Defaults for a new player','Mặc định cho người chơi mới'),ul([
+        t(`Avatar: the red avatar.`,`Avatar: avatar màu đỏ.`),
+        t(`Name: 6 random characters, letters and numbers, all upper case. Example: K7Q2ZB.`,`Tên: 6 ký tự ngẫu nhiên gồm chữ và số, viết hoa toàn bộ. Ví dụ: K7Q2ZB.`)
+      ]))+
+      panel(t('Changing them','Thay đổi'),ul([
+        t(`The player can change their avatar and name at any time, for free.`,`Người chơi có thể đổi avatar và tên bất cứ lúc nào, miễn phí.`),
+        t(`Name: up to 20 characters.`,`Tên: tối đa 20 ký tự.`),
+        t(`Avatar list: TBD.`,`Danh sách avatar: TBD.`)
+      ]))+
+      panel(t('Where they are used','Nơi sử dụng'),ul([
+        t(`Leaderboard rows show the player's avatar and name:`,`Các dòng của Bảng xếp hạng hiện avatar và tên của người chơi:`)+' <a href="#leaderboard">7.4</a>'
       ])));
 
   /* PER GAME: one ent per element: ent(N.key, ul([...rules]), unlock(level), demo('key')). */
@@ -2376,6 +2396,7 @@ function view(l){
       panel(t('The board','Bảng xếp hạng'),ul([
         t(`Each group has 50 players. The board lists them by score, highest first.`,`Mỗi nhóm có 50 người chơi. Bảng xếp theo điểm, cao nhất ở trên.`),
         t(`Each row: rank, avatar, name, score, and the reward of that rank.`,`Mỗi dòng: hạng, avatar, tên, điểm, và phần thưởng của hạng đó.`),
+        t(`Avatar and name follow the player name & avatar rules.`,`Avatar và tên theo luật tên & avatar người chơi.`)+' '+see('additional-mechanics','1.3'),
         t(`The player's own row is highlighted and stays in view.`,`Dòng của người chơi được làm nổi bật và luôn hiện trên màn hình.`),
         t(`Ties: the player who reached the score first ranks higher.`,`Bằng điểm: ai đạt số điểm đó trước thì xếp trên.`)
       ]))+
@@ -2519,6 +2540,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Player name & avatar','Tên & avatar người chơi'),ul([
+        t(`Added player name & avatar to 1.3: red avatar by default, a random 6-character upper-case name (letters and numbers), free changes, name up to 20 characters.`,`Thêm tên & avatar người chơi vào mục 1.3: avatar đỏ mặc định, tên ngẫu nhiên 6 ký tự viết hoa (chữ và số), đổi tự do, tên tối đa 20 ký tự.`),
+        t(`The Leaderboard (7.4) links to it.`,`Bảng xếp hạng (mục 7.4) có liên kết tới phần này.`)
+      ]))+
       ent(t('Leaderboard and Jelly Machine timing','Thời điểm cập nhật Bảng xếp hạng và Jelly Machine'),ul([
         t(`Leaderboard (7.4): the Victory screen shows the candies collected and updates the rank.`,`Bảng xếp hạng (mục 7.4): màn hình Victory hiện số kẹo thu được và cập nhật thứ hạng.`),
         t(`Round end: a player in a level finishes it, claims the level reward, then goes Home for the leaderboard reward and a new round. A player who opens the game after the timer ends sees the reward screen first.`,`Hết vòng: người đang trong màn chơi xong, nhận thưởng màn, rồi về màn hình chính nhận thưởng Bảng xếp hạng và bắt đầu vòng mới. Người mở game sau khi hết giờ thấy màn hình nhận thưởng trước.`),
