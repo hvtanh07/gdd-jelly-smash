@@ -2343,7 +2343,9 @@ function view(l){
       ['collection_event_cooldown_hours',t('Cooldown between two events','Thời gian nghỉ giữa hai sự kiện'),'24',t('h','giờ')],
       ['collection_event_first_set',t('Set of the first event','Bộ mốc của sự kiện đầu tiên'),'easy',t('set','bộ')],
       ['collection_event_set_threshold',t('Last progress that moves the pick from Easy/Medium to Medium/Hard','Tiến độ lần trước để chuyển từ Dễ/Trung bình sang Trung bình/Khó'),'50','%'],
-      ['collection_event_colors',t('Color order of the milestones (repeats)','Thứ tự màu của các mốc (lặp lại)'),'yellow, red, blue, purple',t('list','danh sách')],
+      ['collection_event_colors_easy',t('Easy: color of each milestone (Y yellow, R red, B blue, P purple)','Dễ: màu của từng mốc (Y vàng, R đỏ, B xanh, P tím)'),'Y, R, B, P, B, R, Y, B, R, P, R, B, Y, P, R, Y, B, P, Y, P',t('list','danh sách')],
+      ['collection_event_colors_medium',t('Medium: color of each milestone','Trung bình: màu của từng mốc'),'R, Y, P, R, P, B, P, Y, P, Y, B, R, P, B, Y, B, Y, R, B, R',t('list','danh sách')],
+      ['collection_event_colors_hard',t('Hard: color of each milestone','Khó: màu của từng mốc'),'B, P, Y, B, R, Y, B, R, B, R, Y, P, R, Y, P, R, P, Y, P, B',t('list','danh sách')],
       ['collection_event_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['collection_event_milestone_count',t('Number of milestones','Số mốc'),'20',t('count','mốc')],
       ['collection_event_milestones_easy',t('Easy: jelly needed for each milestone (rewards in 7.3)','Dễ: số thạch cần cho từng mốc (phần thưởng ở mục 7.3)'),'5, 10, 10, 15, 20, 20, 25, 25, 30, 30, 35, 40, 40, 45, 45, 50, 55, 55, 60, 60',t('jelly','thạch')],
@@ -2691,30 +2693,78 @@ function view(l){
           [t('Hard','Khó'),'1,820','9,100','16 Shuffle, 14 Hand, 10 Bomb',t('6 h','6 giờ'),'≈ 24,500']
         ],'compact'))+
       panel(t('Milestones & rewards','Các mốc & phần thưởng'),
-        table(t('Collection Event milestones by set','Các mốc của Collection Event theo bộ'),[t('Milestone','Mốc'),t('Color','Màu'),t('Easy: jelly · reward','Dễ: thạch · thưởng'),t('Medium: jelly · reward','Trung bình: thạch · thưởng'),t('Hard: jelly · reward','Khó: thạch · thưởng')],[
-          ['1',t('yellow','vàng'),t(`5 · 30 coins`,`5 · 30 xu`),t(`10 · 50 coins`,`10 · 50 xu`),t(`15 · 100 coins`,`15 · 100 xu`)],
-          ['2',t('red','đỏ'),t(`10 · 1 Shuffle`,`10 · 1 Shuffle`),t(`15 · 1 Shuffle`,`15 · 1 Shuffle`),t(`25 · 1 Shuffle`,`25 · 1 Shuffle`)],
-          ['3',t('blue','xanh'),t(`10 · 50 coins`,`10 · 50 xu`),t(`20 · 100 coins`,`20 · 100 xu`),t(`30 · 1 Hand`,`30 · 1 Hand`)],
-          ['4',t('purple','tím'),t(`15 · 75 coins`,`15 · 75 xu`),t(`25 · 1 Hand`,`25 · 1 Hand`),t(`40 · 200 coins`,`40 · 200 xu`)],
-          ['5',t('yellow','vàng'),t(`20 · ★ 15 min unlimited lives + 100 coins`,`20 · ★ 15 phút tim vô hạn + 100 xu`),t(`30 · ★ 30 min unlimited lives + 200 coins`,`30 · ★ 30 phút tim vô hạn + 200 xu`),t(`50 · ★ 1 h unlimited lives + 400 coins`,`50 · ★ 1 giờ tim vô hạn + 400 xu`)],
-          ['6',t('red','đỏ'),t(`20 · 75 coins`,`20 · 75 xu`),t(`40 · 150 coins`,`40 · 150 xu`),t(`60 · 300 coins`,`60 · 300 xu`)],
-          ['7',t('blue','xanh'),t(`25 · 1 Hand`,`25 · 1 Hand`),t(`45 · 1 Shuffle`,`45 · 1 Shuffle`),t(`70 · 2 Shuffle`,`70 · 2 Shuffle`)],
-          ['8',t('purple','tím'),t(`25 · 100 coins`,`25 · 100 xu`),t(`50 · 1 Bomb`,`50 · 1 Bomb`),t(`75 · 1 Bomb`,`75 · 1 Bomb`)],
-          ['9',t('yellow','vàng'),t(`30 · 1 Shuffle`,`30 · 1 Shuffle`),t(`50 · 250 coins`,`50 · 250 xu`),t(`80 · 400 coins`,`80 · 400 xu`)],
-          ['10',t('red','đỏ'),t(`30 · ★ 1 Bomb + 150 coins`,`30 · ★ 1 Bomb + 150 xu`),t(`55 · ★ 1 Shuffle + 1 Hand + 1 Bomb + 300 coins`,`55 · ★ 1 Shuffle + 1 Hand + 1 Bomb + 300 xu`),t(`85 · ★ 2 of each booster + 500 coins`,`85 · ★ mỗi loại booster 2 cái + 500 xu`)],
-          ['11',t('blue','xanh'),t(`35 · 150 coins`,`35 · 150 xu`),t(`65 · 300 coins`,`65 · 300 xu`),t(`100 · 500 coins`,`100 · 500 xu`)],
-          ['12',t('purple','tím'),t(`40 · 1 Shuffle`,`40 · 1 Shuffle`),t(`70 · 2 Shuffle`,`70 · 2 Shuffle`),t(`105 · 2 Hand`,`105 · 2 Hand`)],
-          ['13',t('yellow','vàng'),t(`40 · 30 min unlimited lives`,`40 · 30 phút tim vô hạn`),t(`70 · 1 h unlimited lives`,`70 · 1 giờ tim vô hạn`),t(`110 · 2 h unlimited lives`,`110 · 2 giờ tim vô hạn`)],
-          ['14',t('red','đỏ'),t(`45 · 1 Hand`,`45 · 1 Hand`),t(`75 · 2 Hand`,`75 · 2 Hand`),t(`115 · 2 Bomb`,`115 · 2 Bomb`)],
-          ['15',t('blue','xanh'),t(`45 · ★ 1 Bomb + 250 coins`,`45 · ★ 1 Bomb + 250 xu`),t(`80 · ★ 2 Bomb + 500 coins`,`80 · ★ 2 Bomb + 500 xu`),t(`120 · ★ 3 Shuffle + 2 Hand + 1,000 coins`,`120 · ★ 3 Shuffle + 2 Hand + 1.000 xu`)],
-          ['16',t('purple','tím'),t(`50 · 200 coins`,`50 · 200 xu`),t(`85 · 400 coins`,`85 · 400 xu`),t(`140 · 700 coins`,`140 · 700 xu`)],
-          ['17',t('yellow','vàng'),t(`55 · 1 Shuffle + 1 Hand`,`55 · 1 Shuffle + 1 Hand`),t(`90 · 2 Shuffle + 1 Hand`,`90 · 2 Shuffle + 1 Hand`),t(`145 · 3 Shuffle + 2 Hand`,`145 · 3 Shuffle + 2 Hand`)],
-          ['18',t('red','đỏ'),t(`55 · 1 h unlimited lives`,`55 · 1 giờ tim vô hạn`),t(`90 · 2 h unlimited lives`,`90 · 2 giờ tim vô hạn`),t(`150 · 3 h unlimited lives`,`150 · 3 giờ tim vô hạn`)],
-          ['19',t('blue','xanh'),t(`60 · 300 coins`,`60 · 300 xu`),t(`90 · 600 coins`,`90 · 600 xu`),t(`150 · 1,000 coins`,`150 · 1.000 xu`)],
-          ['20',t('purple','tím'),t(`60 · ★ Chest: 1,000 coins + 1 of each booster`,`60 · ★ Rương: 1.000 xu + mỗi loại booster 1 cái`),t(`95 · ★ Grand chest: 2,000 coins + 3 of each booster`,`95 · ★ Rương lớn: 2.000 xu + mỗi loại booster 3 cái`),t(`155 · ★ Grand chest: 4,000 coins + 5 of each booster`,`155 · ★ Rương lớn: 4.000 xu + mỗi loại booster 5 cái`)]
+        `<p>${t('Each set has its own milestones: its own color, jelly count and reward at every step.','Mỗi bộ có các mốc riêng: màu, số thạch và phần thưởng riêng ở từng mốc.')}</p>`+
+        `<p><b>${t('Easy','Dễ')}</b></p>`+
+        table(t('Easy set milestones','Các mốc bộ Dễ'),[t('Milestone','Mốc'),t('Easy: jelly needed','Dễ: thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
+          ['1',t('yellow × 5','vàng × 5'),'5',t(`30 coins`,`30 xu`)],
+          ['2',t('red × 10','đỏ × 10'),'15',t(`1 Shuffle`,`1 Shuffle`)],
+          ['3',t('blue × 10','xanh × 10'),'25',t(`50 coins`,`50 xu`)],
+          ['4',t('purple × 15','tím × 15'),'40',t(`75 coins`,`75 xu`)],
+          ['5',t('blue × 20','xanh × 20'),'60',t(`★ 15 min unlimited lives + 100 coins`,`★ 15 phút tim vô hạn + 100 xu`)],
+          ['6',t('red × 20','đỏ × 20'),'80',t(`75 coins`,`75 xu`)],
+          ['7',t('yellow × 25','vàng × 25'),'105',t(`1 Hand`,`1 Hand`)],
+          ['8',t('blue × 25','xanh × 25'),'130',t(`100 coins`,`100 xu`)],
+          ['9',t('red × 30','đỏ × 30'),'160',t(`1 Shuffle`,`1 Shuffle`)],
+          ['10',t('purple × 30','tím × 30'),'190',t(`★ 1 Bomb + 150 coins`,`★ 1 Bomb + 150 xu`)],
+          ['11',t('red × 35','đỏ × 35'),'225',t(`150 coins`,`150 xu`)],
+          ['12',t('blue × 40','xanh × 40'),'265',t(`1 Shuffle`,`1 Shuffle`)],
+          ['13',t('yellow × 40','vàng × 40'),'305',t(`30 min unlimited lives`,`30 phút tim vô hạn`)],
+          ['14',t('purple × 45','tím × 45'),'350',t(`1 Hand`,`1 Hand`)],
+          ['15',t('red × 45','đỏ × 45'),'395',t(`★ 1 Bomb + 250 coins`,`★ 1 Bomb + 250 xu`)],
+          ['16',t('yellow × 50','vàng × 50'),'445',t(`200 coins`,`200 xu`)],
+          ['17',t('blue × 55','xanh × 55'),'500',t(`1 Shuffle + 1 Hand`,`1 Shuffle + 1 Hand`)],
+          ['18',t('purple × 55','tím × 55'),'555',t(`1 h unlimited lives`,`1 giờ tim vô hạn`)],
+          ['19',t('yellow × 60','vàng × 60'),'615',t(`300 coins`,`300 xu`)],
+          ['20',t('purple × 60','tím × 60'),'675',t(`★ Chest: 1,000 coins + 1 of each booster`,`★ Rương: 1.000 xu + mỗi loại booster 1 cái`)]
+        ],'compact')+
+        `<p><b>${t('Medium','Trung bình')}</b></p>`+
+        table(t('Medium set milestones','Các mốc bộ Trung bình'),[t('Milestone','Mốc'),t('Medium: jelly needed','Trung bình: thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
+          ['1',t('red × 10','đỏ × 10'),'10',t(`50 coins`,`50 xu`)],
+          ['2',t('yellow × 15','vàng × 15'),'25',t(`1 Shuffle`,`1 Shuffle`)],
+          ['3',t('purple × 20','tím × 20'),'45',t(`100 coins`,`100 xu`)],
+          ['4',t('red × 25','đỏ × 25'),'70',t(`1 Hand`,`1 Hand`)],
+          ['5',t('purple × 30','tím × 30'),'100',t(`★ 30 min unlimited lives + 200 coins`,`★ 30 phút tim vô hạn + 200 xu`)],
+          ['6',t('blue × 40','xanh × 40'),'140',t(`150 coins`,`150 xu`)],
+          ['7',t('purple × 45','tím × 45'),'185',t(`1 Shuffle`,`1 Shuffle`)],
+          ['8',t('yellow × 50','vàng × 50'),'235',t(`1 Bomb`,`1 Bomb`)],
+          ['9',t('purple × 50','tím × 50'),'285',t(`250 coins`,`250 xu`)],
+          ['10',t('yellow × 55','vàng × 55'),'340',t(`★ 1 Shuffle + 1 Hand + 1 Bomb + 300 coins`,`★ 1 Shuffle + 1 Hand + 1 Bomb + 300 xu`)],
+          ['11',t('blue × 65','xanh × 65'),'405',t(`300 coins`,`300 xu`)],
+          ['12',t('red × 70','đỏ × 70'),'475',t(`2 Shuffle`,`2 Shuffle`)],
+          ['13',t('purple × 70','tím × 70'),'545',t(`1 h unlimited lives`,`1 giờ tim vô hạn`)],
+          ['14',t('blue × 75','xanh × 75'),'620',t(`2 Hand`,`2 Hand`)],
+          ['15',t('yellow × 80','vàng × 80'),'700',t(`★ 2 Bomb + 500 coins`,`★ 2 Bomb + 500 xu`)],
+          ['16',t('blue × 85','xanh × 85'),'785',t(`400 coins`,`400 xu`)],
+          ['17',t('yellow × 90','vàng × 90'),'875',t(`2 Shuffle + 1 Hand`,`2 Shuffle + 1 Hand`)],
+          ['18',t('red × 90','đỏ × 90'),'965',t(`2 h unlimited lives`,`2 giờ tim vô hạn`)],
+          ['19',t('blue × 90','xanh × 90'),'1,055',t(`600 coins`,`600 xu`)],
+          ['20',t('red × 95','đỏ × 95'),'1,150',t(`★ Grand chest: 2,000 coins + 3 of each booster`,`★ Rương lớn: 2.000 xu + mỗi loại booster 3 cái`)]
+        ],'compact')+
+        `<p><b>${t('Hard','Khó')}</b></p>`+
+        table(t('Hard set milestones','Các mốc bộ Khó'),[t('Milestone','Mốc'),t('Hard: jelly needed','Khó: thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
+          ['1',t('blue × 15','xanh × 15'),'15',t(`100 coins`,`100 xu`)],
+          ['2',t('purple × 25','tím × 25'),'40',t(`1 Shuffle`,`1 Shuffle`)],
+          ['3',t('yellow × 30','vàng × 30'),'70',t(`1 Hand`,`1 Hand`)],
+          ['4',t('blue × 40','xanh × 40'),'110',t(`200 coins`,`200 xu`)],
+          ['5',t('red × 50','đỏ × 50'),'160',t(`★ 1 h unlimited lives + 400 coins`,`★ 1 giờ tim vô hạn + 400 xu`)],
+          ['6',t('yellow × 60','vàng × 60'),'220',t(`300 coins`,`300 xu`)],
+          ['7',t('blue × 70','xanh × 70'),'290',t(`2 Shuffle`,`2 Shuffle`)],
+          ['8',t('red × 75','đỏ × 75'),'365',t(`1 Bomb`,`1 Bomb`)],
+          ['9',t('blue × 80','xanh × 80'),'445',t(`400 coins`,`400 xu`)],
+          ['10',t('red × 85','đỏ × 85'),'530',t(`★ 2 of each booster + 500 coins`,`★ mỗi loại booster 2 cái + 500 xu`)],
+          ['11',t('yellow × 100','vàng × 100'),'630',t(`500 coins`,`500 xu`)],
+          ['12',t('purple × 105','tím × 105'),'735',t(`2 Hand`,`2 Hand`)],
+          ['13',t('red × 110','đỏ × 110'),'845',t(`2 h unlimited lives`,`2 giờ tim vô hạn`)],
+          ['14',t('yellow × 115','vàng × 115'),'960',t(`2 Bomb`,`2 Bomb`)],
+          ['15',t('purple × 120','tím × 120'),'1,080',t(`★ 3 Shuffle + 2 Hand + 1,000 coins`,`★ 3 Shuffle + 2 Hand + 1.000 xu`)],
+          ['16',t('red × 140','đỏ × 140'),'1,220',t(`700 coins`,`700 xu`)],
+          ['17',t('purple × 145','tím × 145'),'1,365',t(`3 Shuffle + 2 Hand`,`3 Shuffle + 2 Hand`)],
+          ['18',t('yellow × 150','vàng × 150'),'1,515',t(`3 h unlimited lives`,`3 giờ tim vô hạn`)],
+          ['19',t('purple × 150','tím × 150'),'1,665',t(`1,000 coins`,`1.000 xu`)],
+          ['20',t('blue × 155','xanh × 155'),'1,820',t(`★ Grand chest: 4,000 coins + 5 of each booster`,`★ Rương lớn: 4.000 xu + mỗi loại booster 5 cái`)]
         ],'compact')+
         ul([
-          t(`Colors follow the order yellow → red → blue → purple, then repeat. Same order in all 3 sets.`,`Màu theo thứ tự vàng → đỏ → xanh → tím, rồi lặp lại. Cả 3 bộ dùng cùng thứ tự.`),
+          t(`Each set has its own color order. Each color appears 5 times per set, never twice in a row. At the same milestone number, the 3 sets always ask for different colors.`,`Mỗi bộ có thứ tự màu riêng. Mỗi màu xuất hiện 5 lần trong một bộ, không bao giờ 2 lần liền nhau. Ở cùng một số mốc, 3 bộ luôn yêu cầu màu khác nhau.`),
           t(`Jelly needed grows fast in the Hook phase, then slowly. The last 5 milestones stay close together so the end does not feel like a wall.`,`Số thạch cần tăng nhanh ở giai đoạn Mồi, sau đó tăng chậm. 5 mốc cuối gần nhau để đoạn cuối không thành bức tường.`)
         ]))+
       panel(t('Claim and next milestone','Nhận thưởng và sang mốc tiếp theo'),ul([
@@ -2750,6 +2800,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Collection Event set milestones','Mốc riêng cho từng bộ'),ul([
+        t(`7.3: each set (Easy, Medium, Hard) now has its own milestone list: own color order, jelly count and reward. One table per set. Remote config (5): one color list per set.`,`Mục 7.3: mỗi bộ (Dễ, Trung bình, Khó) có danh sách mốc riêng: thứ tự màu, số thạch và phần thưởng riêng. Mỗi bộ một bảng. Cấu hình từ xa (mục 5): mỗi bộ một danh sách màu.`)
+      ]))+
       ent(t('Collection Event sets','Bộ mốc Collection Event'),ul([
         t(`7.3: no remote trigger. The first event starts when the player completes level 18. After each 72 h event there is a 24 h cooldown, then a new event.`,`Mục 7.3: không bật từ xa nữa. Sự kiện đầu tiên bắt đầu khi người chơi hoàn thành màn 18. Sau mỗi sự kiện 72 giờ có 24 giờ nghỉ, rồi tới sự kiện mới.`),
         t(`3 milestone sets: Easy (675 jelly, ≈ 7,100 coins of value), Medium (1,150, ≈ 14,600) and Hard (1,820, ≈ 24,500).`,`3 bộ mốc: Dễ (675 thạch, giá trị ≈ 7.100 xu), Trung bình (1.150, ≈ 14.600) và Khó (1.820, ≈ 24.500).`),
