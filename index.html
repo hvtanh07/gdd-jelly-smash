@@ -1656,6 +1656,114 @@ function gaugeUI(){
   setNeedle();
 }
 
+/* ---------- leaderboard: 7-day bot score simulator ---------- */
+const LBS_A=184,LBS_TGT=20,LBS_H=168;
+const LBS_CURVE=[1,.5,.3,.3,.3,.5,1,2,2.5,2,1.5,1.5,2.5,2,1.5,1.5,1.5,2,2.5,3,3.5,3.5,3,2];
+/* group: id, bots, pace first→last (share of target), win rate, sessions lo–hi, skip-day chance, color */
+const LBS_G=[['top',3,.85,.7,.85,4,6,0,'var(--c1)'],['va',7,.65,.4,.8,3,5,.05,'var(--c6)'],['ac',10,.37,.2,.75,2,4,.1,'var(--c4)'],
+  ['ca',15,.18,.06,.7,1,3,.2,'var(--c3)'],['li',10,.05,.02,.65,1,1,.55,'var(--c8)'],['in',4,0,0,.6,0,0,1,'var(--hid)']];
+const LBS_GN={en:{top:'Top rivals',va:'Very active',ac:'Active',ca:'Casual',li:'Light',in:'Inactive',me:'You'},
+  vi:{top:'Đối thủ top',va:'Rất chăm',ac:'Chăm',ca:'Bình thường',li:'Ít chơi',in:'Không chơi',me:'Bạn'}};
+const LBS={seed:1,W:20,t:LBS_H,play:false,raf:0,last:0,bots:null,bseed:0,me:null,mkey:''};
+function lbsRng(a){return()=>{a=a+0x6D2B79F5|0;let x=Math.imul(a^a>>>15,1|a);x=x+Math.imul(x^x>>>7,61|x)^x;return((x^x>>>14)>>>0)/4294967296;};}
+/* one player's 7 days: list of wins as [hour, score after the win] */
+function lbsRun(wpd,wr,slo,shi,skip,r){
+  const ev=[],tot=LBS_CURVE.reduce((a,b)=>a+b,0);let st=0,sum=0;
+  const hour=()=>{let x=r()*tot;for(let h=0;h<24;h++){x-=LBS_CURVE[h];if(x<0)return h;}return 23;};
+  const gauss=()=>Math.sqrt(-2*Math.log(1-r()))*Math.cos(2*Math.PI*r());
+  for(let d=0;d<7;d++){
+    if(!wpd||r()<skip)continue;
+    const n=wpd/wr*(.6+.8*r()),S=slo+Math.floor(r()*(shi-slo+1)),per=n/S,hs=[];
+    for(let i=0;i<S;i++)hs.push(hour());hs.sort((a,b)=>a-b);
+    let tm=d*24;
+    for(const h of hs){
+      tm=Math.max(tm,d*24+h+r());
+      const k=Math.max(1,Math.round(per+per*.3*gauss()));let lives=5;
+      for(let i=0;i<k;i++){
+        tm+=(1+2*r())/60;
+        if(r()<wr){st=Math.min(st+1,5);sum+=Math.round(LBS_A*(.85+.35*r()))*st;if(tm<LBS_H)ev.push([tm,sum]);}
+        else{st=0;if(--lives===0)break;}
+      }
+    }
+  }
+  return ev;
+}
+function lbsData(){
+  if(!LBS.bots||LBS.bseed!==LBS.seed){
+    const r=lbsRng(LBS.seed*7919),ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',bots=[];
+    LBS_G.forEach(([g,c,a,b,wr,lo,hi,sk,col])=>{for(let i=0;i<c;i++){
+      const x=a+(b-a)*(c>1?i/(c-1):0);let nm='';for(let j=0;j<6;j++)nm+=ch[Math.floor(r()*ch.length)];
+      bots.push({g,col,nm,ev:lbsRun(x*LBS_TGT,wr,lo,hi,sk,lbsRng(Math.floor(r()*1e9)))});}});
+    LBS.bots=bots;LBS.bseed=LBS.seed;
+  }
+  const k=LBS.seed+':'+LBS.W;
+  if(LBS.mkey!==k){const s=Math.max(1,Math.min(6,Math.round(LBS.W/4)));LBS.me={g:'me',col:'var(--ink)',me:true,ev:lbsRun(LBS.W,.8,s,s,0,lbsRng(LBS.seed*104729+LBS.W))};LBS.mkey=k;}
+  return LBS.bots.concat([LBS.me]);
+}
+function lbsAt(ev,t){let s=0,w=0;for(const [h,v] of ev){if(h>t)break;s=v;w=h;}return [s,w];}
+function lbsReward(rk,sc,vi){
+  if(!sc)return vi?'Không có thưởng (0 điểm)':'No reward (0 points)';
+  const c=rk===1?1500:rk===2?1000:rk===3?600:rk<=10?300:rk<=20?150:50,bo=rk===1?5:rk===2?3:rk===3?1:0;
+  return vi?`${c.toLocaleString('en-US')} xu`+(bo?` + ${bo} mỗi loại booster`:''):`${c.toLocaleString('en-US')} coins`+(bo?` + ${bo} of each booster`:'');
+}
+function lbsChart(all,vi){
+  const W=640,H=250,L=46,R=10,T=10,Bm=26,max=Math.max(1000,...all.map(p=>p.ev.length?p.ev[p.ev.length-1][1]:0))*1.05;
+  const X=h=>f1(L+h/LBS_H*(W-L-R)),Y=v=>f1(H-Bm-v/max*(H-T-Bm));
+  let g='';
+  for(let i=0;i<=4;i++){const v=max/1.05*i/4,y=Y(v);g+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${L-6}" y="${y}" dy=".35em" text-anchor="end" font-size="10" fill="var(--muted)">${v>=1000?Math.round(v/1000)+'k':Math.round(v)}</text>`;}
+  for(let d=0;d<=7;d++){const x=X(d*24);g+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${H-Bm}" stroke="var(--line)" stroke-dasharray="2 3"/>`+(d<7?`<text x="${X(d*24+12)}" y="${H-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${vi?'Ngày':'Day'} ${d+1}</text>`:'');}
+  const path=p=>{let d=`M${X(0)} ${Y(0)}`;p.ev.forEach(([h,v])=>{d+=`H${X(h)}V${Y(v)}`;});return d+`H${X(LBS_H)}`;};
+  const lines=all.filter(p=>!p.me).map(p=>`<path d="${path(p)}" fill="none" stroke="${p.col}" stroke-width="1.3" opacity=".7"/>`).join('')+
+    `<path d="${path(LBS.me)}" fill="none" stroke="var(--ink)" stroke-width="3"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto" role="img" aria-label="${vi?'Điểm của 49 bot và người chơi trong 7 ngày':'Scores of 49 bots and the player over 7 days'}">${g}
+    <clipPath id="lbsClip"><rect id="lbsClipR" x="0" y="0" width="${W}" height="${H}"/></clipPath><g clip-path="url(#lbsClip)">${lines}</g>
+    <line id="lbsNow" x1="0" x2="0" y1="${T}" y2="${H-Bm}" stroke="var(--accent)" stroke-width="1.5"/></svg>`;
+}
+function lbsFrame(){
+  const box=$('#lbSim');if(!box)return;
+  const vi=lang==='vi',all=lbsData(),N=LBS_GN[vi?'vi':'en'],t=LBS.t,W=640,L=46,R=10,x=f1(L+t/LBS_H*(W-L-R));
+  const cr=$('#lbsClipR');if(cr)cr.setAttribute('width',x);
+  const nl=$('#lbsNow');if(nl){nl.setAttribute('x1',x);nl.setAttribute('x2',x);}
+  const rows=all.map(p=>{const [s,w]=lbsAt(p.ev,t);return {p,s,w};}).sort((a,b)=>b.s-a.s||(a.s?a.w-b.w:0)||(a.p.me?-1:b.p.me?1:0));
+  rows.forEach((r,i)=>r.rk=i+1);
+  const mi=rows.findIndex(r=>r.p.me),me=rows[mi];
+  const show=rows.filter((r,i)=>i<10||Math.abs(i-mi)<=1);
+  const d=Math.min(7,Math.floor(t/24)+1),hh=t>=LBS_H?'24:00':String(Math.floor(t%24)).padStart(2,'0')+':'+String(Math.floor(t%1*60)).padStart(2,'0');
+  $('#lbsT').textContent=(vi?'Ngày ':'Day ')+d+', '+hh;
+  const ts=$('#lbsTime');if(ts&&+ts.value!==t)ts.value=t;
+  $('#lbsRes').innerHTML=(vi?`<b>Bạn:</b> ${me.s.toLocaleString('en-US')} điểm, hạng <b>${me.rk}</b>/50. `:`<b>You:</b> ${me.s.toLocaleString('en-US')} points, rank <b>${me.rk}</b>/50. `)+
+    (t>=LBS_H?(vi?'Phần thưởng: ':'Reward: ')+lbsReward(me.rk,me.s,vi)+'.':(vi?'Phần thưởng nếu vòng kết thúc lúc này: ':'Reward if the round ended now: ')+lbsReward(me.rk,me.s,vi)+'.');
+  let prev=0;
+  $('#lbsBoard').innerHTML=`<div class="tbl compact"><table><thead><tr><th scope="col">${vi?'Hạng':'Rank'}</th><th scope="col">${vi?'Tên':'Name'}</th><th scope="col">${vi?'Nhóm':'Group'}</th><th scope="col">${vi?'Điểm':'Score'}</th></tr></thead><tbody>`+
+    show.map(r=>{const gap=r.rk-prev>1?`<tr><td colspan="4" style="text-align:center;color:var(--muted)">…</td></tr>`:'';prev=r.rk;
+      const sty=r.p.me?' style="background:var(--wip);font-weight:700"':'';
+      return gap+`<tr${sty}><th scope="row">${r.rk}</th><td>${r.p.me?N.me:r.p.nm}</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.p.col};margin-right:6px"></span>${N[r.p.g]}</td><td>${r.s.toLocaleString('en-US')}</td></tr>`;}).join('')+`</tbody></table></div>`;
+  const pb=$('#lbsPlay');if(pb)pb.textContent=LBS.play?(vi?'Tạm dừng':'Pause'):(vi?'Chạy 7 ngày':'Play 7 days');
+}
+function lbsTick(ts){
+  if(!LBS.play){LBS.raf=0;return;}
+  const dt=LBS.last?Math.min(.1,(ts-LBS.last)/1000):0;LBS.last=ts;
+  LBS.t=Math.min(LBS_H,LBS.t+dt*12);
+  if(LBS.t>=LBS_H)LBS.play=false;
+  lbsFrame();
+  LBS.raf=LBS.play?requestAnimationFrame(lbsTick):0;
+}
+function lbsStart(){if(LBS.t>=LBS_H)LBS.t=0;LBS.play=true;LBS.last=0;if(!LBS.raf)LBS.raf=requestAnimationFrame(lbsTick);}
+function lbsUI(){
+  const box=$('#lbSim');if(!box)return;
+  const vi=lang==='vi';
+  $('#lbsChart').innerHTML=lbsChart(lbsData(),vi);
+  $('#lbsLegend').innerHTML=LBS_G.map(g=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px"><span style="width:14px;height:3px;background:${g[8]}"></span>${LBS_GN[vi?'vi':'en'][g[0]]}</span>`).join('')+
+    `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:4px;background:var(--ink)"></span>${vi?'Bạn':'You'}</span>`;
+  const w=$('#lbsWin');w.value=LBS.W;$('#lbsW').textContent=LBS.W;
+  w.oninput=()=>{LBS.W=+w.value;$('#lbsW').textContent=LBS.W;$('#lbsChart').innerHTML=lbsChart(lbsData(),lang==='vi');lbsFrame();};
+  const ts=$('#lbsTime');ts.oninput=()=>{LBS.play=false;LBS.t=+ts.value;lbsFrame();};
+  $('#lbsPlay').onclick=()=>{if(LBS.play)LBS.play=false;else lbsStart();lbsFrame();};
+  $('#lbsNew').onclick=()=>{LBS.seed++;$('#lbsChart').innerHTML=lbsChart(lbsData(),lang==='vi');if(!LBS.play&&!reduceMotion)lbsStart();lbsFrame();};
+  lbsFrame();
+  if(LBS.play&&!LBS.raf)LBS.raf=requestAnimationFrame(lbsTick);
+}
+
 /* ---------- page content (English, Vietnamese) ---------- */
 let paused=false;
 function view(l){
@@ -2449,6 +2557,25 @@ function view(l){
         table(t('Daily curve: chance a session starts in each hour','Đường cong trong ngày: khả năng một phiên bắt đầu ở mỗi giờ'),[t('Hours (local)','Giờ (địa phương)'),t('Weight','Trọng số')],[
           ['00–05','0.3–1'],['06–08','1–2'],['09–11','1.5–2.5'],['12–13',t('2–2.5 (lunch)','2–2,5 (giờ trưa)')],['14–18','1.5–2'],['19–22',t('2.5–3.5 (evening peak)','2,5–3,5 (cao điểm tối)')],['23','2']
         ],'compact'))+
+      panel(t('7-day simulator','Mô phỏng 7 ngày'),
+        `<p>${t(`Runs the logic above for one round: 49 bots in 6 groups and the player. Pick how many levels the player wins per day, then press Play. Each line is one score. A step = one won level.`,`Chạy logic ở trên cho một vòng: 49 bot trong 6 nhóm và người chơi. Chọn số màn người chơi thắng mỗi ngày, rồi bấm Chạy. Mỗi đường là điểm của một người. Mỗi bậc = một màn thắng.`)}</p>
+        <div id="lbSim">
+          <div class="gctl">
+            <label>${t('Player levels won per day','Số màn thắng mỗi ngày của người chơi')}: <b id="lbsW">20</b> <input type="range" id="lbsWin" min="0" max="30" step="1" value="20" style="vertical-align:middle;width:170px"></label>
+            <button type="button" class="gbtn primary" id="lbsPlay">${t('Play 7 days','Chạy 7 ngày')}</button>
+            <button type="button" class="gbtn" id="lbsNew">${t('New round','Vòng mới')}</button>
+          </div>
+          <div class="gctl"><label>${t('Time','Thời gian')}: <b id="lbsT"></b> <input type="range" id="lbsTime" min="0" max="168" step="0.25" value="168" style="vertical-align:middle;width:240px"></label></div>
+          <div id="lbsChart" style="margin-top:12px"></div>
+          <p id="lbsLegend" style="font-size:.86rem;color:var(--muted);margin:6px 0 10px"></p>
+          <p id="lbsRes" style="margin:0 0 10px"></p>
+          <div id="lbsBoard"></div>
+        </div>`+
+        ul([
+          t(`Bot names here are random samples. In the game they come from the Bot Data sheet.`,`Tên bot ở đây là mẫu ngẫu nhiên. Trong game, tên lấy từ sheet Bot Data.`),
+          t(`The player wins 80% of attempts and plays about 1 session per 4 levels (1–6 sessions per day).`,`Người chơi thắng 80% số lượt và chơi khoảng 1 phiên cho mỗi 4 màn (1–6 phiên mỗi ngày).`),
+          t(`New round = new seed: other bot results, same rules.`,`Vòng mới = seed mới: kết quả bot khác, luật giữ nguyên.`)
+        ]))+
       panel(t('What the player gets for how often they play','Người chơi nhận gì theo tần suất chơi'),
         table(t('Player levels won per day and rank','Số màn thắng mỗi ngày của người chơi và thứ hạng'),[t('Levels won per day','Số màn thắng mỗi ngày'),t('Usual rank','Hạng thường đạt'),t('Usual reward','Phần thưởng thường nhận')],[
           ['1','~34',t('50 coins','50 xu')],
@@ -2596,6 +2723,10 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Leaderboard bot simulator','Mô phỏng bot Bảng xếp hạng'),ul([
+        t(`Added a 7-day simulator to 7.4 under the bot score logic: a chart of all 50 scores, a live board and the player's reward.`,`Thêm bộ mô phỏng 7 ngày vào mục 7.4, dưới logic tăng điểm của bot: biểu đồ điểm của cả 50 người, bảng xếp hạng theo thời gian và phần thưởng của người chơi.`),
+        t(`The player's levels won per day can be changed. A new round uses a new seed.`,`Có thể chỉnh số màn thắng mỗi ngày của người chơi. Vòng mới dùng seed mới.`)
+      ]))+
       ent(t('Queen Ant points','Điểm kiến chúa'),ul([
         t(`Leaderboard (7.4): a Queen Ant counts as 10 points when defeated (was TBD).`,`Bảng xếp hạng (7.4): kiến chúa tính 10 điểm khi bị diệt (trước là TBD).`)
       ]))+
@@ -3093,6 +3224,7 @@ function render(){
   startDemos();
   startHero();
   gaugeUI();
+  lbsUI();
   if(G.swing&&!G.raf)G.raf=requestAnimationFrame(gaugeTick);
 }
 function setLang(l){
