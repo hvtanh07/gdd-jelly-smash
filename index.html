@@ -2491,7 +2491,9 @@ function view(l){
   B['live-ops']=`<p class="sec-intro">${t(`The rules for every offer popup (7.1, 7.2) the Collection Event event (7.3) and the Leaderboard (7.4). Jelly Smash has no Limited Time Reward, Skip Level or Retry with Booster.`,
     `Quy tắc cho mọi popup ưu đãi (7.1, 7.2) sự kiện Collection Event (7.3) và Bảng xếp hạng (7.4). Jelly Smash không có Quà giới hạn thời gian, Bỏ qua màn hay Chơi lại kèm công cụ.`)}</p>`;
   const CE=nm('Collection Event','Collection Event');
-  B['leaderboard']=
+  /* wide layout for 7.3 and 7.4: grows past the page width on large screens, unchanged on small ones */
+  const wideEnt=(html,cols)=>html.replace('<div class="ent sys">',`<div class="ent sys" style="width:max(100cqi,min(100vw - var(--rail-w) - 96px,1480px));margin-inline:calc((100cqi - max(100cqi,min(100vw - var(--rail-w) - 96px,1480px))) / 2)${cols?';grid-template-columns:'+cols:''}">`);
+  B['leaderboard']=wideEnt(
     sys(nm('Leaderboard','Bảng xếp hạng'),
       lead(t(`A 7-day ranking against a group of 50 players. The score comes from the ants the player defeats. At the end of a won level, ants defeated × the streak multiplier are added to the score. When the 7 days end, the final ranks decide the rewards. Benchmark: Meowdoku.`,
         `Bảng xếp hạng 7 ngày, đấu trong nhóm 50 người chơi. Điểm đến từ số kiến người chơi tiêu diệt. Cuối mỗi màn thắng, số kiến đã diệt × hệ số streak được cộng vào điểm. Hết 7 ngày, thứ hạng cuối cùng quyết định phần thưởng. Tham khảo: Meowdoku.`))+
@@ -2617,9 +2619,9 @@ function view(l){
         <p id="lbsRes" style="margin:0 0 8px"></p>
         <div id="lbsBoard"></div>
         <p style="margin:8px 0 0;font-size:.74rem;color:var(--muted)">${t('Sample names. The player wins 80% of attempts.','Tên bot là mẫu. Người chơi thắng 80% số lượt.')}</p>
-      </div>`).replace('<div class="ent sys">','<div class="ent sys" style="grid-template-columns:minmax(300px,42%) minmax(0,1fr)">');
+      </div>`),'minmax(300px,32%) minmax(0,1fr)');
 
-  B['collection-event']=
+  B['collection-event']=wideEnt(
     sys(CE,
       lead(t(`A timed event, started remotely for all players. It has a track of 20 milestones. Each milestone asks for an amount of jelly of one color and holds one reward. Fill it, claim the reward, then move on to the next milestone with a different color. Win in a row to multiply the jelly, up to ×5. This streak is separate from the leaderboard streak.`,
         `Sự kiện có thời hạn, được bật từ xa cho mọi người chơi. Gồm 20 mốc. Mỗi mốc yêu cầu thu một số thạch của một màu và có một phần thưởng. Làm đầy mốc, nhận thưởng, rồi sang mốc tiếp theo với màu khác. Thắng liên tiếp để nhân số thạch, tối đa ×5. Streak này tách riêng với streak của Bảng xếp hạng.`))+
@@ -2714,13 +2716,16 @@ function view(l){
         [t('Popup timing','Thời điểm popup'),t(`The event popup shows after the player completes a level and returns Home, so it never overlaps other popups. If the Leaderboard (7.4) has something to show at Home, it goes first. The jelly and progress bar update earlier, on the Victory screen.`,`Popup sự kiện hiện sau khi người chơi hoàn thành màn và về màn hình chính, nên không trùng với các popup khác. Nếu Bảng xếp hạng (mục 7.4) có nội dung cần hiện ở màn hình chính thì hiện trước. Thạch và thanh tiến độ đã cập nhật trước đó, ở màn hình Victory.`)],
         [t('Offline','Offline'),t(`The 72 h timer runs on server time, also offline.`,`Timer 72 giờ chạy theo giờ server, kể cả khi offline.`)],
         [t('Numbers','Con số'),t(`Start time, required level, length, max multiplier, milestones and rewards are remote config (5).`,`Giờ bắt đầu, màn yêu cầu, thời gian, hệ số tối đa, các mốc và phần thưởng nằm trong cấu hình từ xa (mục 5).`)]
-      ]));
+      ])),'150px minmax(0,1fr)');
 
   /* ===== 8. Change note ===== */
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Wider 7.3 and 7.4','Nới rộng mục 7.3 và 7.4'),ul([
+        t(`Collection Event and Leaderboard now use more of the screen width on large screens (up to 1,480 px), so tables and the simulator have more room. Small screens are unchanged.`,`Collection Event và Bảng xếp hạng giờ dùng thêm chiều ngang màn hình lớn (tối đa 1.480 px), nên bảng và bộ mô phỏng có thêm chỗ. Màn hình nhỏ giữ nguyên.`)
+      ]))+
       ent(t('Wider simulator','Mở rộng bộ mô phỏng'),ul([
         t(`7.4: the left column of the Leaderboard is wider (about 40%), so the simulator shows a bigger chart and the top 10 with groups.`,`Mục 7.4: cột trái của Bảng xếp hạng rộng hơn (khoảng 40%), nên bộ mô phỏng có biểu đồ lớn hơn và hiện top 10 kèm nhóm.`)
       ]))+
