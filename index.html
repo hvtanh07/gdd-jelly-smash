@@ -2338,13 +2338,17 @@ function view(l){
       ['remove_ads_unlock_level',t('Remove Ads (IAP) — level from which the offer popup can show','Gỡ quảng cáo (IAP) — màn bắt đầu có thể hiện popup ưu đãi'),'15',t('level','màn')]
     ])+
     rc(t('Collection Event','Collection Event'),[
-      ['collection_event_start_time',t('Start time for all players (remote trigger)','Giờ bắt đầu cho mọi người chơi (bật từ xa)'),'TBD',t('date','ngày giờ')],
-      ['collection_event_unlock_level',t('Level the player must have completed','Màn người chơi phải hoàn thành'),'18',t('level','màn')],
+      ['collection_event_unlock_level',t('Completing this level starts the first event','Hoàn thành màn này sẽ mở sự kiện đầu tiên'),'18',t('level','màn')],
       ['collection_event_duration_hours',t('Length of one event','Thời gian một sự kiện'),'72',t('h','giờ')],
+      ['collection_event_cooldown_hours',t('Cooldown between two events','Thời gian nghỉ giữa hai sự kiện'),'24',t('h','giờ')],
+      ['collection_event_first_set',t('Set of the first event','Bộ mốc của sự kiện đầu tiên'),'easy',t('set','bộ')],
+      ['collection_event_set_threshold',t('Last progress that moves the pick from Easy/Medium to Medium/Hard','Tiến độ lần trước để chuyển từ Dễ/Trung bình sang Trung bình/Khó'),'50','%'],
       ['collection_event_colors',t('Color order of the milestones (repeats)','Thứ tự màu của các mốc (lặp lại)'),'yellow, red, blue, purple',t('list','danh sách')],
       ['collection_event_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['collection_event_milestone_count',t('Number of milestones','Số mốc'),'20',t('count','mốc')],
-      ['collection_event_milestones',t('Jelly needed for each milestone','Số thạch cần cho từng mốc'),'10, 15, 20, 25, 30, 40, 45, 50, 50, 55, 65, 70, 70, 75, 80, 85, 90, 90, 90, 95',t('jelly','thạch')]
+      ['collection_event_milestones_easy',t('Easy: jelly needed for each milestone (rewards in 7.3)','Dễ: số thạch cần cho từng mốc (phần thưởng ở mục 7.3)'),'5, 10, 10, 15, 20, 20, 25, 25, 30, 30, 35, 40, 40, 45, 45, 50, 55, 55, 60, 60',t('jelly','thạch')],
+      ['collection_event_milestones_medium',t('Medium: jelly needed for each milestone (rewards in 7.3)','Trung bình: số thạch cần cho từng mốc (phần thưởng ở mục 7.3)'),'10, 15, 20, 25, 30, 40, 45, 50, 50, 55, 65, 70, 70, 75, 80, 85, 90, 90, 90, 95',t('jelly','thạch')],
+      ['collection_event_milestones_hard',t('Hard: jelly needed for each milestone (rewards in 7.3)','Khó: số thạch cần cho từng mốc (phần thưởng ở mục 7.3)'),'15, 25, 30, 40, 50, 60, 70, 75, 80, 85, 100, 105, 110, 115, 120, 140, 145, 150, 150, 155',t('jelly','thạch')]
     ])+
     rc(t('Leaderboard','Bảng xếp hạng'),[
       ['leaderboard_unlock_level',t('Unlocks on Level Complete of this level','Mở ở Level Complete của màn này'),'10',t('level','màn')],
@@ -2623,13 +2627,28 @@ function view(l){
 
   B['collection-event']=wideEnt(
     sys(CE,
-      lead(t(`A timed event, started remotely for all players. It has a track of 20 milestones. Each milestone asks for an amount of jelly of one color and holds one reward. Fill it, claim the reward, then move on to the next milestone with a different color. Win in a row to multiply the jelly, up to ×5. This streak is separate from the leaderboard streak.`,
-        `Sự kiện có thời hạn, được bật từ xa cho mọi người chơi. Gồm 20 mốc. Mỗi mốc yêu cầu thu một số thạch của một màu và có một phần thưởng. Làm đầy mốc, nhận thưởng, rồi sang mốc tiếp theo với màu khác. Thắng liên tiếp để nhân số thạch, tối đa ×5. Streak này tách riêng với streak của Bảng xếp hạng.`))+
-      tiles([[t('Level 18','Màn 18'),t('Must be completed','Cần hoàn thành')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('×5','×5'),t('Max streak multiplier','Hệ số streak tối đa'),'hot'],['20',t('Milestones','Số mốc')]])+
-      panel(t('Start: remote trigger','Bắt đầu: bật từ xa'),ul([
-        t(`The team starts the event remotely, for all players at once (start time in remote config).`,`Đội vận hành bật sự kiện từ xa, cho mọi người chơi cùng lúc (giờ bắt đầu trong cấu hình từ xa).`),
-        t(`A player joins only after completing level 18 or higher. A player who reaches level 18 while the event is live joins at once, with the time left.`,`Người chơi chỉ tham gia khi đã hoàn thành màn 18 trở lên. Ai qua màn 18 khi sự kiện đang chạy thì vào luôn, với thời gian còn lại.`)
+      lead(t(`A timed event for each player. It starts on its own once the player completes level 18. It has a track of 20 milestones. Each milestone asks for an amount of jelly of one color and holds one reward. There are 3 milestone sets: Easy, Medium and Hard. Harder sets ask for more jelly and give more. Win in a row to multiply the jelly, up to ×5. This streak is separate from the leaderboard streak.`,
+        `Sự kiện có thời hạn, riêng cho từng người chơi. Sự kiện tự bắt đầu khi người chơi hoàn thành màn 18. Gồm 20 mốc. Mỗi mốc yêu cầu thu một số thạch của một màu và có một phần thưởng. Có 3 bộ mốc: Dễ, Trung bình và Khó. Bộ càng khó thì cần nhiều thạch hơn và thưởng nhiều hơn. Thắng liên tiếp để nhân số thạch, tối đa ×5. Streak này tách riêng với streak của Bảng xếp hạng.`))+
+      tiles([[t('Level 18','Màn 18'),t('Starts the first event','Mở sự kiện đầu tiên')],[t('72 h','72 giờ'),t('Event length','Thời gian sự kiện')],[t('24 h','24 giờ'),t('Cooldown before the next event','Nghỉ trước sự kiện mới')],[t('3 sets','3 bộ'),t('Easy · Medium · Hard','Dễ · Trung bình · Khó'),'hot']])+
+      panel(t('Start and cooldown','Bắt đầu và thời gian nghỉ'),ul([
+        t(`No remote trigger. The first event starts on its own when the player completes level 18.`,`Không bật từ xa. Sự kiện đầu tiên tự bắt đầu khi người chơi hoàn thành màn 18.`),
+        t(`Each player has their own 72 h timer, from the moment their event starts.`,`Mỗi người chơi có timer 72 giờ riêng, tính từ lúc sự kiện của họ bắt đầu.`),
+        t(`When the timer ends, the event closes and a 24 h cooldown starts. During the cooldown the icon shows the time until the next event.`,`Hết timer, sự kiện đóng và bắt đầu 24 giờ nghỉ. Trong thời gian nghỉ, biểu tượng hiện thời gian tới sự kiện mới.`),
+        t(`After the cooldown, a new event starts with a milestone set picked by the rule below. Progress, rewards and the streak start from zero.`,`Hết thời gian nghỉ, sự kiện mới bắt đầu với bộ mốc được chọn theo quy tắc bên dưới. Tiến độ, phần thưởng và streak tính lại từ đầu.`),
+        t(`Finishing all 20 milestones early does not start the cooldown early. The player waits for the 72 h timer to end.`,`Hoàn thành cả 20 mốc sớm không làm thời gian nghỉ bắt đầu sớm. Người chơi chờ tới khi timer 72 giờ kết thúc.`)
       ]))+
+      panel(t('Picking the milestone set','Chọn bộ mốc'),
+        table(t('Milestone set rule','Quy tắc chọn bộ mốc'),[t('Event','Sự kiện'),t('Last event progress','Tiến độ sự kiện trước'),t('Set (random, equal chance)','Bộ mốc (ngẫu nhiên, tỉ lệ bằng nhau)')],[
+          [t('First event','Sự kiện đầu tiên'),dash,t('Always Easy','Luôn là Dễ')],
+          [t('Next events','Các sự kiện sau'),t('Under 50% (0–9 milestones)','Dưới 50% (0–9 mốc)'),t('Easy or Medium','Dễ hoặc Trung bình')],
+          [t('Next events','Các sự kiện sau'),t('50% or more (10–20 milestones)','Từ 50% trở lên (10–20 mốc)'),t('Medium or Hard','Trung bình hoặc Khó')]
+        ],'compact')+
+        ul([
+          t(`Progress = milestones filled in the last event ÷ 20.`,`Tiến độ = số mốc đã làm đầy ở sự kiện trước ÷ 20.`),
+          t(`Exactly 50% (10 milestones) counts in the upper group.`,`Đúng 50% (10 mốc) tính vào nhóm trên.`)+' '+inf,
+          t(`A player who did not play the last event has 0% and gets Easy or Medium.`,`Người chơi không chơi sự kiện trước có tiến độ 0% và nhận Dễ hoặc Trung bình.`),
+          t(`The set is picked when the event starts and does not change during the event.`,`Bộ mốc được chọn khi sự kiện bắt đầu và không đổi trong suốt sự kiện.`)
+        ]))+
       panel(t('Milestones: collect jelly','Các mốc: thu thập thạch'),ul([
         t(`The track has 20 milestones. Only 1 milestone is active at a time. Each one has 1 jelly color, a jelly count and 1 reward.`,`Thanh tiến độ có 20 mốc. Mỗi lúc chỉ có 1 mốc đang chạy. Mỗi mốc có 1 màu thạch, số thạch cần thu và 1 phần thưởng.`),
         t(`Every cube of the active milestone's color the player matches on the board counts as 1 jelly.`,`Mỗi khối cùng màu với mốc đang chạy mà người chơi match trên bàn tính là 1 thạch.`),
@@ -2653,50 +2672,57 @@ function view(l){
       panel(t('Balance intention','Ý đồ cân bằng'),
         ul([
           t(`Goal: everyone who plays during the event gets a few rewards; only players who keep a win streak finish all 20.`,`Mục tiêu: ai chơi trong thời gian sự kiện cũng nhận được vài phần quà; chỉ người giữ được chuỗi thắng mới về đích cả 20 mốc.`),
+          t(`<b>Easy:</b> about 60% of Medium's jelly for about half its rewards. A safe first event and a way back for players who fell behind.`,`<b>Dễ:</b> khoảng 60% số thạch của Trung bình, phần thưởng khoảng một nửa. Sự kiện đầu an toàn, và đường quay lại cho người chơi bị tụt lại.`),
+          t(`<b>Medium:</b> the base set.`,`<b>Trung bình:</b> bộ chuẩn.`),
+          t(`<b>Hard:</b> about 1.6× Medium's jelly for about 1.7× its rewards. The best reward per jelly, for players who finished half or more last time.`,`<b>Khó:</b> khoảng 1,6 lần số thạch của Trung bình, phần thưởng khoảng 1,7 lần. Giá trị trên mỗi thạch cao nhất, cho người chơi đã hoàn thành từ một nửa trở lên ở lần trước.`),
           t(`Assumption: about 15 jelly of one color per won level at ×1 (1 color out of 4 on the board).`,`Giả định: khoảng 15 thạch của một màu mỗi màn thắng ở ×1 (1 trong 4 màu trên bàn).`)+' '+inf,
-          t(`4 phases of 5 milestones. Every 5th milestone (★) is a peak reward, worth about as much as the 4 before it, so the player always sees a big goal close by.`,`4 giai đoạn, mỗi giai đoạn 5 mốc. Mỗi mốc thứ 5 (★) là phần thưởng đỉnh, giá trị gần bằng 4 mốc trước cộng lại, để người chơi luôn thấy một mục tiêu lớn ở gần.`),
+          t(`4 phases of 5 milestones in every set. Every 5th milestone (★) is a peak reward, worth about as much as the 4 before it, so the player always sees a big goal close by.`,`Mỗi bộ có 4 giai đoạn, mỗi giai đoạn 5 mốc. Mỗi mốc thứ 5 (★) là phần thưởng đỉnh, giá trị gần bằng 4 mốc trước cộng lại, để người chơi luôn thấy một mục tiêu lớn ở gần.`),
           t(`Coin values used: 1 win = 40 coins; Shuffle ≈ 300, Hand ≈ 400, Bomb ≈ 500 coins each (3 for 900 / 1,200 / 1,500 in the shop, see 5).`,`Giá trị quy đổi: 1 màn thắng = 40 xu; Shuffle ≈ 300, Hand ≈ 400, Bomb ≈ 500 xu mỗi cái (cửa hàng bán 3 cái giá 900 / 1.200 / 1.500, xem mục 5).`)
         ])+
-        table(t('Collection Event phases','Các giai đoạn Collection Event'),[t('Phase','Giai đoạn'),t('Milestones','Mốc'),t('Total jelly','Tổng thạch'),t('Who gets there','Ai tới được'),t('Intention','Ý đồ')],[
-          [t('Hook','Mồi'),'1–5','100',t('Everyone, day 1 (about 7 wins at ×1)','Mọi người, ngày 1 (khoảng 7 màn thắng ở ×1)'),t('Fast first claims. Teach claim and streak. Peak: unlimited lives.','Nhận thưởng nhanh. Dạy cách nhận thưởng và streak. Đỉnh: tim vô hạn.')],
-          [t('Habit','Thói quen'),'6–10','340',t('Casual player, about 5 wins a day for 3 days','Người chơi thường, khoảng 5 màn thắng mỗi ngày trong 3 ngày'),t('Bring the player back each day. Peak: one of each booster.','Kéo người chơi quay lại mỗi ngày. Đỉnh: mỗi loại booster 1 cái.')],
-          [t('Push','Bứt tốc'),'11–15','700',t('Active player who keeps ×2–×3','Người chơi tích cực, giữ được ×2–×3'),t('Make the streak matter. Bigger boosters and longer lives.','Làm streak có giá trị. Booster nhiều hơn, tim vô hạn lâu hơn.')],
-          [t('Chase','Về đích'),'16–20','1,150',t('Engaged player, about 10 wins a day at ×3–×4','Người chơi chăm, khoảng 10 màn thắng mỗi ngày ở ×3–×4'),t('Long goal for the top players. Peak: grand chest.','Mục tiêu dài cho người chơi giỏi. Đỉnh: rương lớn.')]
+        table(t('Collection Event phases','Các giai đoạn Collection Event'),[t('Phase','Giai đoạn'),t('Milestones','Mốc'),t('Total jelly: Easy / Medium / Hard','Tổng thạch: Dễ / Trung bình / Khó'),t('Intention','Ý đồ')],[
+          [t('Hook','Mồi'),'1–5','60 / 100 / 160',t('Fast first claims. Teach claim and streak. Peak: unlimited lives.','Nhận thưởng nhanh. Dạy cách nhận thưởng và streak. Đỉnh: tim vô hạn.')],
+          [t('Habit','Thói quen'),'6–10','190 / 340 / 530',t('Bring the player back each day. Milestone 10 = the 50% line for the next set.','Kéo người chơi quay lại mỗi ngày. Mốc 10 = vạch 50% để chọn bộ mốc sau.')],
+          [t('Push','Bứt tốc'),'11–15','395 / 700 / 1,080',t('Make the streak matter. Bigger boosters and longer lives.','Làm streak có giá trị. Booster nhiều hơn, tim vô hạn lâu hơn.')],
+          [t('Chase','Về đích'),'16–20','675 / 1,150 / 1,820',t('Long goal for the top players. Peak: chest.','Mục tiêu dài cho người chơi giỏi. Đỉnh: rương.')]
+        ],'compact')+
+        table(t('Collection Event set totals','Tổng thưởng của từng bộ'),[t('Set','Bộ'),t('Jelly','Thạch'),t('Coins','Xu'),t('Boosters','Booster'),t('Unlimited lives','Tim vô hạn'),t('Value in coins','Giá trị quy ra xu')],[
+          [t('Easy','Dễ'),'675','2,480','5 Shuffle, 4 Hand, 3 Bomb',t('1 h 45 min','1 giờ 45 phút'),'≈ 7,100'],
+          [t('Medium','Trung bình'),'1,150','4,850','10 Shuffle, 8 Hand, 7 Bomb',t('3 h 30 min','3 giờ 30 phút'),'≈ 14,600'],
+          [t('Hard','Khó'),'1,820','9,100','16 Shuffle, 14 Hand, 10 Bomb',t('6 h','6 giờ'),'≈ 24,500']
         ],'compact'))+
       panel(t('Milestones & rewards','Các mốc & phần thưởng'),
-        table(t('Collection Event milestones','Các mốc của Collection Event'),[t('Milestone','Mốc'),t('Jelly needed','Thạch cần'),t('Total','Cộng dồn'),t('Reward','Phần thưởng')],[
-          ['1',t('10 yellow','10 vàng'),'10',t('50 coins','50 xu')],
-          ['2',t('15 red','15 đỏ'),'25',t('1 Shuffle','1 Shuffle')],
-          ['3',t('20 blue','20 xanh'),'45',t('100 coins','100 xu')],
-          ['4',t('25 purple','25 tím'),'70',t('1 Hand','1 Hand')],
-          ['5',t('30 yellow','30 vàng'),'100',t('★ 30 min unlimited lives + 200 coins','★ 30 phút tim vô hạn + 200 xu')],
-          ['6',t('40 red','40 đỏ'),'140',t('150 coins','150 xu')],
-          ['7',t('45 blue','45 xanh'),'185',t('1 Shuffle','1 Shuffle')],
-          ['8',t('50 purple','50 tím'),'235',t('1 Bomb','1 Bomb')],
-          ['9',t('50 yellow','50 vàng'),'285',t('250 coins','250 xu')],
-          ['10',t('55 red','55 đỏ'),'340',t('★ 1 Shuffle + 1 Hand + 1 Bomb + 300 coins','★ 1 Shuffle + 1 Hand + 1 Bomb + 300 xu')],
-          ['11',t('65 blue','65 xanh'),'405',t('300 coins','300 xu')],
-          ['12',t('70 purple','70 tím'),'475',t('2 Shuffle','2 Shuffle')],
-          ['13',t('70 yellow','70 vàng'),'545',t('1 h unlimited lives','1 giờ tim vô hạn')],
-          ['14',t('75 red','75 đỏ'),'620',t('2 Hand','2 Hand')],
-          ['15',t('80 blue','80 xanh'),'700',t('★ 2 Bomb + 500 coins','★ 2 Bomb + 500 xu')],
-          ['16',t('85 purple','85 tím'),'785',t('400 coins','400 xu')],
-          ['17',t('90 yellow','90 vàng'),'875',t('2 Shuffle + 1 Hand','2 Shuffle + 1 Hand')],
-          ['18',t('90 red','90 đỏ'),'965',t('2 h unlimited lives','2 giờ tim vô hạn')],
-          ['19',t('90 blue','90 xanh'),'1,055',t('600 coins','600 xu')],
-          ['20',t('95 purple','95 tím'),'1,150',t('★ Grand chest: 2,000 coins + 3 of each booster','★ Rương lớn: 2.000 xu + mỗi loại booster 3 cái')]
+        table(t('Collection Event milestones by set','Các mốc của Collection Event theo bộ'),[t('Milestone','Mốc'),t('Color','Màu'),t('Easy: jelly · reward','Dễ: thạch · thưởng'),t('Medium: jelly · reward','Trung bình: thạch · thưởng'),t('Hard: jelly · reward','Khó: thạch · thưởng')],[
+          ['1',t('yellow','vàng'),t(`5 · 30 coins`,`5 · 30 xu`),t(`10 · 50 coins`,`10 · 50 xu`),t(`15 · 100 coins`,`15 · 100 xu`)],
+          ['2',t('red','đỏ'),t(`10 · 1 Shuffle`,`10 · 1 Shuffle`),t(`15 · 1 Shuffle`,`15 · 1 Shuffle`),t(`25 · 1 Shuffle`,`25 · 1 Shuffle`)],
+          ['3',t('blue','xanh'),t(`10 · 50 coins`,`10 · 50 xu`),t(`20 · 100 coins`,`20 · 100 xu`),t(`30 · 1 Hand`,`30 · 1 Hand`)],
+          ['4',t('purple','tím'),t(`15 · 75 coins`,`15 · 75 xu`),t(`25 · 1 Hand`,`25 · 1 Hand`),t(`40 · 200 coins`,`40 · 200 xu`)],
+          ['5',t('yellow','vàng'),t(`20 · ★ 15 min unlimited lives + 100 coins`,`20 · ★ 15 phút tim vô hạn + 100 xu`),t(`30 · ★ 30 min unlimited lives + 200 coins`,`30 · ★ 30 phút tim vô hạn + 200 xu`),t(`50 · ★ 1 h unlimited lives + 400 coins`,`50 · ★ 1 giờ tim vô hạn + 400 xu`)],
+          ['6',t('red','đỏ'),t(`20 · 75 coins`,`20 · 75 xu`),t(`40 · 150 coins`,`40 · 150 xu`),t(`60 · 300 coins`,`60 · 300 xu`)],
+          ['7',t('blue','xanh'),t(`25 · 1 Hand`,`25 · 1 Hand`),t(`45 · 1 Shuffle`,`45 · 1 Shuffle`),t(`70 · 2 Shuffle`,`70 · 2 Shuffle`)],
+          ['8',t('purple','tím'),t(`25 · 100 coins`,`25 · 100 xu`),t(`50 · 1 Bomb`,`50 · 1 Bomb`),t(`75 · 1 Bomb`,`75 · 1 Bomb`)],
+          ['9',t('yellow','vàng'),t(`30 · 1 Shuffle`,`30 · 1 Shuffle`),t(`50 · 250 coins`,`50 · 250 xu`),t(`80 · 400 coins`,`80 · 400 xu`)],
+          ['10',t('red','đỏ'),t(`30 · ★ 1 Bomb + 150 coins`,`30 · ★ 1 Bomb + 150 xu`),t(`55 · ★ 1 Shuffle + 1 Hand + 1 Bomb + 300 coins`,`55 · ★ 1 Shuffle + 1 Hand + 1 Bomb + 300 xu`),t(`85 · ★ 2 of each booster + 500 coins`,`85 · ★ mỗi loại booster 2 cái + 500 xu`)],
+          ['11',t('blue','xanh'),t(`35 · 150 coins`,`35 · 150 xu`),t(`65 · 300 coins`,`65 · 300 xu`),t(`100 · 500 coins`,`100 · 500 xu`)],
+          ['12',t('purple','tím'),t(`40 · 1 Shuffle`,`40 · 1 Shuffle`),t(`70 · 2 Shuffle`,`70 · 2 Shuffle`),t(`105 · 2 Hand`,`105 · 2 Hand`)],
+          ['13',t('yellow','vàng'),t(`40 · 30 min unlimited lives`,`40 · 30 phút tim vô hạn`),t(`70 · 1 h unlimited lives`,`70 · 1 giờ tim vô hạn`),t(`110 · 2 h unlimited lives`,`110 · 2 giờ tim vô hạn`)],
+          ['14',t('red','đỏ'),t(`45 · 1 Hand`,`45 · 1 Hand`),t(`75 · 2 Hand`,`75 · 2 Hand`),t(`115 · 2 Bomb`,`115 · 2 Bomb`)],
+          ['15',t('blue','xanh'),t(`45 · ★ 1 Bomb + 250 coins`,`45 · ★ 1 Bomb + 250 xu`),t(`80 · ★ 2 Bomb + 500 coins`,`80 · ★ 2 Bomb + 500 xu`),t(`120 · ★ 3 Shuffle + 2 Hand + 1,000 coins`,`120 · ★ 3 Shuffle + 2 Hand + 1.000 xu`)],
+          ['16',t('purple','tím'),t(`50 · 200 coins`,`50 · 200 xu`),t(`85 · 400 coins`,`85 · 400 xu`),t(`140 · 700 coins`,`140 · 700 xu`)],
+          ['17',t('yellow','vàng'),t(`55 · 1 Shuffle + 1 Hand`,`55 · 1 Shuffle + 1 Hand`),t(`90 · 2 Shuffle + 1 Hand`,`90 · 2 Shuffle + 1 Hand`),t(`145 · 3 Shuffle + 2 Hand`,`145 · 3 Shuffle + 2 Hand`)],
+          ['18',t('red','đỏ'),t(`55 · 1 h unlimited lives`,`55 · 1 giờ tim vô hạn`),t(`90 · 2 h unlimited lives`,`90 · 2 giờ tim vô hạn`),t(`150 · 3 h unlimited lives`,`150 · 3 giờ tim vô hạn`)],
+          ['19',t('blue','xanh'),t(`60 · 300 coins`,`60 · 300 xu`),t(`90 · 600 coins`,`90 · 600 xu`),t(`150 · 1,000 coins`,`150 · 1.000 xu`)],
+          ['20',t('purple','tím'),t(`60 · ★ Chest: 1,000 coins + 1 of each booster`,`60 · ★ Rương: 1.000 xu + mỗi loại booster 1 cái`),t(`95 · ★ Grand chest: 2,000 coins + 3 of each booster`,`95 · ★ Rương lớn: 2.000 xu + mỗi loại booster 3 cái`),t(`155 · ★ Grand chest: 4,000 coins + 5 of each booster`,`155 · ★ Rương lớn: 4.000 xu + mỗi loại booster 5 cái`)]
         ],'compact')+
         ul([
-          t(`Colors follow the order yellow → red → blue → purple, then repeat.`,`Màu theo thứ tự vàng → đỏ → xanh → tím, rồi lặp lại.`),
-          t(`Jelly needed grows fast in the Hook phase, then slowly. The last 5 milestones stay near 90 so the end does not feel like a wall.`,`Số thạch cần tăng nhanh ở giai đoạn Mồi, sau đó tăng chậm. 5 mốc cuối giữ quanh 90 để đoạn cuối không thành bức tường.`),
-          t(`Total value: about 4,850 coins + 10 Shuffle, 8 Hand, 7 Bomb and 3.5 h of unlimited lives. A casual player who reaches milestone 10 gets about 1,050 coins and 7 boosters, about 25 level wins' worth of coins.`,`Tổng giá trị: khoảng 4.850 xu + 10 Shuffle, 8 Hand, 7 Bomb và 3,5 giờ tim vô hạn. Người chơi thường tới mốc 10 nhận khoảng 1.050 xu và 7 booster, tương đương xu của khoảng 25 màn thắng.`)
+          t(`Colors follow the order yellow → red → blue → purple, then repeat. Same order in all 3 sets.`,`Màu theo thứ tự vàng → đỏ → xanh → tím, rồi lặp lại. Cả 3 bộ dùng cùng thứ tự.`),
+          t(`Jelly needed grows fast in the Hook phase, then slowly. The last 5 milestones stay close together so the end does not feel like a wall.`,`Số thạch cần tăng nhanh ở giai đoạn Mồi, sau đó tăng chậm. 5 mốc cuối gần nhau để đoạn cuối không thành bức tường.`)
         ]))+
       panel(t('Claim and next milestone','Nhận thưởng và sang mốc tiếp theo'),ul([
         t(`When a milestone is full, the game moves on to the next milestone at once, with a new color.`,`Khi mốc đầy, game tự chuyển ngay sang mốc tiếp theo, với màu mới.`),
         t(`The full milestone's reward shows a “Claim” button on the event screen. The player can claim it any time while the event runs.`,`Phần thưởng của mốc đã đầy hiện nút “Nhận” ở màn hình sự kiện. Người chơi có thể nhận bất cứ lúc nào trong thời gian sự kiện.`),
         t(`Several rewards can wait to be claimed at the same time. Claimed ones show a check.`,`Nhiều phần thưởng có thể cùng chờ nhận. Mốc đã nhận hiện dấu tích.`),
         t(`A reward not claimed when the event ends is given in the end popup.`,`Phần thưởng chưa nhận khi sự kiện kết thúc sẽ được trao trong popup kết thúc.`),
-        t(`After milestone 20 the event is done. The icon shows a check until the event ends.`,`Sau mốc 20, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi sự kiện kết thúc.`)
+        t(`After milestone 20 the event is done. The icon shows a check until the 72 h timer ends.`,`Sau mốc 20, sự kiện hoàn thành. Biểu tượng hiện dấu tích tới khi hết timer 72 giờ.`)
       ]))+
       panel(t('Event popup (Collection Event)','Popup sự kiện (Collection Event)'),ul([
         t(`<b>Top bar:</b> info (i) and close (X) buttons.`,`<b>Thanh trên:</b> nút thông tin (i) và nút đóng (X).`),
@@ -2706,16 +2732,17 @@ function view(l){
       ]))+
       panel(t('Event flow','Luồng sự kiện'),
         table(t('Collection Event cycle','Chu kỳ Collection Event'),[t('State','Trạng thái'),t('Player sees','Người chơi thấy'),t('Next','Tiếp theo')],[
-          [t('Locked','Chưa mở'),t('Nothing','Không có gì'),t('Event started remotely and level 18 completed → Start','Sự kiện được bật từ xa và đã qua màn 18 → Bắt đầu')],
-          [t('Start','Bắt đầu'),t('Event popup with milestone 1, the 72 h timer and the rewards. 1st time: a short how-to.','Popup sự kiện với mốc 1, timer 72 giờ và các phần thưởng. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
+          [t('Locked','Chưa mở'),t('Nothing','Không có gì'),t('Level 18 completed → Start (Easy set)','Hoàn thành màn 18 → Bắt đầu (bộ Dễ)')],
+          [t('Start','Bắt đầu'),t('Event popup with milestone 1, the 72 h timer and the rewards of the picked set. 1st time: a short how-to.','Popup sự kiện với mốc 1, timer 72 giờ và phần thưởng của bộ đã chọn. Lần đầu: kèm hướng dẫn ngắn.'),t('Close → Live','Đóng → Đang chạy')],
           [t('Live','Đang chạy'),t('Home icon with timer, progress and multiplier. Counter in the level.','Biểu tượng ở màn hình chính kèm timer, tiến độ và hệ số. Bộ đếm trong màn.'),t('Win, Victory screen (after the Leaderboard) → add jelly, fill the bar · Milestone full → next milestone, reward ready to claim · Milestone 20 → Done','Thắng, màn hình Victory (sau Bảng xếp hạng) → cộng thạch, cập nhật thanh tiến độ · Mốc đầy → sang mốc tiếp, quà chờ nhận · Mốc 20 → Hoàn thành')],
           [t('Done','Hoàn thành'),t('Icon with a check','Biểu tượng có dấu tích'),t('Timer over → End','Hết giờ → Kết thúc')],
-          [t('End','Kết thúc'),t('Event end popup with the result','Popup kết thúc kèm kết quả'),t('Next remote start → Start','Lần bật từ xa tiếp theo → Bắt đầu')]
+          [t('End','Kết thúc'),t('Event end popup with the result and any unclaimed rewards','Popup kết thúc kèm kết quả và phần thưởng chưa nhận'),t('Close → Cooldown','Đóng → Nghỉ')],
+          [t('Cooldown','Nghỉ'),t('Icon with the time until the next event (24 h)','Biểu tượng hiện thời gian tới sự kiện mới (24 giờ)'),t('Cooldown over → pick a set by last progress → Start','Hết thời gian nghỉ → chọn bộ mốc theo tiến độ lần trước → Bắt đầu')]
         ],'compact'))+
       kv([
         [t('Popup timing','Thời điểm popup'),t(`The event popup shows after the player completes a level and returns Home, so it never overlaps other popups. If the Leaderboard (7.4) has something to show at Home, it goes first. The jelly and progress bar update earlier, on the Victory screen.`,`Popup sự kiện hiện sau khi người chơi hoàn thành màn và về màn hình chính, nên không trùng với các popup khác. Nếu Bảng xếp hạng (mục 7.4) có nội dung cần hiện ở màn hình chính thì hiện trước. Thạch và thanh tiến độ đã cập nhật trước đó, ở màn hình Victory.`)],
-        [t('Offline','Offline'),t(`The 72 h timer runs on server time, also offline.`,`Timer 72 giờ chạy theo giờ server, kể cả khi offline.`)],
-        [t('Numbers','Con số'),t(`Start time, required level, length, max multiplier, milestones and rewards are remote config (5).`,`Giờ bắt đầu, màn yêu cầu, thời gian, hệ số tối đa, các mốc và phần thưởng nằm trong cấu hình từ xa (mục 5).`)]
+        [t('Offline','Offline'),t(`The 72 h timer and the 24 h cooldown run on server time, also offline. A player who comes back after the cooldown gets the new event on the next Home visit.`,`Timer 72 giờ và 24 giờ nghỉ chạy theo giờ server, kể cả khi offline. Người chơi quay lại sau thời gian nghỉ sẽ nhận sự kiện mới ở lần về màn hình chính tiếp theo.`)],
+        [t('Numbers','Con số'),t(`Required level, length, cooldown, max multiplier, the 3 sets (milestones and rewards) and the set rule are remote config (5).`,`Màn yêu cầu, thời gian, thời gian nghỉ, hệ số tối đa, 3 bộ mốc (số thạch và phần thưởng) và quy tắc chọn bộ nằm trong cấu hình từ xa (mục 5).`)]
       ])),'150px minmax(0,1fr)');
 
   /* ===== 8. Change note ===== */
@@ -2723,6 +2750,11 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 19, 2026','19/11/2026'),
+      ent(t('Collection Event sets','Bộ mốc Collection Event'),ul([
+        t(`7.3: no remote trigger. The first event starts when the player completes level 18. After each 72 h event there is a 24 h cooldown, then a new event.`,`Mục 7.3: không bật từ xa nữa. Sự kiện đầu tiên bắt đầu khi người chơi hoàn thành màn 18. Sau mỗi sự kiện 72 giờ có 24 giờ nghỉ, rồi tới sự kiện mới.`),
+        t(`3 milestone sets: Easy (675 jelly, ≈ 7,100 coins of value), Medium (1,150, ≈ 14,600) and Hard (1,820, ≈ 24,500).`,`3 bộ mốc: Dễ (675 thạch, giá trị ≈ 7.100 xu), Trung bình (1.150, ≈ 14.600) và Khó (1.820, ≈ 24.500).`),
+        t(`Set rule: first event Easy. Then under 50% last progress → Easy or Medium; 50% or more → Medium or Hard. Remote config (5) updated.`,`Quy tắc chọn bộ: sự kiện đầu là Dễ. Sau đó tiến độ lần trước dưới 50% → Dễ hoặc Trung bình; từ 50% → Trung bình hoặc Khó. Cập nhật cấu hình từ xa (mục 5).`)
+      ]))+
       ent(t('Wider 7.3 and 7.4','Nới rộng mục 7.3 và 7.4'),ul([
         t(`Collection Event and Leaderboard now use more of the screen width on large screens (up to 1,480 px), so tables and the simulator have more room. Small screens are unchanged.`,`Collection Event và Bảng xếp hạng giờ dùng thêm chiều ngang màn hình lớn (tối đa 1.480 px), nên bảng và bộ mô phỏng có thêm chỗ. Màn hình nhỏ giữ nguyên.`)
       ]))+
