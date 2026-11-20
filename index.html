@@ -1660,6 +1660,20 @@ function gaugeUI(){
 const LBS_A=184,LBS_TGT=20,LBS_H=168;
 const LBS_CURVE=[1,.5,.3,.3,.3,.5,1,2,2.5,2,1.5,1.5,2.5,2,1.5,1.5,1.5,2,2.5,3,3.5,3.5,3,2];
 /* group: id, bots, pace first→last (share of target), win rate, sessions lo–hi, skip-day chance, color */
+/* bot group: id, bots, points per day min, max, color (6 updates per day, the last adds what is left) */
+const LBS_BG=[['top',3,8000,12000,'var(--c1)'],['va',7,4000,8000,'var(--c6)'],['ac',10,1500,4000,'var(--c4)'],['ca',15,400,1500,'var(--c3)'],['li',10,50,200,'var(--c8)'],['in',4,0,0,'var(--hid)']];
+function lbsBot(lo,hi,r){
+  const ev=[],tot=LBS_CURVE.reduce((a,b)=>a+b,0);let sum=0;
+  const hour=()=>{let x=r()*tot;for(let h=0;h<24;h++){x-=LBS_CURVE[h];if(x<0)return h;}return 23;};
+  if(!hi)return ev;
+  for(let d=0;d<7;d++){
+    const D=Math.round(lo+(hi-lo)*r()),ts=[];
+    for(let i=0;i<6;i++)ts.push(d*24+hour()+r());ts.sort((a,b)=>a-b);
+    let left=D;
+    ts.forEach((tm,i)=>{const add=i<5?Math.min(left,Math.round(D/6*(.5+r()))):left;left-=add;sum+=add;if(add>0)ev.push([tm,sum]);});
+  }
+  return ev;
+}
 const LBS_G=[['top',3,.85,.7,.85,4,6,0,'var(--c1)'],['va',7,.65,.4,.8,3,5,.05,'var(--c6)'],['ac',10,.37,.2,.75,2,4,.1,'var(--c4)'],
   ['ca',15,.18,.06,.7,1,3,.2,'var(--c3)'],['li',10,.05,.02,.65,1,1,.55,'var(--c8)'],['in',4,0,0,.6,0,0,1,'var(--hid)']];
 const LBS_GN={en:{top:'Top rivals',va:'Very active',ac:'Active',ca:'Casual',li:'Light',in:'Inactive',me:'You'},
@@ -1692,9 +1706,9 @@ function lbsRun(wpd,wr,slo,shi,skip,r){
 function lbsData(){
   if(!LBS.bots||LBS.bseed!==LBS.seed){
     const r=lbsRng(LBS.seed*7919),ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',bots=[];
-    LBS_G.forEach(([g,c,a,b,wr,lo,hi,sk,col])=>{for(let i=0;i<c;i++){
-      const x=a+(b-a)*(c>1?i/(c-1):0);let nm='';for(let j=0;j<6;j++)nm+=ch[Math.floor(r()*ch.length)];
-      bots.push({g,col,nm,ev:lbsRun(x*LBS_TGT,wr,lo,hi,sk,lbsRng(Math.floor(r()*1e9)))});}});
+    LBS_BG.forEach(([g,c,lo,hi,col])=>{for(let i=0;i<c;i++){
+      let nm='';for(let j=0;j<6;j++)nm+=ch[Math.floor(r()*ch.length)];
+      bots.push({g,col,nm,ev:lbsBot(lo,hi,lbsRng(Math.floor(r()*1e9)))});}});
     LBS.bots=bots;LBS.bseed=LBS.seed;
   }
   const k=LBS.seed+':'+LBS.W;
@@ -2364,12 +2378,11 @@ function view(l){
       ['leaderboard_round_days',t('Length of one round','Độ dài một vòng'),'7',t('days','ngày')],
       ['leaderboard_streak_max',t('Max streak multiplier','Hệ số streak tối đa'),'5','×'],
       ['leaderboard_group_size',t('Players per group','Số người mỗi nhóm'),'50',t('players','người')],
-      ['leaderboard_bot_target_wins_per_day',t('Hidden target: levels won per day that matches the top bot','Target ẩn: số màn thắng mỗi ngày ngang bot top 1'),'20',t('levels','màn')],
-      ['leaderboard_bot_avg_ants',t('Ants in an average level (levels 11–20)','Số kiến của màn trung bình (màn 11–20)'),'184',t('ants','kiến')],
       ['leaderboard_bot_groups',t('Bots per group: top, very active, active, casual, light, inactive','Số bot mỗi nhóm: top, rất chăm, chăm, bình thường, ít chơi, không chơi'),'3, 7, 10, 15, 10, 4',t('bots','bot')],
-      ['leaderboard_bot_pace',t('Pace per group, share of target (first → last bot)','Tốc độ mỗi nhóm, so với target (bot đầu → bot cuối)'),'85→70, 65→40, 37→20, 18→6, 5→2, 0','%'],
-      ['leaderboard_bot_win_rate',t('Win rate per group','Tỉ lệ thắng mỗi nhóm'),'85, 80, 75, 70, 65','%'],
-      ['leaderboard_bot_day_factor',t('Random day factor range','Khoảng hệ số ngày ngẫu nhiên'),'0.6–1.4','×'],
+      ['leaderboard_bot_daily_points',t('Points per day per group (min–max), same order','Điểm mỗi ngày của từng nhóm (min–max), cùng thứ tự'),'8000–12000, 4000–8000, 1500–4000, 400–1500, 50–200, 0',t('points','điểm')],
+      ['leaderboard_bot_updates_per_day',t('Score updates per bot per day (the last adds what is left)','Số lần cập nhật điểm mỗi bot mỗi ngày (lần cuối cộng phần còn lại)'),'6',t('times','lần')],
+      ['leaderboard_bot_update_share',t('Random share of each update 1–5, × day total ÷ 6','Tỉ lệ ngẫu nhiên của mỗi lần 1–5, × tổng điểm ngày ÷ 6'),'0.5–1.5','×'],
+      ['leaderboard_bot_hour_weights',t('Weight of each local hour 00–23 for update times','Trọng số từng giờ địa phương 00–23 để chọn mốc cập nhật'),'1, .5, .3, .3, .3, .5, 1, 2, 2.5, 2, 1.5, 1.5, 2.5, 2, 1.5, 1.5, 1.5, 2, 2.5, 3, 3.5, 3.5, 3, 2',t('list','danh sách')],
       ['leaderboard_reward_coins',t('Coins for rank 1, 2, 3, 4–10, 11–20, 21–50','Xu cho hạng 1, 2, 3, 4–10, 11–20, 21–50'),'1500, 1000, 600, 300, 150, 50',coins],
       ['leaderboard_reward_boosters',t('Boosters of each type (Shuffle, Hand, Bomb) for rank 1, 2, 3','Số booster mỗi loại (Shuffle, Hand, Bomb) cho hạng 1, 2, 3'),'5, 3, 1',t('each','mỗi loại')]
     ]);
@@ -2544,51 +2557,54 @@ function view(l){
         t(`The other 49 players in a group are bots. Their scores grow on their own so the board looks like real people playing.`,`49 người còn lại trong nhóm là bot. Điểm của bot tự tăng để bảng trông như người thật đang chơi.`),
         t(`<b>Goal:</b> the player's reward depends on how often they play. More levels won per day = a higher rank.`,`<b>Mục tiêu:</b> phần thưởng của người chơi phụ thuộc vào tần suất chơi. Thắng nhiều màn mỗi ngày hơn = hạng cao hơn.`),
         t(`<b>Average level:</b> 184 ants, the average of levels 11–20 (160–220 ants each).`,`<b>Màn trung bình:</b> 184 kiến, trung bình của màn 11–20 (mỗi màn 160–220 kiến).`),
-        t(`<b>Hidden target:</b> 20 levels won per day. A player who wins this many each day is about even with the top bot. The player never sees this number.`,`<b>Target ẩn:</b> thắng 20 màn mỗi ngày. Người chơi đạt mức này mỗi ngày sẽ ngang ngửa bot top 1. Người chơi không thấy con số này.`),
+        t(`<b>Hidden target:</b> 20 levels won per day. A player who wins this many each day scores a little more than the top bots' best day, so they usually take rank 1. The player never sees this number.`,`<b>Target ẩn:</b> thắng 20 màn mỗi ngày. Người chơi đạt mức này mỗi ngày được điểm cao hơn một chút so với ngày tốt nhất của nhóm bot top, nên thường đứng hạng 1. Người chơi không thấy con số này.`),
+        t(`The daily point ranges below come from these two numbers and the earlier 7-day simulation, with the low end lowered.`,`Khoảng điểm mỗi ngày bên dưới được tính từ hai con số này và bản mô phỏng 7 ngày trước đó, có hạ thấp mức dưới.`),
         t(`Bots do not react to the player: no catch-up, no slow-down. The player's own effort decides the rank.`,`Bot không phản ứng theo người chơi: không đuổi theo, không chậm lại. Công sức của người chơi quyết định thứ hạng.`)
       ]))+
-      panel(t('Bot groups','Các nhóm bot'),
-        table(t('Leaderboard bot groups','Các nhóm bot của Bảng xếp hạng'),[t('Group','Nhóm'),t('Bots','Số bot'),t('Levels won per day (share of target)','Số màn thắng mỗi ngày (so với target)'),t('Win rate','Tỉ lệ thắng'),t('Sessions per day','Số phiên mỗi ngày'),t('Skips a day','Bỏ chơi 1 ngày'),t('7-day score (sim)','Điểm 7 ngày (mô phỏng)')],[
-          [t('Top rivals','Đối thủ top'),'3',t('17 → 14 (85% → 70%)','17 → 14 (85% → 70%)'),'85%','4–6','0%','82k → 67k'],
-          [t('Very active','Rất chăm'),'7',t('13 → 8 (65% → 40%)','13 → 8 (65% → 40%)'),'80%','3–5','5%','54k → 33k'],
-          [t('Active','Chăm'),'10',t('7.4 → 4 (37% → 20%)','7,4 → 4 (37% → 20%)'),'75%','2–4','10%','27k → 14k'],
-          [t('Casual','Bình thường'),'15',t('3.6 → 1.2 (18% → 6%)','3,6 → 1,2 (18% → 6%)'),'70%','1–3','20%','10k → 4.4k'],
-          [t('Light','Ít chơi'),'10',t('1 → 0.4 (5% → 2%)','1 → 0,4 (5% → 2%)'),'65%','1','55%','1.2k → 0.6k'],
-          [t('Inactive','Không chơi'),'4','0',dash,'0','100%','0']
+      panel(t('Bot groups: points per day','Các nhóm bot: điểm mỗi ngày'),
+        table(t('Leaderboard bot groups','Các nhóm bot của Bảng xếp hạng'),[t('Group','Nhóm'),t('Bots','Số bot'),t('Points per day (range)','Điểm mỗi ngày (khoảng)'),t('7-day score (range)','Điểm 7 ngày (khoảng)')],[
+          [t('Top rivals','Đối thủ top'),'3','8,000–12,000','56k–84k'],
+          [t('Very active','Rất chăm'),'7','4,000–8,000','28k–56k'],
+          [t('Active','Chăm'),'10','1,500–4,000','10.5k–28k'],
+          [t('Casual','Bình thường'),'15','400–1,500','2.8k–10.5k'],
+          [t('Light','Ít chơi'),'10','50–200','350–1.4k'],
+          [t('Inactive','Không chơi'),'4','0','0']
         ],'compact')+
         ul([
-          t(`Inside a group, the bots' paces are spread evenly from the first value to the last.`,`Trong mỗi nhóm, tốc độ của các bot dàn đều từ giá trị đầu tới giá trị cuối.`),
-          t(`Lazier groups also lose more often, so they rarely reach a high streak. This is why their scores drop faster than their level count.`,`Nhóm càng lười thì thua càng nhiều, nên hiếm khi có streak cao. Vì vậy điểm của họ giảm nhanh hơn số màn.`),
-          t(`7-day scores are the average of 200 simulated rounds.`,`Điểm 7 ngày là trung bình của 200 vòng mô phỏng.`)
+          t(`Old 7-day ranges (session model): top 67k–82k, very active 33k–54k, active 14k–27k, casual 4.4k–10k, light 0.6k–1.2k. The new low ends are about 15–40% lower.`,`Khoảng 7 ngày cũ (mô hình phiên chơi): top 67k–82k, rất chăm 33k–54k, chăm 14k–27k, bình thường 4,4k–10k, ít chơi 0,6k–1,2k. Mức dưới mới thấp hơn khoảng 15–40%.`),
+          t(`All bots in a group use the same range. Each day each bot rolls its own total, so bots in a group still end up apart.`,`Mọi bot trong một nhóm dùng chung khoảng điểm. Mỗi ngày mỗi bot tự random tổng điểm riêng, nên các bot trong nhóm vẫn cách nhau.`)
         ]))+
       panel(t('Bot score logic','Logic tăng điểm của bot'),ol([
         t(`<b>Round start:</b> pick 49 bots from the Bot Data sheet (name and avatar), not used in the player's last round. Shuffle them into the groups, so a name never means a fixed strength.`,`<b>Bắt đầu vòng:</b> chọn 49 bot từ sheet Bot Data (tên và avatar), không trùng với vòng trước của người chơi. Xáo ngẫu nhiên vào các nhóm, để một cái tên không gắn với một mức mạnh cố định.`),
-        t(`<b>Each day, each bot:</b> may skip the day (group's skip chance). Otherwise its levels for the day = its pace × a day factor (random 0.6–1.4). Attempts = levels ÷ its win rate.`,`<b>Mỗi ngày, mỗi bot:</b> có thể bỏ chơi cả ngày (theo tỉ lệ của nhóm). Nếu chơi, số màn trong ngày = tốc độ của bot × hệ số ngày (ngẫu nhiên 0,6–1,4). Số lượt chơi = số màn ÷ tỉ lệ thắng.`),
-        t(`<b>Sessions:</b> the attempts are split into the group's number of sessions (±30% each). Session start times follow the daily curve below, in the player's local time.`,`<b>Phiên chơi:</b> số lượt chia vào số phiên của nhóm (mỗi phiên ±30%). Giờ bắt đầu phiên theo đường cong trong ngày bên dưới, theo giờ địa phương của người chơi.`),
-        t(`<b>Each attempt:</b> takes 1–3 minutes. Win (win rate): streak +1, up to ×5, and points = ants × streak, with ants = 184 × random 0.85–1.2. Loss: streak back to ×1 and 1 life lost.`,`<b>Mỗi lượt:</b> kéo dài 1–3 phút. Thắng (theo tỉ lệ thắng): streak +1, tối đa ×5, điểm = số kiến × streak, số kiến = 184 × ngẫu nhiên 0,85–1,2. Thua: streak về ×1 và mất 1 tim.`),
-        t(`<b>Lives:</b> after 5 losses in a session the bot stops until its next session, like a real player out of lives.`,`<b>Tim:</b> thua 5 lần trong một phiên thì bot nghỉ tới phiên sau, giống người chơi thật hết tim.`),
-        t(`<b>Show:</b> each win is a time and a number of points. A bot's score = the sum of its wins up to now. So scores rise in steps of one level, in bursts during sessions, and stay still between sessions.`,`<b>Hiển thị:</b> mỗi lần thắng là một mốc thời gian kèm số điểm. Điểm của bot = tổng các lần thắng tính tới hiện tại. Vì vậy điểm tăng theo từng màn, dồn dập trong phiên, và đứng yên giữa các phiên.`),
-        t(`<b>Same result everywhere:</b> each bot has a seed for the round, so its wins are the same every time they are worked out, online or offline, after a restart too.`,`<b>Kết quả giống nhau mọi lúc:</b> mỗi bot có một seed cho cả vòng, nên các lần thắng luôn được tính ra giống nhau, online hay offline, kể cả sau khi mở lại game.`),
-        t(`<b>Refresh:</b> bot scores are worked out again when the board or the Victory screen opens, and every 60 s while the board is open.`,`<b>Làm mới:</b> điểm bot được tính lại khi mở bảng hoặc màn hình Victory, và mỗi 60 giây khi bảng đang mở.`)
+        t(`<b>Day total:</b> at the start of each day, each bot rolls its points for the day, at random inside its group's range.`,`<b>Tổng điểm ngày:</b> đầu mỗi ngày, mỗi bot random số điểm của ngày đó, trong khoảng điểm của nhóm.`),
+        t(`<b>6 updates per day:</b> each bot picks 6 update times for the day. Each time = an hour picked by the weight table below (local time) + a random minute.`,`<b>6 lần cập nhật mỗi ngày:</b> mỗi bot chọn 6 mốc cập nhật trong ngày. Mỗi mốc = một giờ chọn theo bảng trọng số bên dưới (giờ địa phương) + phút ngẫu nhiên.`),
+        t(`<b>Updates 1–5:</b> each adds day total ÷ 6 × random 0.5–1.5, never more than what is left of the day total.`,`<b>Lần 1–5:</b> mỗi lần cộng tổng điểm ngày ÷ 6 × ngẫu nhiên 0,5–1,5, không vượt quá phần còn lại của tổng điểm ngày.`),
+        t(`<b>Update 6 (last of the day):</b> adds all the points left, so the day ends exactly on the day total.`,`<b>Lần 6 (lần cuối trong ngày):</b> cộng toàn bộ số điểm còn lại, để cuối ngày điểm đúng bằng tổng điểm ngày.`),
+        t(`<b>Example:</b> a Very active bot rolls 6,000 for the day. Updates add 1,000 × 0.5–1.5 each: 1,300, 700, 1,200, 900, 1,100. The last update adds the 800 left.`,`<b>Ví dụ:</b> bot Rất chăm random được 6.000 điểm cho ngày. Mỗi lần cộng 1.000 × 0,5–1,5: 1.300, 700, 1.200, 900, 1.100. Lần cuối cộng 800 còn lại.`),
+        t(`<b>Day:</b> the round is split into 7 days of 24 h from the round start.`,`<b>Ngày:</b> vòng được chia thành 7 ngày, mỗi ngày 24 giờ tính từ lúc bắt đầu vòng.`)+' '+inf,
+        t(`<b>Show:</b> a bot's score = the sum of its updates whose time has passed. Scores jump 6 times a day and stay still in between.`,`<b>Hiển thị:</b> điểm của bot = tổng các lần cập nhật đã tới giờ. Điểm nhảy 6 lần mỗi ngày và đứng yên giữa các lần.`),
+        t(`<b>Same result everywhere:</b> each bot has a seed for the round, so its updates are the same every time they are worked out, online or offline, after a restart too.`,`<b>Kết quả giống nhau mọi lúc:</b> mỗi bot có một seed cho cả vòng, nên các lần cập nhật luôn được tính ra giống nhau, online hay offline, kể cả sau khi mở lại game.`),
+        t(`<b>When the board changes:</b> bot scores are worked out when the board or the Victory screen opens. No timed refresh while the board is open.`,`<b>Khi nào bảng thay đổi:</b> điểm bot được tính khi mở bảng hoặc màn hình Victory. Không tự làm mới theo thời gian khi bảng đang mở.`)
       ])+
-        table(t('Daily curve: chance a session starts in each hour','Đường cong trong ngày: khả năng một phiên bắt đầu ở mỗi giờ'),[t('Hours (local)','Giờ (địa phương)'),t('Weight','Trọng số')],[
+        table(t('Hour weights for picking update times','Trọng số giờ để chọn mốc cập nhật'),[t('Hours (local)','Giờ (địa phương)'),t('Weight','Trọng số')],[
           ['00–05','0.3–1'],['06–08','1–2'],['09–11','1.5–2.5'],['12–13',t('2–2.5 (lunch)','2–2,5 (giờ trưa)')],['14–18','1.5–2'],['19–22',t('2.5–3.5 (evening peak)','2,5–3,5 (cao điểm tối)')],['23','2']
-        ],'compact'))+
+        ],'compact')+
+        `<p class="note">${t('Exact weights per hour: 00 1, 01 0.5, 02–04 0.3, 05 0.5, 06 1, 07 2, 08 2.5, 09 2, 10–11 1.5, 12 2.5, 13 2, 14–16 1.5, 17 2, 18 2.5, 19 3, 20–21 3.5, 22 3, 23 2.','Trọng số chính xác theo giờ: 00 1, 01 0,5, 02–04 0,3, 05 0,5, 06 1, 07 2, 08 2,5, 09 2, 10–11 1,5, 12 2,5, 13 2, 14–16 1,5, 17 2, 18 2,5, 19 3, 20–21 3,5, 22 3, 23 2.')}</p>`)+
       panel(t('What the player gets for how often they play','Người chơi nhận gì theo tần suất chơi'),
         table(t('Player levels won per day and rank','Số màn thắng mỗi ngày của người chơi và thứ hạng'),[t('Levels won per day','Số màn thắng mỗi ngày'),t('Usual rank','Hạng thường đạt'),t('Usual reward','Phần thưởng thường nhận')],[
-          ['1','~34',t('50 coins','50 xu')],
+          ['1','~36',t('50 coins','50 xu')],
           ['3','~21',t('50–150 coins','50–150 xu')],
-          ['5','~15',t('150 coins','150 xu')],
-          ['8–10','~8–10',t('300 coins','300 xu')],
-          ['12','~5',t('300 coins','300 xu')],
-          ['15','~4',t('Top 3 about half the time','Top 3 khoảng một nửa số lần')],
-          ['18','~2',t('Top 3 78%, rank 1 31%','Top 3 78%, hạng 1 31%')],
-          [t('20 (target)','20 (target)'),'~1',t('Top 3 94%, rank 1 53%','Top 3 94%, hạng 1 53%')],
-          ['22','1',t('Rank 1 71%','Hạng 1 71%')]
+          ['5–8','~11–12',t('150 coins','150 xu')],
+          ['10','~6',t('300 coins','300 xu')],
+          ['12','~4',t('300 coins','300 xu')],
+          ['15','~4',t('Top 3 42%, rank 1 27%','Top 3 42%, hạng 1 27%')],
+          ['18','1',t('Top 3 84%, rank 1 71%','Top 3 84%, hạng 1 71%')],
+          [t('20 (target)','20 (target)'),'1',t('Top 3 95%, rank 1 89%','Top 3 95%, hạng 1 89%')],
+          ['22','1',t('Rank 1 97%','Hạng 1 97%')]
         ],'compact')+
         ul([
-          t(`From 150 simulated rounds per row, with the player winning 80% of attempts.`,`Từ 150 vòng mô phỏng cho mỗi dòng, người chơi thắng 80% số lượt.`)+' '+inf,
-          t(`To make rank 1 easier or harder, change the hidden target. All groups move with it.`,`Muốn hạng 1 dễ hơn hay khó hơn, chỉnh target ẩn. Mọi nhóm thay đổi theo.`)
+          t(`From 400 simulated rounds per row, with the new bot logic and the player winning 80% of attempts (player score keeps the streak rule).`,`Từ 400 vòng mô phỏng cho mỗi dòng, theo logic bot mới, người chơi thắng 80% số lượt (điểm người chơi vẫn theo luật streak).`)+' '+inf,
+          t(`Rank 1 is now easier at the target than before (89% vs 53%), because a bot's 7 daily rolls average out. To make it harder, raise the Top rivals range.`,`Hạng 1 ở mức target giờ dễ hơn trước (89% so với 53%), vì 7 lần random theo ngày của bot bù trừ nhau. Muốn khó hơn, nâng khoảng điểm của nhóm Đối thủ top.`)
         ]))+
       panel(t('Rewards by rank at round end','Phần thưởng theo hạng khi hết vòng'),
         table(t('Leaderboard rewards','Phần thưởng Bảng xếp hạng'),[t('Rank','Hạng'),t('Coins','Xu'),t('Boosters','Booster')],[
@@ -2620,7 +2636,7 @@ function view(l){
       ]),'',
       `<div id="lbSim" style="position:sticky;top:calc(var(--bar-h) + 16px);margin-top:14px;font-size:.84rem;line-height:1.45">
         <p style="margin:0 0 6px;font-weight:700">${t('7-day simulator','Mô phỏng 7 ngày')}</p>
-        <p style="margin:0 0 8px;color:var(--muted)">${t('49 bots and the player, using the bot logic. A step = one won level.','49 bot và người chơi, theo logic bot. Mỗi bậc = một màn thắng.')}</p>
+        <p style="margin:0 0 8px;color:var(--muted)">${t('49 bots and the player. A bot step = one of its 6 daily updates. A player step = one won level.','49 bot và người chơi. Mỗi bậc của bot = một trong 6 lần cập nhật mỗi ngày. Mỗi bậc của người chơi = một màn thắng.')}</p>
         <label style="display:block">${t('Player wins per day','Số màn thắng/ngày')}: <b id="lbsW">20</b><input type="range" id="lbsWin" min="0" max="30" step="1" value="20" style="display:block;width:100%"></label>
         <label style="display:block;margin-top:4px">${t('Time','Thời gian')}: <b id="lbsT"></b><input type="range" id="lbsTime" min="0" max="168" step="0.25" value="168" style="display:block;width:100%"></label>
         <div style="display:flex;gap:6px;margin:8px 0">
@@ -2807,6 +2823,13 @@ function view(l){
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
+    day(t('November 20, 2026','20/11/2026'),
+      ent(t('Leaderboard bot updates','Cập nhật điểm bot Bảng xếp hạng'),ul([
+        t(`7.4: bots no longer play simulated levels. Each group has a points-per-day range (low ends lowered from the earlier 7-day ranges).`,`Mục 7.4: bot không còn mô phỏng từng màn. Mỗi nhóm có khoảng điểm mỗi ngày (mức dưới hạ thấp so với khoảng 7 ngày trước đó).`),
+        t(`Each bot updates 6 times a day at times picked by the hour weight table. Updates 1–5 add a random part of the day total; the last adds what is left.`,`Mỗi bot cập nhật 6 lần mỗi ngày, mốc giờ chọn theo bảng trọng số giờ. Lần 1–5 cộng một phần ngẫu nhiên của tổng điểm ngày; lần cuối cộng phần còn lại.`),
+        t(`Removed the 60 s refresh. Simulator, rank table and remote config (5) updated.`,`Bỏ làm mới mỗi 60 giây. Cập nhật bộ mô phỏng, bảng thứ hạng và cấu hình từ xa (mục 5).`)
+      ]))
+    )+
     day(t('November 19, 2026','19/11/2026'),
       ent(t('Collection Event set picker','Chọn bộ mốc Collection Event'),ul([
         t(`7.3: the 3 milestone lists are now one block, with Easy / Medium / Hard buttons to switch between them.`,`Mục 7.3: 3 danh sách mốc gom thành một mục, có nút Dễ / Trung bình / Khó để chuyển qua lại.`)
