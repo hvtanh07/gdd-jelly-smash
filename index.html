@@ -2582,7 +2582,7 @@ function view(l){
         t(`<b>Updates 1–5:</b> each adds day total ÷ 6 × random 0.5–1.5, never more than what is left of the day total.`,`<b>Lần 1–5:</b> mỗi lần cộng tổng điểm ngày ÷ 6 × ngẫu nhiên 0,5–1,5, không vượt quá phần còn lại của tổng điểm ngày.`),
         t(`<b>Update 6 (last of the day):</b> adds all the points left, so the day ends exactly on the day total.`,`<b>Lần 6 (lần cuối trong ngày):</b> cộng toàn bộ số điểm còn lại, để cuối ngày điểm đúng bằng tổng điểm ngày.`),
         t(`<b>Example:</b> a Very active bot rolls 6,000 for the day. Updates add 1,000 × 0.5–1.5 each: 1,300, 700, 1,200, 900, 1,100. The last update adds the 800 left.`,`<b>Ví dụ:</b> bot Rất chăm random được 6.000 điểm cho ngày. Mỗi lần cộng 1.000 × 0,5–1,5: 1.300, 700, 1.200, 900, 1.100. Lần cuối cộng 800 còn lại.`),
-        t(`<b>Day:</b> the round is split into 7 days of 24 h from the round start.`,`<b>Ngày:</b> vòng được chia thành 7 ngày, mỗi ngày 24 giờ tính từ lúc bắt đầu vòng.`)+' '+inf,
+        t(`<b>Day:</b> the round is split into 7 days of 24 h from the round start.`,`<b>Ngày:</b> vòng được chia thành 7 ngày, mỗi ngày 24 giờ tính từ lúc bắt đầu vòng.`),
         t(`<b>Show:</b> a bot's score = the sum of its updates whose time has passed. Scores jump 6 times a day and stay still in between.`,`<b>Hiển thị:</b> điểm của bot = tổng các lần cập nhật đã tới giờ. Điểm nhảy 6 lần mỗi ngày và đứng yên giữa các lần.`),
         t(`<b>Same result everywhere:</b> each bot has a seed for the round, so its updates are the same every time they are worked out, online or offline, after a restart too.`,`<b>Kết quả giống nhau mọi lúc:</b> mỗi bot có một seed cho cả vòng, nên các lần cập nhật luôn được tính ra giống nhau, online hay offline, kể cả sau khi mở lại game.`),
         t(`<b>When the board changes:</b> bot scores are worked out when the board or the Victory screen opens. No timed refresh while the board is open.`,`<b>Khi nào bảng thay đổi:</b> điểm bot được tính khi mở bảng hoặc màn hình Victory. Không tự làm mới theo thời gian khi bảng đang mở.`)
@@ -2824,6 +2824,11 @@ function view(l){
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
+    day(t('November 24, 2026','24/11/2026'),
+      ent(t('Leaderboard bot day','Ngày của bot Bảng xếp hạng'),ul([
+        t(`7.4: confirmed that a bot day = 24 h from the round start; removed the "to verify" tag.`,`Mục 7.4: xác nhận một ngày của bot = 24 giờ tính từ lúc bắt đầu vòng; bỏ nhãn "cần xác nhận".`)
+      ]))
+    )+
     day(t('November 20, 2026','20/11/2026'),
       ent(t('Locked Slot: color lock','Slot khóa: khóa theo màu'),ul([
         t(`1.4: each locked slot has a color. Only matches of that color count it down (was: every cannon that enters a slot counted every lock).`,`Mục 1.4: mỗi slot khóa có 1 màu. Chỉ match đúng màu đó mới làm khóa giảm (trước: mọi pháo vào slot làm mọi khóa giảm).`),
