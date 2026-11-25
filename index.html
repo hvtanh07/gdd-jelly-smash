@@ -2122,7 +2122,7 @@ function view(l){
       t(`Then a new key appears on another random cube. This repeats until every slot is open. After that, no more keys.`,`Sau đó chìa mới xuất hiện ở 1 khối ngẫu nhiên khác. Lặp lại cho tới khi mọi slot đều mở. Sau đó không còn chìa nữa.`),
       t(`The key counts even when its cannon is lost (slots full).`,`Chìa vẫn được tính kể cả khi pháo của match đó bị mất (slot đầy).`),
       t(`At 0 the slot opens and works as a normal slot.`,`Về 0 thì slot mở, dùng như slot thường.`),
-      t(`New cannons skip locked slots. Keys needed per slot: set per level.`,`Pháo mới bỏ qua slot khóa. Số chìa cần cho mỗi slot: đặt theo màn.`)
+      t(`Keys needed per slot: set per slot per level.`,`Số chìa cần cho mỗi slot: đặt riêng cho từng slot trong từng màn.`)
     ]),unlock(12),demo('lockSlot'))+
     ent(N.el8,ul([
       t(`Ant grid. An ant that wears armor of its color.`,`Trên lưới kiến. Con kiến mặc áo giáp cùng màu.`),
@@ -2851,6 +2851,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 25, 2026','25/11/2026'),
+      ent(t('Locked Slot wording','Câu chữ Slot khóa'),ul([
+        t(`1.4: removed "New cannons skip locked slots". Keys needed are set per slot per level.`,`Mục 1.4: bỏ câu "Pháo mới bỏ qua slot khóa". Số chìa cần đặt riêng cho từng slot trong từng màn.`)
+      ]))+
       ent(t('Locked Slot demo','Demo Slot khóa'),ul([
         t(`1.4: the Locked Slot demo now plays on a real board: swap, line of 3 pops, new cubes drop in from the top (was: lines appearing over a faded board).`,`Mục 1.4: demo Slot khóa giờ chạy trên bàn thật: swap, hàng 3 nổ, khối mới rơi từ trên xuống (trước: hàng khối hiện lên trên bàn mờ).`)
       ]))+
