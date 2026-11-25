@@ -1144,20 +1144,24 @@ const DEMOS={
         ['.k01','transform',[[S[3]+.26,'scale(1)'],[S[3]+.34,'scale(1.3)'],[S[3]+.48,'scale(0)']]],['.k41','transform',[[S[4]+.26,'scale(1)'],[S[4]+.34,'scale(1.3)'],[S[4]+.48,'scale(0)']]],
         ['.sp','opacity',[[0,0],[.5,0],[.6,1],[1.9,1],[2.0,0]]]);
       return tr;}},
-  lockSlot:{D:6.4, /* color lock: only matches of the lock's color count it down; at 0 the slot opens */
+  lockSlot:{D:6.4, /* key lock: the key cube's match takes 1 off the locked slot with the fewest keys left (tie: leftmost); then a new key appears */
     svg:()=>{
       const sx=i=>7+38*i,cx=i=>sx(i)+17,CY=52;
       let o=arena();
       for(let i=0;i<3;i++)o+=dslot(sx(i),26,34,44);
       o+=[3,4].map(i=>dslot(sx(i),26,34,44)).join('');
-      const lock=(i,vals,c)=>`<g class="lk${i}" style="transform-box:fill-box;transform-origin:center"><rect x="${sx(i)}" y="26" width="34" height="44" rx="9" fill="#3a2456" stroke="${DJ[c][0]}" stroke-width="2"/>`+
-        `<path d="M${cx(i)-5},${CY-6}v-4a5,5 0 0 1 10,0v4" fill="none" stroke="${DJ[c][0]}" stroke-width="2.2"/><rect x="${cx(i)-8}" y="${CY-6}" width="16" height="12" rx="3" fill="${DJ[c][0]}"/>`+
+      const lock=(i,vals)=>`<g class="lk${i}" style="transform-box:fill-box;transform-origin:center"><rect x="${sx(i)}" y="26" width="34" height="44" rx="9" fill="#3a2456" stroke="#d9d0ea" stroke-width="2"/>`+
+        `<path d="M${cx(i)-5},${CY-6}v-4a5,5 0 0 1 10,0v4" fill="none" stroke="#d9d0ea" stroke-width="2.2"/><rect x="${cx(i)-8}" y="${CY-6}" width="16" height="12" rx="3" fill="#d9d0ea"/>`+
         vals.map((v,k)=>`<text class="u${k}" x="${cx(i)}" y="${CY+15}" dy=".35em" text-anchor="middle" fill="#fff" style="${DFONT};font-size:10px${k?';opacity:0':''}">${v}</text>`).join('')+`</g>`;
-      o+=lock(3,['1','0'],3)+lock(4,['1','0'],2);
+      o+=lock(3,['1','0'])+lock(4,['2','1']);
       o+=dpanel(16,82,168,104);
       [[0,4,2,5,3],[3,1,4,0,2],[2,5,0,4,1]].forEach((r,j)=>r.forEach((c,i)=>{o+=`<g opacity=".28">${dj(24+32*i,90+32*j,26,c,true)}</g>`;}));
-      const grp=(k,c)=>{let g='';for(let m=0;m<3;m++)g+=dj(59+28*m,118,26,c,true);return `<g class="g${k}" style="opacity:0"><g class="g${k}i" style="transform-box:fill-box;transform-origin:center">${g}</g></g>`;};
-      o+=grp(0,0)+grp(1,3)+grp(2,2);
+      const key=(x,y)=>`<g><circle cx="${x}" cy="${y}" r="7" fill="#3a2400" opacity=".35"/><circle cx="${x-2.5}" cy="${y}" r="3" fill="none" stroke="#ffd93d" stroke-width="2"/><path d="M${x}.5,${y}h5.5v2.6M${x+3.5},${y}v2" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round"/></g>`;
+      const kx=m=>59+28*m+19,ky=118+19;
+      const grp=(k,c,km)=>{let g='';for(let m=0;m<3;m++)g+=dj(59+28*m,118,26,c,true)+(m===km?key(kx(m),ky):'');return `<g class="g${k}" style="opacity:0"><g class="g${k}i" style="transform-box:fill-box;transform-origin:center">${g}</g></g>`;};
+      o+=grp(0,0,-1)+grp(1,3,-1)+grp(2,2,2);
+      o+=`<g class="ky0" style="transform-box:fill-box;transform-origin:center">${key(kx(1),ky)}</g><g class="ky2" style="opacity:0;transform-box:fill-box;transform-origin:center">${key(kx(2),ky)}</g>`;
+      o+=`<g class="kf" style="opacity:0;transform-box:fill-box;transform-origin:center">${key(kx(1),ky)}</g>`;
       const hid=(k,i,c,v)=>`<g class="q${k}" style="opacity:0;transform-box:fill-box;transform-origin:center">${dcan(cx(i),CY,c,[v],'',.75)}</g>`;
       o+=`<g class="q9" style="transform-box:fill-box;transform-origin:center">${dcan(cx(0),CY,2,['1'],'',.75)}</g>`+dcan(cx(1),CY,4,['5'],'',.75)+hid(0,2,0,'3')+hid(1,0,3,'3')+hid(2,3,2,'3');
       return o+dpill('pu',100,13,84,'Slot unlocked!','#ffd93d','#3a2400');},
@@ -1168,13 +1172,16 @@ const DEMOS={
         [`.g${k}`,'transform',[[s+.45,T(0,0,1),'ease-in'],[s+.85,T(cx(slot)-100,-83,.3)]]],
         [`.q${k}`,'opacity',[[0,0],[s+.8,0],[s+.85,1]]],[`.q${k}`,'transform',[[s+.8,'scale(0)'],[s+.95,'scale(1.15)'],[s+1.05,'scale(1)']]]);};
       fly(0,.4,2);fly(1,2.4,0);fly(2,4.2,3);
-      /* red match (0.4): no lock counts. Green lock: 1 → 0 at 3.25 (green match), then opens. Yellow lock: 1 → 0 at 5.05 (yellow match), then opens */
-      tr.push(['.lk3 .u0','opacity',[[0,1],[3.25,1],[3.27,0]]],['.lk3 .u1','opacity',[[0,0],[3.25,0],[3.27,1]]],
-        ['.lk3','transform',[[3.3,'scale(1)'],[3.45,'scale(1.15)'],[3.65,'scale(0)']]],['.lk3','opacity',[[0,1],[3.55,1],[3.65,0]]],
-        ['.lk4 .u0','opacity',[[0,1],[5.05,1],[5.07,0]]],['.lk4 .u1','opacity',[[0,0],[5.05,0],[5.07,1]]],
-        ['.lk4','transform',[[5.1,'scale(1)'],[5.25,'scale(1.15)'],[5.45,'scale(0)']]],['.lk4','opacity',[[0,1],[5.35,1],[5.45,0]]],
+      /* red match (0.4) holds the key: slot 4 (1 key left, fewest) 1 → 0 at 1.3, opens; new key pops at 1.7 on the yellow spot. Green (2.4): no key. Yellow (4.2) holds the new key: last slot 2 → 1 at 5.1 */
+      tr.push(['.ky0','opacity',[[0,1],[.4,1],[.42,0]]],
+        ['.kf','opacity',[[0,0],[.4,0],[.42,1],[1.25,1],[1.3,0]]],['.kf','transform',[[.85,T(0,0,1),'ease-in'],[1.28,T(cx(3)-87,-85,.8)]]],
+        ['.lk3 .u0','opacity',[[0,1],[1.3,1],[1.32,0]]],['.lk3 .u1','opacity',[[0,0],[1.3,0],[1.32,1]]],
+        ['.lk3','transform',[[1.35,'scale(1)'],[1.5,'scale(1.15)'],[1.7,'scale(0)']]],['.lk3','opacity',[[0,1],[1.6,1],[1.7,0]]],
+        ['.ky2','opacity',[[0,0],[1.7,0],[1.75,1],[4.2,1],[4.22,0]]],['.ky2','transform',[[1.7,'scale(0)'],[1.85,'scale(1.3)'],[2.0,'scale(1)']]],
+        ['.lk4 .u0','opacity',[[0,1],[5.1,1],[5.12,0]]],['.lk4 .u1','opacity',[[0,0],[5.1,0],[5.12,1]]],
+        ['.lk4','transform',[[5.1,'scale(1)'],[5.25,'scale(1.15)'],[5.4,'scale(1)']]],
         ['.q9','transform',[[1.8,'scale(1)'],[2.1,'scale(0)']]],['.q9','opacity',[[0,1],[2.0,1],[2.1,0]]],
-        ['.pu','opacity',[[0,0],[3.5,0],[3.6,1],[4.3,1],[4.4,0],[5.3,0],[5.4,1],[6.0,1],[6.1,0]]]);
+        ['.pu','opacity',[[0,0],[1.6,0],[1.7,1],[2.4,1],[2.5,0]]]);
       return tr;}},
   fountain:{D:6.6, /* every 2 moves the fountain makes chocolate next to it, then next to the chocolate */
     svg:()=>{
@@ -1832,7 +1839,7 @@ function view(l){
     chocoL:t('This chocolate has 3 layers. An orange line above it removes 1 layer and a red line below removes 1 more. The purple line above makes the 3rd match: the chocolate breaks and shows a blue jelly.','Miếng chocolate này có 3 lớp. Hàng cam phía trên phá 1 lớp, hàng đỏ phía dưới phá thêm 1 lớp. Hàng tím phía trên là match thứ 3: chocolate vỡ hẳn, lộ khối thạch xanh.'),
     choco:t('Tap the chocolate: it shakes, it can\'t be swapped. A swap makes a red line next to it: the chocolate breaks and shows a blue jelly, then the column refills.','Chạm chocolate: nó rung, không swap được. Một swap tạo hàng đỏ cạnh nó: chocolate vỡ, lộ khối thạch xanh, rồi cột được refill.'),
     stack3:t('A group of 4 gave this cannon 5 ammo. The stack of 3 takes 3 shots, so only 2 are left for the other blue cubes.','Nhóm 4 khối cho pháo này 5 đạn. Chồng 3 khối tốn 3 phát, nên chỉ còn 2 đạn cho các khối xanh khác.'),
-    lockSlot:t('Two slots are locked: a green lock and a yellow lock, 1 each. The red match does not count. The green match opens the green slot, which takes the next cannon. The yellow match opens the yellow slot.','2 slot bị khóa: ổ khóa xanh lá và ổ khóa vàng, mỗi ổ còn 1. Match đỏ không tính. Match xanh lá mở slot xanh lá, slot này nhận pháo kế tiếp. Match vàng mở slot vàng.'),
+    lockSlot:t('Two slots are locked: 1 key and 2 keys. The red match has the key: it goes to the slot with 1 left, which opens. A new key appears. The green match has no key. The yellow match takes the new key: the last slot goes to 1.','2 slot bị khóa: còn 1 chìa và 2 chìa. Match đỏ có chìa: chìa tới slot còn 1, slot mở. Chìa mới xuất hiện. Match xanh lá không có chìa. Match vàng lấy chìa mới: slot cuối còn 1.'),
     fountain:t('Every 2 moves the fountain makes chocolate: first next to itself, then next to that chocolate.','Cứ 2 move vòi tạo chocolate: lần đầu cạnh vòi, lần sau cạnh miếng chocolate đó.'),
     queen:t('The queen takes 2×2 cells and has 6 HP in the demo. Her rainbow armor takes any color: the red, blue and yellow cannons all hit her. At 0 HP she swells up and disappears.','Kiến chúa chiếm 2×2 ô, demo có 6 HP. Giáp cầu vồng nhận mọi màu: pháo đỏ, xanh và vàng đều bắn trúng. Về 0 HP, kiến chúa mập lên rồi biến mất.'),
     bottle:t('A swap makes a blue line of 3 right under the tray. The blue bottle breaks, and the match gets +5 ammo: the blue cannon comes in with 3 + 5 = 8.','Một lần swap tạo hàng 3 khối xanh ngay dưới khay. Lọ xanh vỡ, và match đó được +5 đạn: pháo xanh vào với 3 + 5 = 8 đạn.'),
@@ -2093,11 +2100,13 @@ function view(l){
       t(`Blocks refill: no new cube falls through it. Cells below it fill by cubes sliding in diagonally from the side (Refill, 1.2).`,`Chặn refill: không khối mới nào rơi xuyên qua. Ô bên dưới được lấp bằng khối trượt chéo từ bên cạnh (Refill, mục 1.2).`)
     ]),unlock(7),demo('chocoL'))+
     ent(N.el3,ul([
-      t(`Slot row. A slot with a padlock in one jelly color and a number.`,`Trên hàng slot. Slot có ổ khóa mang 1 màu thạch và 1 con số.`),
-      t(`Each match of the lock's color counts it down by 1. Matches of other colors don't count.`,`Mỗi match đúng màu ổ khóa làm khóa giảm 1. Match màu khác không tính.`),
-      t(`The match counts even when its cannon is lost (slots full).`,`Match vẫn được tính kể cả khi pháo của nó bị mất (slot đầy).`),
-      t(`At 0 it opens and works as a normal slot.`,`Về 0 thì slot mở, dùng như slot thường.`),
-      t(`New cannons skip locked slots. Color and number per slot: set per level.`,`Pháo mới bỏ qua slot khóa. Màu và con số mỗi slot: đặt theo màn.`)
+      t(`Slot row. A locked slot shows a padlock and a number: the keys it still needs.`,`Trên hàng slot. Slot khóa có ổ khóa và 1 con số: số chìa khóa còn cần.`),
+      t(`In a level with a locked slot, the board always has exactly 1 cube with a key. It is never under a Chocolate Layer or in a Jelly Bottle tray. The key falls with its cube.`,`Màn có slot khóa thì trên bàn luôn có đúng 1 khối mang chìa khóa. Khối này không bao giờ nằm dưới Lớp chocolate hay trong khay Lọ thạch. Chìa khóa rơi theo khối.`),
+      t(`Match the key cube: the lowest locked slot gets −1. Lowest = fewest keys left; on a tie, the leftmost slot.`,`Match được khối có chìa: slot khóa thấp nhất −1. Thấp nhất = còn ít chìa nhất; nếu bằng nhau thì lấy slot bên trái.`),
+      t(`Then a new key appears on another random cube. This repeats until every slot is open. After that, no more keys.`,`Sau đó chìa mới xuất hiện ở 1 khối ngẫu nhiên khác. Lặp lại cho tới khi mọi slot đều mở. Sau đó không còn chìa nữa.`),
+      t(`The key counts even when its cannon is lost (slots full).`,`Chìa vẫn được tính kể cả khi pháo của match đó bị mất (slot đầy).`),
+      t(`At 0 the slot opens and works as a normal slot.`,`Về 0 thì slot mở, dùng như slot thường.`),
+      t(`New cannons skip locked slots. Keys needed per slot: set per level.`,`Pháo mới bỏ qua slot khóa. Số chìa cần cho mỗi slot: đặt theo màn.`)
     ]),unlock(12),demo('lockSlot'))+
     ent(N.el8,ul([
       t(`Ant grid. An ant that wears armor of its color.`,`Trên lưới kiến. Con kiến mặc áo giáp cùng màu.`),
@@ -2136,14 +2145,15 @@ function view(l){
       t(`Clears every cube on the board and fills it with a new board.`,`Xóa hết khối trên bàn và thay bằng bàn mới.`),
       t(`Cleared cubes give no cannon and no ammo.`,`Khối bị xóa không sinh pháo, không cho đạn.`),
       t(`The new board has no ready match. Each color in the bottom row of the ant grid gets a swap that makes a line of 3.`,`Bàn mới không có match sẵn. Mỗi màu ở hàng dưới cùng của lưới kiến có 1 nước swap ra hàng 3.`),
-      withEl+':'+ul([t(`${P.el1} and ${P.el6} stay where they are. Only normal cubes are replaced.`,`${P.el1} và ${P.el6} giữ nguyên chỗ. Chỉ thay khối thường.`)])
+      withEl+':'+ul([t(`${P.el1} and ${P.el6} stay where they are. Only normal cubes are replaced.`,`${P.el1} và ${P.el6} giữ nguyên chỗ. Chỉ thay khối thường.`),
+        t(`${P.el3}: the key goes to a random cube of the new board. No slot counts down.`,`${P.el3}: chìa khóa chuyển sang 1 khối ngẫu nhiên của bàn mới. Không slot nào giảm.`)+' '+inf])
     ]),unlockB('TBD'),demo('jShuffle'))+
     ent(N.bo3,ul([
       t(`The game takes 3 colors from the bottom row of the ant grid. Fewer than 3 colors there: the rest come from the next rows up.`,`Game lấy 3 màu từ hàng dưới cùng của lưới kiến. Hàng đó ít hơn 3 màu: lấy thêm từ các hàng phía trên.`),
       t(`It spawns 3 cannons of those colors, 15 ammo each. They don't take a slot.`,`Sinh 3 pháo của 3 màu đó, mỗi pháo 15 đạn. Không chiếm slot.`),
       t(`They fire like Hand: any ant of their color, nearest first, until the ammo runs out.`,`Bắn như Hand: kiến cùng màu nào cũng bắn, gần nhất trước, cho tới khi hết đạn.`),
       t(`Its color runs out before its ammo: that cannon leaves, and the leftover ammo is lost.`,`Hết kiến màu đó trước khi hết đạn: pháo biến mất, đạn dư bị mất.`),
-      withEl+':'+ul([t(`${P.el3}: Bomb cannons don't come from a match, so they don't count the lock down.`,`${P.el3}: pháo của Bomb không đến từ match nên không làm khóa giảm.`)])
+      withEl+':'+ul([t(`${P.el3}: Bomb cannons don't come from a match, so they never use the key.`,`${P.el3}: pháo của Bomb không đến từ match nên không bao giờ dùng chìa khóa.`)])
     ]),unlockB('TBD'),demo('jBomb'));
 
   /* ===== 2. FTUE & tutorial ===== */
@@ -2191,7 +2201,7 @@ function view(l){
     [t('Element','Yếu tố'),t('Popup text','Nội dung popup'),t('Unlocks at level','Mở ở màn')],
     [
       [N.el1,popup('Match next to the chocolate<br>to break it.','Ghép cạnh chocolate<br>để phá vỡ.'),lvl(7)],
-      [N.el3,popup('Match the lock\'s color<br>to open the slot.','Ghép đúng màu ổ khóa<br>để mở slot.'),lvl(12)],
+      [N.el3,popup('Match the key cube<br>to open a slot.','Ghép khối có chìa khóa<br>để mở slot.'),lvl(12)],
       [N.el8,popup('Break the armor first<br>to defeat the ant.','Phá giáp trước<br>để hạ kiến.'),lvl(17)],
       [N.el6,popup('Match next to a bottle<br>to break it.','Ghép cạnh lọ<br>để làm vỡ lọ.'),lvl(22)],
       [N.el7,popup('Use any cannon<br>to defeat the queen.','Dùng pháo bất kỳ<br>để hạ kiến chúa.'),lvl(27)],
@@ -2261,8 +2271,8 @@ function view(l){
       [an,t('Can\'t swap: it shakes. Lose a layer: it shakes, bits fly off and the badge counts down. Last layer: it breaks and the jelly under it pops up.','Không swap được: rung nhẹ. Mất 1 lớp: rung, mảnh vụn văng ra, huy hiệu giảm 1. Lớp cuối: vỡ hẳn, khối thạch bên dưới bật lên.')]
     ]))+
     ent(N.el3,params([
-      [look,t('A dark filled slot with a border and padlock in the lock color, and a number.','Slot tô tối, viền và ổ khóa mang màu của khóa, có con số.')],
-      [an,t('Count down: the slot bounces. Open: the padlock pops and the dashed slot shows.','Đếm ngược: slot nảy. Mở: ổ khóa vỡ, hiện slot viền nét đứt.')]
+      [look,t('A dark filled slot with a light padlock and a number. The key: a small gold key on one cube.','Slot tô tối, ổ khóa màu sáng và con số. Chìa khóa: chìa vàng nhỏ trên 1 khối.')],
+      [an,t('Key matched: the key flies to the lowest locked slot, the slot bounces and the number drops. A new key pops in on a cube. Open: the padlock pops and the dashed slot shows.','Match được chìa: chìa bay tới slot khóa thấp nhất, slot nảy và con số giảm. Chìa mới bật ra trên 1 khối. Mở: ổ khóa vỡ, hiện slot viền nét đứt.')]
     ]))+
     ent(N.el8,params([
       [look,t('A normal ant with a shell of its color on its back. The shell has a silver rim and a white number.','Kiến thường có lớp vỏ giáp cùng màu trên lưng. Vỏ có viền bạc và con số màu trắng.')],
@@ -2301,7 +2311,7 @@ function view(l){
     ['Cannon Shot','core',t('A cannon fires','Pháo bắn'),0],
     ['Ant Pop','core',t('A shot hits a normal ant: it swells and disappears','Đạn trúng kiến thường: kiến mập lên rồi biến mất'),1],
     ['Chocolate Break','el',t('A Chocolate Layer breaks','Lớp chocolate vỡ'),0],
-    ['Slot Unlock','el',t('A locked slot counts down or opens','Slot khóa đếm ngược hoặc mở'),1],
+    ['Slot Unlock','el',t('A key reaches a locked slot, or the slot opens','Chìa khóa tới slot khóa, hoặc slot mở'),1],
     ['Armor Hit','el',t('A shot hits armor and its number drops','Đạn trúng giáp và số giảm'),0],
     ['Armor Break','el',t('An armor reaches 0 and breaks','Giáp về 0 và vỡ'),1],
     ['Bottle Break','el',t('A Jelly Bottle breaks and gives +5 ammo','Lọ thạch vỡ và cho +5 đạn'),1],
@@ -2824,6 +2834,13 @@ function view(l){
   /* Add one day() block per day, newest first, with one ent per area changed */
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
+    day(t('November 25, 2026','25/11/2026'),
+      ent(t('Locked Slot: key','Slot khóa: chìa khóa'),ul([
+        t(`1.4: locked slots now open with keys (was: matches of the lock's color). The board always has 1 key cube, never under chocolate or in a tray.`,`Mục 1.4: slot khóa giờ mở bằng chìa khóa (trước: match đúng màu ổ khóa). Trên bàn luôn có 1 khối mang chìa, không nằm dưới chocolate hay trong khay.`),
+        t(`Matching it takes 1 off the locked slot with the fewest keys left (tie: leftmost). Then a new key appears on a random cube, until all slots are open.`,`Match được khối đó thì slot khóa còn ít chìa nhất −1 (bằng nhau: lấy slot bên trái). Sau đó chìa mới xuất hiện ở 1 khối ngẫu nhiên, cho tới khi mọi slot đều mở.`),
+        t(`Demo, tutorial popup (2), look (3), SFX (4), Shuffle and Bomb notes (1.5) updated.`,`Cập nhật demo, popup hướng dẫn (mục 2), hình ảnh (mục 3), SFX (mục 4), ghi chú Shuffle và Bomb (mục 1.5).`)
+      ]))
+    )+
     day(t('November 24, 2026','24/11/2026'),
       ent(t('Leaderboard bot day','Ngày của bot Bảng xếp hạng'),ul([
         t(`7.4: confirmed that a bot day = 24 h from the round start; removed the "to verify" tag.`,`Mục 7.4: xác nhận một ngày của bot = 24 giờ tính từ lúc bắt đầu vòng; bỏ nhãn "cần xác nhận".`)
