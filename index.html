@@ -1144,9 +1144,9 @@ const DEMOS={
         ['.k01','transform',[[S[3]+.26,'scale(1)'],[S[3]+.34,'scale(1.3)'],[S[3]+.48,'scale(0)']]],['.k41','transform',[[S[4]+.26,'scale(1)'],[S[4]+.34,'scale(1.3)'],[S[4]+.48,'scale(0)']]],
         ['.sp','opacity',[[0,0],[.5,0],[.6,1],[1.9,1],[2.0,0]]]);
       return tr;}},
-  lockSlot:{D:6.4, /* key lock: the key cube's match takes 1 off the locked slot with the fewest keys left (tie: leftmost); then a new key appears */
+  lockSlot:{D:6.8, /* key lock on a real board: swap → line of 3 pops → cubes refill from the top. The red line holds the key: it flies to the locked slot with the fewest keys (1 → 0, opens). A new key appears on a cube. Green line: no key. Yellow line takes the new key: last slot 2 → 1 */
     svg:()=>{
-      const sx=i=>7+38*i,cx=i=>sx(i)+17,CY=52;
+      const sx=i=>7+38*i,cx=i=>sx(i)+17,CY=52,bx=i=>24+32*i,by=j=>90+32*j,S=26;
       let o=arena();
       for(let i=0;i<3;i++)o+=dslot(sx(i),26,34,44);
       o+=[3,4].map(i=>dslot(sx(i),26,34,44)).join('');
@@ -1154,34 +1154,50 @@ const DEMOS={
         `<path d="M${cx(i)-5},${CY-6}v-4a5,5 0 0 1 10,0v4" fill="none" stroke="#d9d0ea" stroke-width="2.2"/><rect x="${cx(i)-8}" y="${CY-6}" width="16" height="12" rx="3" fill="#d9d0ea"/>`+
         vals.map((v,k)=>`<text class="u${k}" x="${cx(i)}" y="${CY+15}" dy=".35em" text-anchor="middle" fill="#fff" style="${DFONT};font-size:10px${k?';opacity:0':''}">${v}</text>`).join('')+`</g>`;
       o+=lock(3,['1','0'])+lock(4,['2','1']);
-      o+=dpanel(16,82,168,104);
-      [[0,4,2,5,3],[3,1,4,0,2],[2,5,0,4,1]].forEach((r,j)=>r.forEach((c,i)=>{o+=`<g opacity=".28">${dj(24+32*i,90+32*j,26,c,true)}</g>`;}));
-      const key=(x,y)=>`<g><circle cx="${x}" cy="${y}" r="7" fill="#3a2400" opacity=".35"/><circle cx="${x-2.5}" cy="${y}" r="3" fill="none" stroke="#ffd93d" stroke-width="2"/><path d="M${x}.5,${y}h5.5v2.6M${x+3.5},${y}v2" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round"/></g>`;
-      const kx=m=>59+28*m+19,ky=118+19;
-      const grp=(k,c,km)=>{let g='';for(let m=0;m<3;m++)g+=dj(59+28*m,118,26,c,true)+(m===km?key(kx(m),ky):'');return `<g class="g${k}" style="opacity:0"><g class="g${k}i" style="transform-box:fill-box;transform-origin:center">${g}</g></g>`;};
-      o+=grp(0,0,-1)+grp(1,3,-1)+grp(2,2,2);
-      o+=`<g class="ky0" style="transform-box:fill-box;transform-origin:center">${key(kx(1),ky)}</g><g class="ky2" style="opacity:0;transform-box:fill-box;transform-origin:center">${key(kx(2),ky)}</g>`;
-      o+=`<g class="kf" style="opacity:0;transform-box:fill-box;transform-origin:center">${key(kx(1),ky)}</g>`;
+      o+=dpanel(16,82,168,104)+`<clipPath id="lsClip"><rect x="16" y="86" width="168" height="98"/></clipPath><g clip-path="url(#lsClip)">`;
+      /* start board: row 0 R R Y G P, row 1 B O R P G, row 2 G P B O Y. The key is on the 2nd red cube */
+      const G=[[0,0,2,3,1],[4,5,0,1,3],[3,1,4,5,2]];
+      const cube=(id,i,j,c)=>`<g class="o${id}"><g class="i${id}">${dj(bx(i),by(j),S,c,true)}</g></g>`;
+      G.forEach((r,j)=>r.forEach((c,i)=>{o+=cube(`${j}${i}`,i,j,c);}));
+      /* new cubes that drop into row 0 after each line: a = after red, b = after green, c = after yellow */
+      [[0,2],[1,2],[2,3]].forEach(([i,c])=>{o+=cube(`a${i}`,i,0,c);});
+      [[2,4],[3,5],[4,0]].forEach(([i,c])=>{o+=cube(`b${i}`,i,0,c);});
+      [[0,3],[1,1],[2,5]].forEach(([i,c])=>{o+=cube(`c${i}`,i,0,c);});
+      o+=`</g>`;
+      const key=(cls,x,y,st)=>`<g class="${cls}" style="transform-box:fill-box;transform-origin:center${st||''}"><circle cx="${x}" cy="${y}" r="7" fill="#3a2400" opacity=".35"/><circle cx="${x-2.5}" cy="${y}" r="3" fill="none" stroke="#ffd93d" stroke-width="2"/><path d="M${x}.5,${y}h5.5v2.6M${x+3.5},${y}v2" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round"/></g>`;
+      o+=key('ky0',bx(1)+19,by(0)+19)+key('ky1',bx(0)+19,by(0)+19,';opacity:0');
       const hid=(k,i,c,v)=>`<g class="q${k}" style="opacity:0;transform-box:fill-box;transform-origin:center">${dcan(cx(i),CY,c,[v],'',.75)}</g>`;
       o+=`<g class="q9" style="transform-box:fill-box;transform-origin:center">${dcan(cx(0),CY,2,['1'],'',.75)}</g>`+dcan(cx(1),CY,4,['5'],'',.75)+hid(0,2,0,'3')+hid(1,0,3,'3')+hid(2,3,2,'3');
+      o+=dtap('t0',bx(2)+13,by(1)+13)+dtap('t1',bx(4)+13,by(1)+13)+dtap('t2',bx(2)+13,by(1)+13);
       return o+dpill('pu',100,13,84,'Slot unlocked!','#ffd93d','#3a2400');},
     tracks:()=>{
-      const cx=i=>24+38*i,tr=[];
-      const fly=(k,s,slot)=>{tr.push([`.g${k}`,'opacity',[[0,0],[s,0],[s+.1,1],[s+.75,1],[s+.85,0]]],
-        [`.g${k}i`,'transform',[[s,'scale(1)'],[s+.12,'scale(1.12)'],[s+.24,'scale(1)'],[s+.36,'scale(1.12)'],[s+.48,'scale(1)']]],
-        [`.g${k}`,'transform',[[s+.45,T(0,0,1),'ease-in'],[s+.85,T(cx(slot)-100,-83,.3)]]],
-        [`.q${k}`,'opacity',[[0,0],[s+.8,0],[s+.85,1]]],[`.q${k}`,'transform',[[s+.8,'scale(0)'],[s+.95,'scale(1.15)'],[s+1.05,'scale(1)']]]);};
-      fly(0,.4,2);fly(1,2.4,0);fly(2,4.2,3);
-      /* red match (0.4) holds the key: slot 4 (1 key left, fewest) 1 → 0 at 1.3, opens; new key pops at 1.7 on the yellow spot. Green (2.4): no key. Yellow (4.2) holds the new key: last slot 2 → 1 at 5.1 */
-      tr.push(['.ky0','opacity',[[0,1],[.4,1],[.42,0]]],
-        ['.kf','opacity',[[0,0],[.4,0],[.42,1],[1.25,1],[1.3,0]]],['.kf','transform',[[.85,T(0,0,1),'ease-in'],[1.28,T(cx(3)-87,-85,.8)]]],
-        ['.lk3 .u0','opacity',[[0,1],[1.3,1],[1.32,0]]],['.lk3 .u1','opacity',[[0,0],[1.3,0],[1.32,1]]],
-        ['.lk3','transform',[[1.35,'scale(1)'],[1.5,'scale(1.15)'],[1.7,'scale(0)']]],['.lk3','opacity',[[0,1],[1.6,1],[1.7,0]]],
-        ['.ky2','opacity',[[0,0],[1.7,0],[1.75,1],[4.2,1],[4.22,0]]],['.ky2','transform',[[1.7,'scale(0)'],[1.85,'scale(1.3)'],[2.0,'scale(1)']]],
-        ['.lk4 .u0','opacity',[[0,1],[5.1,1],[5.12,0]]],['.lk4 .u1','opacity',[[0,0],[5.1,0],[5.12,1]]],
-        ['.lk4','transform',[[5.1,'scale(1)'],[5.25,'scale(1.15)'],[5.4,'scale(1)']]],
-        ['.q9','transform',[[1.8,'scale(1)'],[2.1,'scale(0)']]],['.q9','opacity',[[0,1],[2.0,1],[2.1,0]]],
-        ['.pu','opacity',[[0,0],[1.6,0],[1.7,1],[2.4,1],[2.5,0]]]);
+      const tr=[],sw=(a,b,t,dy)=>tr.push([`.o${a}`,'transform',[[t,T(0,0)],[t+.3,T(0,dy)]]],[`.o${b}`,'transform',[[t,T(0,0)],[t+.3,T(0,-dy)]]]);
+      const drop=(ids,t)=>tr.push([ids.map(x=>`.o${x}`).join(','),'transform',[[t,T(0,-32),'ease-in'],[t+.3,T(0,0)]]]);
+      const can=(k,t)=>tr.push([`.q${k}`,'opacity',[[0,0],[t,0],[t+.05,1]]],[`.q${k}`,'transform',[[t,'scale(0)'],[t+.15,'scale(1.15)'],[t+.25,'scale(1)']]]);
+      /* 1. swap the yellow (row 0) with the red below it: red line in row 0 with the key */
+      tr.push(...dtapT('t0',.3));tr.push(['.o12','transform',[[.5,T(0,0)],[.8,T(0,-32)]]]);
+      tr.push(...dpopT('.i00,.i01,.i12',.95));
+      tr.push(['.ky0','opacity',[[0,1],[1.85,1],[1.9,0]]],['.ky0','transform',[[1.5,T(0,0,1),'ease-in'],[1.85,T(63,-57,.9)]]]);
+      tr.push(['.lk3 .u0','opacity',[[0,1],[1.9,1],[1.92,0]]],['.lk3 .u1','opacity',[[0,0],[1.9,0],[1.92,1]]],
+        ['.lk3','transform',[[1.95,'scale(1)'],[2.1,'scale(1.15)'],[2.3,'scale(0)']]],['.lk3','opacity',[[0,1],[2.2,1],[2.3,0]]],
+        ['.pu','opacity',[[0,0],[2.15,0],[2.25,1],[2.85,1],[2.95,0]]]);
+      can(0,1.6);drop(['a0','a1','a2'],1.6);
+      /* a new key pops in on a cube */
+      tr.push(['.ky1','opacity',[[0,0],[2.3,0],[2.35,1],[5.9,1],[5.95,0]]],['.ky1','transform',[[2.3,T(0,0,0)],[2.45,T(0,0,1.3)],[2.6,T(0,0,1)],[5.5,T(0,0,1),'ease-in'],[5.9,T(133,-57,.9)]]]);
+      /* the cannon in slot 1 runs out of ammo */
+      tr.push(['.q9','transform',[[2.4,'scale(1)'],[2.7,'scale(0)']]],['.q9','opacity',[[0,1],[2.6,1],[2.7,0]]]);
+      /* 2. swap the purple (row 0) with the green below it: green line, no key */
+      tr.push(...dtapT('t1',2.6));sw('04','14',2.8,32);
+      tr.push(...dpopT('.ia2,.i03,.i14',3.2));
+      can(1,3.85);drop(['b2','b3','b4'],3.85);
+      /* 3. swap the new blue (row 0) with the yellow below it: yellow line with the new key */
+      tr.push(...dtapT('t2',4.3));
+      tr.push(['.ob2','transform',[[3.85,T(0,-32),'ease-in'],[4.15,T(0,0)],[4.5,T(0,0)],[4.8,T(0,32)]]]);
+      tr.push(['.o02','transform',[[.5,T(0,0)],[.8,T(0,32)],[4.5,T(0,32)],[4.8,T(0,0)]]]);
+      tr.push(...dpopT('.ia0,.ia1,.i02',4.9));
+      can(2,5.55);drop(['c0','c1','c2'],5.55);
+      tr.push(['.lk4 .u0','opacity',[[0,1],[5.9,1],[5.92,0]]],['.lk4 .u1','opacity',[[0,0],[5.9,0],[5.92,1]]],
+        ['.lk4','transform',[[5.9,'scale(1)'],[6.05,'scale(1.15)'],[6.2,'scale(1)']]]);
       return tr;}},
   fountain:{D:6.6, /* every 2 moves the fountain makes chocolate next to it, then next to the chocolate */
     svg:()=>{
@@ -1839,7 +1855,7 @@ function view(l){
     chocoL:t('This chocolate has 3 layers. An orange line above it removes 1 layer and a red line below removes 1 more. The purple line above makes the 3rd match: the chocolate breaks and shows a blue jelly.','Miếng chocolate này có 3 lớp. Hàng cam phía trên phá 1 lớp, hàng đỏ phía dưới phá thêm 1 lớp. Hàng tím phía trên là match thứ 3: chocolate vỡ hẳn, lộ khối thạch xanh.'),
     choco:t('Tap the chocolate: it shakes, it can\'t be swapped. A swap makes a red line next to it: the chocolate breaks and shows a blue jelly, then the column refills.','Chạm chocolate: nó rung, không swap được. Một swap tạo hàng đỏ cạnh nó: chocolate vỡ, lộ khối thạch xanh, rồi cột được refill.'),
     stack3:t('A group of 4 gave this cannon 5 ammo. The stack of 3 takes 3 shots, so only 2 are left for the other blue cubes.','Nhóm 4 khối cho pháo này 5 đạn. Chồng 3 khối tốn 3 phát, nên chỉ còn 2 đạn cho các khối xanh khác.'),
-    lockSlot:t('Two slots are locked: 1 key and 2 keys. The red match has the key: it goes to the slot with 1 left, which opens. A new key appears. The green match has no key. The yellow match takes the new key: the last slot goes to 1.','2 slot bị khóa: còn 1 chìa và 2 chìa. Match đỏ có chìa: chìa tới slot còn 1, slot mở. Chìa mới xuất hiện. Match xanh lá không có chìa. Match vàng lấy chìa mới: slot cuối còn 1.'),
+    lockSlot:t('Two slots are locked: 1 key and 2 keys. A swap makes a red line with the key: the key goes to the slot with 1 left, which opens. New cubes drop in and a new key appears. The green line has no key. The yellow line takes the new key: the last slot goes to 1.','2 slot bị khóa: còn 1 chìa và 2 chìa. Swap tạo hàng đỏ có chìa: chìa tới slot còn 1, slot mở. Khối mới rơi xuống và chìa mới xuất hiện. Hàng xanh lá không có chìa. Hàng vàng lấy chìa mới: slot cuối còn 1.'),
     fountain:t('Every 2 moves the fountain makes chocolate: first next to itself, then next to that chocolate.','Cứ 2 move vòi tạo chocolate: lần đầu cạnh vòi, lần sau cạnh miếng chocolate đó.'),
     queen:t('The queen takes 2×2 cells and has 6 HP in the demo. Her rainbow armor takes any color: the red, blue and yellow cannons all hit her. At 0 HP she swells up and disappears.','Kiến chúa chiếm 2×2 ô, demo có 6 HP. Giáp cầu vồng nhận mọi màu: pháo đỏ, xanh và vàng đều bắn trúng. Về 0 HP, kiến chúa mập lên rồi biến mất.'),
     bottle:t('A swap makes a blue line of 3 right under the tray. The blue bottle breaks, and the match gets +5 ammo: the blue cannon comes in with 3 + 5 = 8.','Một lần swap tạo hàng 3 khối xanh ngay dưới khay. Lọ xanh vỡ, và match đó được +5 đạn: pháo xanh vào với 3 + 5 = 8 đạn.'),
@@ -2835,6 +2851,9 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 25, 2026','25/11/2026'),
+      ent(t('Locked Slot demo','Demo Slot khóa'),ul([
+        t(`1.4: the Locked Slot demo now plays on a real board: swap, line of 3 pops, new cubes drop in from the top (was: lines appearing over a faded board).`,`Mục 1.4: demo Slot khóa giờ chạy trên bàn thật: swap, hàng 3 nổ, khối mới rơi từ trên xuống (trước: hàng khối hiện lên trên bàn mờ).`)
+      ]))+
       ent(t('Locked Slot: key','Slot khóa: chìa khóa'),ul([
         t(`1.4: locked slots now open with keys (was: matches of the lock's color). The board always has 1 key cube, never under chocolate or in a tray.`,`Mục 1.4: slot khóa giờ mở bằng chìa khóa (trước: match đúng màu ổ khóa). Trên bàn luôn có 1 khối mang chìa, không nằm dưới chocolate hay trong khay.`),
         t(`Matching it takes 1 off the locked slot with the fewest keys left (tie: leftmost). Then a new key appears on a random cube, until all slots are open.`,`Match được khối đó thì slot khóa còn ít chìa nhất −1 (bằng nhau: lấy slot bên trái). Sau đó chìa mới xuất hiện ở 1 khối ngẫu nhiên, cho tới khi mọi slot đều mở.`),
