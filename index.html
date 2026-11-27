@@ -2567,7 +2567,7 @@ function view(l){
         t(`Each group has 50 players. The board lists them by score, highest first.`,`Mỗi nhóm có 50 người chơi. Bảng xếp theo điểm, cao nhất ở trên.`),
         t(`Each row: rank, avatar, name, score, online/offline status, and the reward of that rank.`,`Mỗi dòng: hạng, avatar, tên, điểm, trạng thái online/offline, và phần thưởng của hạng đó.`),
         t(`<b>Online/offline:</b> the player's own row always shows online.`,`<b>Online/offline:</b> dòng của người chơi luôn hiện online.`),
-        t(`Each bot gets a random status (30% online) when the board or the Victory screen opens. It stays the same while the board is open.`,`Mỗi bot nhận trạng thái ngẫu nhiên (30% online) khi mở bảng hoặc màn hình Victory. Trạng thái giữ nguyên khi bảng đang mở.`)+' '+inf,
+        t(`Each bot gets a random status (30% online) when the board or the Victory screen opens. It stays the same while the board is open.`,`Mỗi bot nhận trạng thái ngẫu nhiên (30% online) khi mở bảng hoặc màn hình Victory. Trạng thái giữ nguyên khi bảng đang mở.`),
         t(`Avatar and name follow the player name & avatar rules.`,`Avatar và tên theo luật tên & avatar người chơi.`)+' '+see('additional-mechanics','1.3'),
         t(`The player's own row is highlighted and stays in view.`,`Dòng của người chơi được làm nổi bật và luôn hiện trên màn hình.`),
         t(`Ties: the player who reached the score first ranks higher.`,`Bằng điểm: ai đạt số điểm đó trước thì xếp trên.`)
@@ -2854,6 +2854,7 @@ function view(l){
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 27, 2026','27/11/2026'),
       ent(t('Leaderboard: online/offline','Bảng xếp hạng: online/offline'),ul([
+        t(`Bot status rule (30% online, rolled when the board or the Victory screen opens) confirmed. "To verify" tag removed.`,`Đã chốt luật trạng thái bot (30% online, random khi mở bảng hoặc màn hình Victory). Bỏ tag "cần xác nhận".`),
         t(`7.4: each row shows an online/offline status. The player is always online. Bots get a random status (30% online) each time the board or the Victory screen opens.`,`Mục 7.4: mỗi dòng hiện trạng thái online/offline. Người chơi luôn online. Bot nhận trạng thái ngẫu nhiên (30% online) mỗi lần mở bảng hoặc màn hình Victory.`)
       ])))+
     day(t('November 25, 2026','25/11/2026'),
