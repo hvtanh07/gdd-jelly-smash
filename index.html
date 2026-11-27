@@ -2162,7 +2162,7 @@ function view(l){
       t(`Cleared cubes give no cannon and no ammo.`,`Khối bị xóa không sinh pháo, không cho đạn.`),
       t(`The new board has no ready match. Each color in the bottom row of the ant grid gets a swap that makes a line of 3.`,`Bàn mới không có match sẵn. Mỗi màu ở hàng dưới cùng của lưới kiến có 1 nước swap ra hàng 3.`),
       withEl+':'+ul([t(`${P.el1} and ${P.el6} stay where they are. Only normal cubes are replaced.`,`${P.el1} và ${P.el6} giữ nguyên chỗ. Chỉ thay khối thường.`),
-        t(`${P.el3}: the key goes to a random cube of the new board. No slot counts down.`,`${P.el3}: chìa khóa chuyển sang 1 khối ngẫu nhiên của bàn mới. Không slot nào giảm.`)+' '+inf])
+        t(`${P.el3}: the key goes to a random cube of the new board. No slot counts down.`,`${P.el3}: chìa khóa chuyển sang 1 khối ngẫu nhiên của bàn mới. Không slot nào giảm.`)])
     ]),unlockB('TBD'),demo('jShuffle'))+
     ent(N.bo3,ul([
       t(`The game takes 3 colors from the bottom row of the ant grid. Fewer than 3 colors there: the rest come from the next rows up.`,`Game lấy 3 màu từ hàng dưới cùng của lưới kiến. Hàng đó ít hơn 3 màu: lấy thêm từ các hàng phía trên.`),
@@ -2699,7 +2699,7 @@ function view(l){
         ],'compact')+
         ul([
           t(`Progress = milestones filled in the last event ÷ 20.`,`Tiến độ = số mốc đã làm đầy ở sự kiện trước ÷ 20.`),
-          t(`Exactly 50% (10 milestones) counts in the upper group.`,`Đúng 50% (10 mốc) tính vào nhóm trên.`)+' '+inf,
+          t(`Exactly 50% (10 milestones) counts in the upper group.`,`Đúng 50% (10 mốc) tính vào nhóm trên.`),
           t(`A player who did not play the last event has 0% and gets Easy or Medium.`,`Người chơi không chơi sự kiện trước có tiến độ 0% và nhận Dễ hoặc Trung bình.`),
           t(`The set is picked when the event starts and does not change during the event.`,`Bộ mốc được chọn khi sự kiện bắt đầu và không đổi trong suốt sự kiện.`)
         ]))+
@@ -2853,6 +2853,11 @@ function view(l){
   const day=(title,body)=>`<div class="sub"><h3><span>${title}</span></h3>${body}</div>`;
   B['change-note']=`<p class="sec-intro">${t('Changes made to this GDD, newest day first.','Các thay đổi của tài liệu này, ngày mới nhất ở trên cùng.')}</p>`+
     day(t('November 27, 2026','27/11/2026'),
+      ent(t('Confirmed rules','Luật đã chốt'),ul([
+        t(`Shuffle (1.5): with a Locked Slot, the key goes to a random cube of the new board. No slot counts down.`,`Shuffle (mục 1.5): khi có Slot khóa, chìa khóa chuyển sang 1 khối ngẫu nhiên của bàn mới. Không slot nào giảm.`),
+        t(`Collection Event: exactly 50% (10 milestones) counts in the upper group.`,`Collection Event: đúng 50% (10 mốc) tính vào nhóm trên.`),
+        t(`"To verify" tags removed from both.`,`Bỏ tag "cần xác nhận" ở cả hai.`)
+      ]))+
       ent(t('Leaderboard: online/offline','Bảng xếp hạng: online/offline'),ul([
         t(`Bot status rule (30% online, rolled when the board or the Victory screen opens) confirmed. "To verify" tag removed.`,`Đã chốt luật trạng thái bot (30% online, random khi mở bảng hoặc màn hình Victory). Bỏ tag "cần xác nhận".`),
         t(`7.4: each row shows an online/offline status. The player is always online. Bots get a random status (30% online) each time the board or the Victory screen opens.`,`Mục 7.4: mỗi dòng hiện trạng thái online/offline. Người chơi luôn online. Bot nhận trạng thái ngẫu nhiên (30% online) mỗi lần mở bảng hoặc màn hình Victory.`)
